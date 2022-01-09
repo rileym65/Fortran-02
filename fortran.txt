@@ -1,0 +1,103 @@
+00001 statement area
+C comment line
+     1 Any character is continuation line
+
+      INTEGER var,var,...
+      LOGICAL var,var,...
+      REAL var,var,...
+      BYTE var,var,...
+      SHORT var,var,...
+      DIMENSION var(size,size,...),...
+      DATA var,var,var/data,data,data/var,var,.../data,data,...
+
+      var = expr
+      ASSIGN line TO var
+      CALL OUT(port,value)
+      CALL POKE(address,value)
+      DO line var=start,end[,step]        (only constants so far)
+      IF (expr) less,equal,greater
+      IF (expr) statement
+      GO TO line
+      GO TO (line,line,line,...),var
+      GO TO var
+      WRITE(lun,fline)var,var,...         (for lun 0, terminal)
+      CONTINUE
+      PAUSE [c]
+      STOP [c]
+      END
+      ASM
+
+Expression operators:
+      +
+      -
+      *
+      /
+      &
+      |
+      ^
+      =
+      <>
+      <
+      >
+      <=
+      >=
+      .AND.
+      .OR.
+      .XOR.
+      .EQ.
+      .NE.
+      .LT.
+      .GT.
+      .LE.
+      .GE.
+      ABS(n)
+      ACOS(n)
+      ASIN(n)
+      ATAN(n)
+      COS(n)
+      EXP(n)
+      FLG(n)
+      FLOAT(n)
+      INP(n)
+      INT(n)
+      LN(n)
+      PEEK(n)
+      RND(n)
+      SGN(n)
+      SIN(n)
+      SQRT(n)
+      TAN(n)
+
+Format specifiers:
+      [n]I[size]
+      [n]X
+      'string'
+
+
+
+Still to implement:
+      COMMON /name/var,var,.../name/var,var,var...
+      EQUIVALENCE (var,var,...),(var,var,...),...
+
+
+      GO TO var,(line,line,...)
+      CALL subr(arg,arg,...)
+      CALL OPEN(lun,filename,reclen)
+      CALL REWIND(lun)
+      CALL APPEND(lun,filename,reclen)
+      CALL CLOSE(lun)
+      RETURN
+      READ(lun[,REC=index],fline,ERR=line,END=line)var,var,...
+      WRITE(lun[,REC=index],fline,ERR=line,END=line)var,var,...
+      FORMAT(spec,spec,...)
+      READ(lun[,REC=index],ERR=line,END=line)var,var,...
+      WRITE(lun[,REC=index],ERR=line,END=line)var,var,...
+
+      PROGRAM name
+      fnmame(arg,arg,...) = expr
+      [type] FUNCTION name(arg,arg,...)
+      SUBROUTINE name(arg,arg,...)
+      SUBROUTINE name
+      CALL sname(arg,arg,...)
+      CALL sname
+      BLOCK DATA

@@ -1,0 +1,7 @@
+fortran
+*.o
+*.for
+*.lst
+*.prg
+*.bin
+
