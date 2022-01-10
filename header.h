@@ -297,6 +297,7 @@ LINK word   asmAddress;
 LINK char   nests[10];
 LINK int    numNests;
 
+extern char* arrayRef(char* line, int v);
 extern void cassign(char* line);
 extern void ccall(char* line);
 extern void ccommon(char* line);

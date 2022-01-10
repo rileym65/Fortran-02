@@ -7,6 +7,7 @@ LIBS =
 LIBDIR =
 OBJS = \
 	addvariable.o \
+	arrayref.o \
 	asm.o \
 	casm.o \
 	cassign.o \
@@ -62,6 +63,7 @@ clean:
 	-rm $(PROJECT)
 
 addvariable.o:   header.h addvariable.c
+arrayref.o:      header.h arrayref.c
 asm.o:           header.h asm.c
 casm.o:          header.h casm.c
 cassign.o:       header.h cassign.c

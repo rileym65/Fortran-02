@@ -15,9 +15,7 @@ void clet(char* line) {
   int  fp;
   int  st;
   int  v;
-  int  dims;
   int  isArray;
-  int  d1;
   char varname[256];
   line = trim(line);
   if (!(*line >= 'a' && *line <= 'z') && !(*line >= 'A' && *line <= 'Z')) {
@@ -65,79 +63,9 @@ void clet(char* line) {
 /* *********************************** */
   if (*line == '(') {
     v = getVariable(varname, module);
-    if (v < 0) return;
-    if (variables[v].dimensions == 0) {
-      showError("Array reference on non-array variable");
-      return;
-      }
-    dims = 1;
-    line++;
-    while (*line != ')' && *line != 0) {
-      line = cexpr(line, 0);
-      if (exprErrors > 0) return;
-      if (dims > 1) {
-        if (dims == 2) d1 = variables[v].sizes[0];
-          else d1 = variables[v].sizes[0] * variables[v].sizes[1];
-        sprintf(buffer,"           ldi     %d                        ; multiply by size",(d1 >> 24) & 0xff);
-        Asm(buffer);
-        Asm("           sex     r7                        ; point x to expr stack");
-        Asm("           stxd");
-        sprintf(buffer,"           ldi     %d",(d1 >> 16) & 0xff);
-        Asm(buffer);
-        Asm("           stxd");
-        sprintf(buffer,"           ldi     %d",(d1 >> 8) & 0xff);
-        Asm(buffer);
-        Asm("           stxd");
-        sprintf(buffer,"           ldi     %d",d1 & 0xff);
-        Asm(buffer);
-        Asm("           stxd");
-        Asm("           sex     r2                        ; point x back to stack");
-        Asm("           sep     scall                     ; perform multiply");
-        Asm("           dw      mul32");
-        Asm("           sep     scall                     ; then add first dimension");
-        Asm("           dw      add32");
-        addDefine("MUL32",1,1);
-        addDefine("ADD32",1,1);
-        }
-      if (*line == ',') {
-        dims++;
-        line++;
-        }
-      }
-    if (*line == 0) {
-      showError("Syntax error");
-      return;
-      }
-    line++;
-    if (dims != variables[v].dimensions) {
-      showError("Incorrect number of dimensions referenced");
-      return;
-      }
-    if (dims > 1) {
-      }
-    Asm("           inc     r7                        ; Recover offset");
-    Asm("           lda     r7");
-    Asm("           plo     rf");
-    Asm("           lda     r7");
-    Asm("           phi     rf");
-    Asm("           inc     r7");
-    
-    if (varType(v) != 'L' && varType(v) != 'B') {
-      Asm("           glo     rf                        ; Shift for data size");
-      Asm("           shl");
-      Asm("           plo     rf");
-      Asm("           ghi     rf");
-      Asm("           shlc");
-      Asm("           phi     rf");
-      }
-    if (varType(v) == 'I' || varType(v) == 'R') {
-      Asm("           glo     rf");
-      Asm("           shl");
-      Asm("           plo     rf");
-      Asm("           ghi     rf");
-      Asm("           shlc");
-      Asm("           phi     rf");
-      }
+     if (v < 0) return;
+    line = arrayRef(line, v);
+    if (line == NULL) return;
     Asm("           ghi     rf                        ; Save offset for later");
     Asm("           stxd");
     Asm("           glo     rf");

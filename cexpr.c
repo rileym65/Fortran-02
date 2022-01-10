@@ -124,6 +124,7 @@ char* evaluate(char *pos, int *err, char* rtype) {
   int  p;
   int  v;
   int  error;
+  int  isArray;
   char ntype;
   char term;
   byte success;
@@ -136,6 +137,7 @@ char* evaluate(char *pos, int *err, char* rtype) {
   *err = 0;
   while (*pos  != 0 && op != OP_END) {
     flag = -1;
+    isArray = 0;
     while (flag) {
       flag = 0;
       if (*pos == '(') {
@@ -284,12 +286,40 @@ char* evaluate(char *pos, int *err, char* rtype) {
               *err = -1;
               return pos;
               }
+            if (*pos == '(') {
+              if (variables[v].dimensions == 0) {
+                showError("Attempt to subscript a non-array variable");
+                *err = -1;
+                return pos;
+                }
+              pos = arrayRef(pos, v);
+              if (pos == NULL) {
+                *err = -1;
+                return pos;
+                }
+              isArray = -1;
+              Asm("           ghi     rf                        ; Save offset for later");
+              Asm("           stxd");
+              Asm("           glo     rf");
+              Asm("           stxd");
+              }
             sprintf(abuffer,"           ldi     %s_%s.1             ; Point to variable",module,token);
             Asm(abuffer);
             Asm("           phi     rf");
             sprintf(abuffer,"           ldi     %s_%s.0             ; Point to variable",module,token);
             Asm(abuffer);
             Asm("           plo     rf");
+            if (isArray) {
+              Asm("           irx                               ; Add array cell offset");
+              Asm("           glo     rf");
+              Asm("           add");
+              Asm("           plo     rf");
+              Asm("           irx");
+              Asm("           ghi     rf");
+              Asm("           adc");
+              Asm("           phi     rf");
+              isArray = 0;
+              }
             Asm("           sex     r7");
             if (variables[v].type == V_BYTE || variables[v].type == V_LOGICAL) {
               Asm("           ldi     0                   ; place value onto expr stack");
