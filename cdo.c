@@ -134,7 +134,7 @@ void cdo(char* line) {
        (end[0] == '-' || (end[0] >= '0' && end[0] <= '9')) &&
        (step[0] >= '0' && step[0] <= '9') ) {
     doLoops[numDoLoops].varStep = 'N';
-    doLoops[numDoLoops].loops = (1 + atoi(end) - atoi(start)) / atoi(step);
+    doLoops[numDoLoops].loops = ((atoi(end) - atoi(start)) / atoi(step)) + 1;
     doLoops[numDoLoops].step = atoi(step);
     value = atoi(start);
     sprintf(buffer,"          ldi   (%s_%s).1                 ; point to variable",variables[v].module, variables[v].name);
