@@ -29,7 +29,6 @@ printf("inline assembly\n");
     else if (fgets(aline, 1023, source) == NULL) flag = 0;
     if (flag) {
       while (strlen(aline) > 0 && aline[strlen(aline)-1] <= 32) aline[strlen(aline)-1] = 0;
-printf("<<%s>>\n",aline);
       pline = aline;
       pline = trim(pline);
       if (strcasecmp(pline,"end") == 0) flag = 0;
