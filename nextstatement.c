@@ -115,6 +115,8 @@ int nextStatement() {
       }
     if (first) {
       strcpy(initialLine, nextLine);
+      while (strlen(initialLine) > 0 && initialLine[strlen(initialLine)-1] <=' ')
+        initialLine[strlen(initialLine)-1] = 0;
       }
     if (first != 0 && nextLine[5] != ' ' && nextLine[5] != '0') {
       showError("Unexpectadly encountered continuation line");
