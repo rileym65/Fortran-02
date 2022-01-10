@@ -38,7 +38,7 @@ typedef unsigned int   dword;
 typedef struct {
   char  name[32];
   char  module[32];
-  byte  commonVar;;
+  byte  commonVar;
   char  common[32];
   word  offset;
   byte  type;
