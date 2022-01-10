@@ -9,7 +9,6 @@
 */
 
 #include "header.h"
-#include <sys/time.h>
 #include <time.h>
 
 // R7 - data stack
@@ -206,4 +205,3 @@ void startup() {
   showCompiler = ctmp;
   if (passNumber == 1) runtime = address;
   }
-
