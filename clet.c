@@ -81,22 +81,50 @@ void clet(char* line) {
       showError("Syntax error");
       *line = 0;
       }
-    sprintf(buffer,"          ldi   (%s_%s+3).1              ; Get destination variable address", module,varname); Asm(buffer);
-    Asm("          phi   rf");
-    sprintf(buffer,"          ldi   (%s_%s+3).0", module,varname); Asm(buffer);
-    Asm("          plo   rf");
-    Asm("          inc   r7                        ; Write expresison result to variable");
-    Asm("          lda   r7");
-    Asm("          str   rf");
-    Asm("          dec   rf");
-    Asm("          lda   r7");
-    Asm("          str   rf");
-    Asm("          dec   rf");
-    Asm("          lda   r7");
-    Asm("          str   rf");
-    Asm("          dec   rf");
-    Asm("          ldn   r7");
-    Asm("          str   rf");
+    if (varType(v) == 'I' || varType(v) == 'R') {
+      sprintf(buffer,"          ldi   (%s_%s+3).1              ; Get destination variable address", module,varname); Asm(buffer);
+      Asm("          phi   rf");
+      sprintf(buffer,"          ldi   (%s_%s+3).0", module,varname); Asm(buffer);
+      Asm("          plo   rf");
+      Asm("          inc   r7                        ; Write expresison result to variable");
+      Asm("          lda   r7");
+      Asm("          str   rf");
+      Asm("          dec   rf");
+      Asm("          lda   r7");
+      Asm("          str   rf");
+      Asm("          dec   rf");
+      Asm("          lda   r7");
+      Asm("          str   rf");
+      Asm("          dec   rf");
+      Asm("          ldn   r7");
+      Asm("          str   rf");
+      }
+    if (varType(v) == 'S') {
+      sprintf(buffer,"          ldi   (%s_%s+1).1              ; Get destination variable address", module,varname); Asm(buffer);
+      Asm("          phi   rf");
+      sprintf(buffer,"          ldi   (%s_%s+1).0", module,varname); Asm(buffer);
+      Asm("          plo   rf");
+      Asm("          inc   r7                        ; Write expresison result to variable");
+      Asm("          lda   r7");
+      Asm("          str   rf");
+      Asm("          dec   rf");
+      Asm("          lda   r7");
+      Asm("          str   rf");
+      Asm("          inc   r7");
+      Asm("          inc   r7");
+      }
+    if (varType(v) == 'B' || varType(v) == 'L') {
+      sprintf(buffer,"          ldi   (%s_%s).1              ; Get destination variable address", module,varname); Asm(buffer);
+      Asm("          phi   rf");
+      sprintf(buffer,"          ldi   (%s_%s).0", module,varname); Asm(buffer);
+      Asm("          plo   rf");
+      Asm("          inc   r7                        ; Write expresison result to variable");
+      Asm("          lda   r7");
+      Asm("          str   rf");
+      Asm("          inc   r7");
+      Asm("          inc   r7");
+      Asm("          inc   r7");
+      }
     }
   }
 
