@@ -12,6 +12,7 @@
 
 int pass(char* filename) {
   int   i;
+  int   size;
   char  tmp[16];
   source = fopen(filename,"r");
   if (source == NULL) {
@@ -97,62 +98,84 @@ int pass(char* filename) {
   Asm("DATA__:  equ  $");
   for (i=0; i<numVariables; i++) {
     if (strlen(variables[i].common) == 0) {
-      switch (variables[i].type) {
-        case V_BYTE:
-             sprintf(buffer, "%s_%s:    db    %d", 
-                     variables[i].module,
-                     variables[i].name,
-                     variables[i].value);
-             Asm(buffer);
-             break;
-        case V_LOGICAL:
-             sprintf(buffer, "%s_%s:    db    %d", 
-                     variables[i].module,
-                     variables[i].name,
-                     variables[i].value);
-             Asm(buffer);
-             break;
-        case V_SHORT:
-             sprintf(buffer, "%s_%s:    dw    %d", 
-                     variables[i].module,
-                     variables[i].name,
-                     variables[i].value);
-             Asm(buffer);
-             break;
-        case V_INTEGER:
-             sprintf(buffer, "%s_%s:    dw    %d,%d", 
-                     variables[i].module,
-                     variables[i].name,
-                     variables[i].value / 65536,
-                     variables[i].value % 65536);
-             Asm(buffer);
-             break;
-        case V_REAL:
-             sprintf(buffer, "%s_%s:    dw    %d,%d", 
-                     variables[i].module,
-                     variables[i].name,
-                     variables[i].value / 65536,
-                     variables[i].value % 65536);
-             Asm(buffer);
-             break;
-        case V_DEFAULT:
-             if ((variables[i].name[0] >= 'i' && variables[i].name[0] <= 'n') ||
-                 (variables[i].name[0] >= 'I' && variables[i].name[0] <= 'N')) {
+      if (variables[i].dimensions > 0) {
+        size = variables[i].sizes[0];
+        if (variables[i].dimensions > 1)
+          size *= variables[i].sizes[1];
+        if (variables[i].dimensions > 2)
+          size *= variables[i].sizes[2];
+        switch (varType(i)) {
+          case 'I': size *= 4; break;
+          case 'R': size *= 4; break;
+          case 'S': size *= 2; break;
+          case 'L': size *= 1; break;
+          case 'B': size *= 1; break;
+          default : size *= 4; break;
+          }
+        sprintf(buffer, "%s_%s:    ds    %d", 
+                variables[i].module,
+                variables[i].name,
+                size);
+        Asm(buffer);
+        }
+      else {
+        switch (variables[i].type) {
+          case V_BYTE:
+               sprintf(buffer, "%s_%s:    db    %d", 
+                       variables[i].module,
+                       variables[i].name,
+                       variables[i].value);
+               Asm(buffer);
+               break;
+          case V_LOGICAL:
+               sprintf(buffer, "%s_%s:    db    %d", 
+                       variables[i].module,
+                       variables[i].name,
+                       variables[i].value);
+               Asm(buffer);
+               break;
+          case V_SHORT:
+               sprintf(buffer, "%s_%s:    dw    %d", 
+                       variables[i].module,
+                       variables[i].name,
+                       variables[i].value);
+               Asm(buffer);
+               break;
+          case V_INTEGER:
                sprintf(buffer, "%s_%s:    dw    %d,%d", 
                        variables[i].module,
                        variables[i].name,
                        variables[i].value / 65536,
                        variables[i].value % 65536);
                Asm(buffer);
-               }
-             else {
+               break;
+          case V_REAL:
                sprintf(buffer, "%s_%s:    dw    %d,%d", 
                        variables[i].module,
                        variables[i].name,
                        variables[i].value / 65536,
                        variables[i].value % 65536);
                Asm(buffer);
-               }
+               break;
+          case V_DEFAULT:
+               if ((variables[i].name[0] >= 'i' && variables[i].name[0] <= 'n') ||
+                   (variables[i].name[0] >= 'I' && variables[i].name[0] <= 'N')) {
+                 sprintf(buffer, "%s_%s:    dw    %d,%d", 
+                         variables[i].module,
+                         variables[i].name,
+                         variables[i].value / 65536,
+                         variables[i].value % 65536);
+                 Asm(buffer);
+                 }
+               else {
+                 sprintf(buffer, "%s_%s:    dw    %d,%d", 
+                         variables[i].module,
+                         variables[i].name,
+                         variables[i].value / 65536,
+                         variables[i].value % 65536);
+                 Asm(buffer);
+                 }
+          }
 
         }
       }
