@@ -25,7 +25,9 @@ int pass(char* filename) {
   lineCount = -1;
   nextLabel = 1;
   numDoLoops = 0;
+  Asm("BEGIN__:  equ  $");
   startup();
+  Asm("PROGRAM__:  equ  $");
   inUnit = 0;
   strcpy(module,"main");
   while (nextStatement() != 0) {
@@ -36,6 +38,7 @@ int pass(char* filename) {
       }
     }
   fclose(source);
+  Asm("RUNTIME__:  equ  $");
   if (showCompiler && passNumber == 2) printf("%04x:",address);
   if (useStg) {
     Asm("            ldi  STG_.1");
@@ -66,6 +69,7 @@ int pass(char* filename) {
     }
   if (passNumber == 2 && showCompiler) printf("\n");
   library();
+  Asm("ENDRUNTIME__:  equ  $");
   if (useData) {
     if (passNumber == 1) { 
       dataAddress = address;
@@ -90,6 +94,7 @@ int pass(char* filename) {
     if (passNumber == 2 && showCompiler) printf("\n");
     }
 
+  Asm("DATA__:  equ  $");
   for (i=0; i<numVariables; i++) {
     if (strlen(variables[i].common) == 0) {
       switch (variables[i].type) {
