@@ -100,6 +100,7 @@ int nextStatement() {
         return 0;
         }
       fgets(nextLine, 1023, source);
+      nextLine[71] = 0;
       lineCount++;
       if (strlen(nextLine) > 0) {
         if (nextLine[0] == 'c' || nextLine[0] == 'C')
