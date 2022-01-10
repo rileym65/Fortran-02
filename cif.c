@@ -85,12 +85,14 @@ void cif(char* line) {
   Asm(buffer);
 
   if (strncasecmp(line, "assign", 6) == 0)         cassign(line+6);
+  else if (strncasecmp(line, "call", 4) == 0)      ccall(line+4);
   else if (strncasecmp(line, "continue", 8) == 0)  ccontinue(line+8);
   else if (strncasecmp(line, "end", 3) == 0)       cend(line+3);
   else if (strncasecmp(line, "goto", 4) == 0)      cgoto(line+4);
   else if (strncasecmp(line, "if", 2) == 0)        cif(line+2);
   else if (strncasecmp(line, "pause", 5) == 0)     cpause(line+5);
   else if (strncasecmp(line, "stop", 4) == 0)      cstop(line+4);
+  else if (strncasecmp(line, "write", 5) == 0)     cwrite(line+5);
   else clet(line);
 
 
