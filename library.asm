@@ -529,26 +529,39 @@ fmtwrt_x:   ldi     ' '                ; write a blank to output
             inc     r8
             lbr     fmtloop            ; otherwise check next specifier
 
-fmtwrt_lp:  ldn     r9                 ; get type from data
-            lbz     fmtwrt_dn          ; jump if end of list
-            smi     'I'                ; is it an integer
-            lbz     fmtwrt_i           ; jump if integer
-            ldn     r9                 ; get type again
-            smi     'R'                ; check for real data
-            lbz     fmtwrt_r           ; jump if so
-; unknown type
-            inc     r9                 ; skip unknown entry
-            inc     r9
-            inc     r9
-            lbr     fmtwrt_lp          ; loop back for next variable
-
-fmtwrt_i:   inc     r9                 ; move past data type
-            lda     r9                 ; point to data
+            /* ************************ */
+            /* ***** I Conversion ***** */
+            /* ************************ */
+fmtwrt_lp:  ldn     r8                 ; get current conversion
+            smi     'I'                ; is it integer
+            lbz     fmtwrt_i           ; jump if so
+            lbr     fmtwrt_dn          ; done if not valid conversion
+fmtwrt_i:   lda     r9                 ; get next variable type
+            lbz     fmtwrt_dn          ; done if no more variables
+            plo     re                 ; save type for a moment
+            lda     r9                 ; retrieve address of data
             phi     rf
             lda     r9
             plo     rf
-            lda     rf                 ; retrieve value
-            sex     r7                 ; place onto expression stack
+            glo     re                 ; get conversion
+            sex     r7                 ; point to expr stack
+            smi     'I'                ; is it an integer
+            lbz     fmtwrt_i4          ; jump if so
+            glo     re                 ; recover conversion
+            smi     'S'                ; is it a short
+            lbz     fmtwrt_i2          ; jump if so
+            glo     re                 ; recover conversion
+            smi     'B'                ; is it a byte
+            lbz     fmtwrt_i1          ; jump if so
+            glo     re                 ; recover conversion
+            smi     'L'                ; is it a logical
+            lbz     fmtwrt_i1          ; jump if so
+            glo     re                 ; recover conversion
+            smi     'R'                ; is it a Real
+            lbz     fmtwrt_ir          ; jump if so
+            sex     r2                 ; point x back to stack
+            lbr     fmtwrt_dn          ; unknown type ends
+fmtwrt_ir:  lda     rf                 ; place variable value on expr stack
             stxd
             lda     rf
             stxd
@@ -557,11 +570,66 @@ fmtwrt_i:   inc     r9                 ; move past data type
             lda     rf
             stxd
             sex     r2                 ; point x back to stack
-            ghi     r7                 ; point to data item
-            phi     rf
-            glo     r7
-            plo     rf
-            inc     rf
+            ghi     r8                 ; save consumed registers
+            stxd
+            glo     r8
+            stxd
+            ghi     r9
+            stxd
+            glo     r9
+            stxd
+            ghi     ra
+            stxd
+            glo     ra
+            stxd
+            ghi     rb
+            stxd
+            glo     rb
+            stxd
+            sep     scall              ; convert floating point to integer
+            dw      ftoi
+            irx                        ; recover consumed registers
+            ldxa
+            plo     rb
+            ldxa
+            phi     rb
+            ldxa
+            plo     ra
+            ldxa
+            phi     ra
+            ldxa
+            plo     r9
+            ldxa
+            phi     r9
+            ldxa
+            plo     r8
+            ldx
+            phi     r8
+            lbr     fmtwrt_ia          ; then process as an integer
+fmtwrt_i1:  ldi     0                  ; first 3 bytes are zero
+            stxd                       ; push to expr stack
+            stxd
+            stxd
+            lda     rf                 ; get byte from variable
+            stxd                       ; push to expr stack
+            lbr     fmtwrt_ia          ; then continue
+fmtwrt_i2:  ldi     0                  ; first 2 bytes are zero
+            stxd                       ; push to expr stack
+            stxd
+            lda     rf                 ; get byte from variable
+            stxd                       ; push to expr stack
+            lda     rf                 ; get byte from variable
+            stxd                       ; push to expr stack
+            lbr     fmtwrt_ia          ; then continue
+fmtwrt_i4:  lda     rf                 ; place variable value on expr stack
+            stxd
+            lda     rf
+            stxd
+            lda     rf
+            stxd
+            lda     rf
+            stxd
+fmtwrt_ia:  sex     r2                 ; point x back to stack
             ldi     scratch1_.1        ; where to put conversion
             phi     rd
             ldi     scratch1_.0
@@ -582,55 +650,14 @@ fmtwrt_i:   inc     r9                 ; move past data type
             stxd
             glo     rb
             stxd
+            ghi     r7                 ; point to data item
+            phi     rf
+            glo     r7
+            plo     rf
+            inc     rf
             sep     scall              ; convert integer to ascii
             dw      itoa32
-            lbr     fmtwrt_fmt         ; now format it
-
-fmtwrt_r:   inc     r9                 ; move past data type
-            lda     r9                 ; point to data
-            phi     rf
-            lda     r9
-            plo     rf
-            lda     rf                 ; retrieve value
-            sex     r7                 ; place onto expression stack
-            stxd
-            lda     rf
-            stxd
-            lda     rf
-            stxd
-            lda     rf
-            stxd
-            sex     r2                 ; point x back to stack
-            ghi     r7                 ; point to data item
-            phi     rf
-            glo     r7
-            plo     rf
-            inc     rf
-            ldi     scratch1_.1        ; where to put conversion
-            phi     rd
-            ldi     scratch1_.0
-            plo     rd
-            ghi     r8                 ; save consumed registers
-            stxd
-            glo     r8
-            stxd
-            ghi     r9
-            stxd
-            glo     r9
-            stxd
-            ghi     ra
-            stxd
-            glo     ra
-            stxd
-            ghi     rb
-            stxd
-            glo     rb
-            stxd
-            sep     scall              ; convert integer to ascii
-            dw      ftoa
-            lbr     fmtwrt_fmt         ; now format it
-
-fmtwrt_fmt: irx                        ; recover consumed registers
+            irx                        ; recover consumed registers
             ldxa
             plo     rb
             ldxa
@@ -651,11 +678,6 @@ fmtwrt_fmt: irx                        ; recover consumed registers
             inc     r7
             inc     r7
             inc     r7
-            ldn     r8                 ; get format type
-            smi     'I'                ; jump if integer
-            lbz     fmtwrt_fi          ; jump if I conversion
-            lbr     fmtwrt_dn          ; done if invalid conversion
-          
 fmtwrt_fi:  ldi     scratch1_.1        ; point to ascii value
             phi     rf
             ldi     scratch1_.0
