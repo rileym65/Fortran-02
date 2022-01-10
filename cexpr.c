@@ -258,16 +258,13 @@ char* evaluate(char *pos, int *err, char* rtype) {
           numbers[nstack++] = ntype;
           term = -1;
           pos--;
-          sprintf(abuffer,"           ldi     %d                  ; Push constant onto expr stack",(number & 0xff000000) >> 24); Asm(abuffer);
-          Asm("           sex     r7");
-          Asm("           stxd");
-          sprintf(abuffer,"           ldi     %d",(number & 0xff0000) >> 16); Asm(abuffer);
-          Asm("           stxd");
-          sprintf(abuffer,"           ldi     %d",(number & 0xff00) >> 8); Asm(abuffer);
-          Asm("           stxd");
-          sprintf(abuffer,"           ldi     %d",number & 0xff); Asm(abuffer);
-          Asm("           stxd");
-          Asm("           sex     r2");
+            Asm("           sep     scall                     ; push constant to expr stack");
+            Asm("           dw      epush");
+            sprintf(abuffer,"           db      %d,%d,%d,%d",
+              (number >> 24) & 0xff,
+              (number >> 16) & 0xff,
+              (number >> 8) & 0xff,
+              number & 0xff); Asm(abuffer);
           }
 
         if (term == 0) {
@@ -303,63 +300,73 @@ char* evaluate(char *pos, int *err, char* rtype) {
               Asm("           glo     rf");
               Asm("           stxd");
               }
-            sprintf(abuffer,"           ldi     %s_%s.1             ; Point to variable",module,token);
-            Asm(abuffer);
-            Asm("           phi     rf");
-            sprintf(abuffer,"           ldi     %s_%s.0             ; Point to variable",module,token);
-            Asm(abuffer);
-            Asm("           plo     rf");
-            if (isArray) {
-              Asm("           irx                               ; Add array cell offset");
-              Asm("           glo     rf");
-              Asm("           add");
-              Asm("           plo     rf");
-              Asm("           irx");
-              Asm("           ghi     rf");
-              Asm("           adc");
+            if ((varType(v) == 'I' || varType(v) == 'R') && isArray == 0) {
+              Asm("           sep     scall                     ; push variable to expr stack");
+              Asm("           dw      vpush32");
+              sprintf(abuffer,"           dw      %s_%s",module,token);
+              Asm(abuffer);
+              if (varType(v) == 'I') numbers[nstack++] = 'I';
+              if (varType(v) == 'R') numbers[nstack++] = 'R';
+              }
+            else {
+              sprintf(abuffer,"           ldi     %s_%s.1             ; Point to variable",module,token);
+              Asm(abuffer);
               Asm("           phi     rf");
-              isArray = 0;
-              }
-            Asm("           sex     r7");
-            if (variables[v].type == V_BYTE || variables[v].type == V_LOGICAL) {
-              Asm("           ldi     0                   ; place value onto expr stack");
-              Asm("           stxd");
-              Asm("           stxd");
-              Asm("           stxd");
-              Asm("           ldn     rf");
-              Asm("           stxd");
-              numbers[nstack++] = 'I';
-              }
-            else if (variables[v].type == V_SHORT) {
-              Asm("           ldi     0                   ; place value onto expr stack");
-              Asm("           stxd");
-              Asm("           stxd");
-              Asm("           lda     rf");
-              Asm("           stxd");
-              Asm("           ldn     rf");
-              Asm("           stxd");
-              numbers[nstack++] = 'I';
-              }
-            else if (variables[v].type == V_INTEGER ||
-                     variables[v].type == V_REAL ||
-                     variables[v].type == V_DEFAULT) {
-              Asm("           lda     rf                  ; place value onto expr stack");
-              Asm("           stxd");
-              Asm("           lda     rf");
-              Asm("           stxd");
-              Asm("           lda     rf");
-              Asm("           stxd");
-              Asm("           ldn     rf");
-              Asm("           stxd");
-              if (variables[v].type == V_INTEGER) numbers[nstack++] = 'I';
-              if (variables[v].type == V_REAL) numbers[nstack++] = 'R';
-              if (variables[v].type == V_DEFAULT) {
-                if (variables[v].name[0] >= 'i' && variables[v].name[0] <= 'n') numbers[nstack++] = 'I';
-                else if (variables[v].name[0] >= 'I' && variables[v].name[0] <= 'N') numbers[nstack++] = 'I';
-                else numbers[nstack++] = 'R';
+              sprintf(abuffer,"           ldi     %s_%s.0             ; Point to variable",module,token);
+              Asm(abuffer);
+              Asm("           plo     rf");
+              if (isArray) {
+                Asm("           irx                               ; Add array cell offset");
+                Asm("           glo     rf");
+                Asm("           add");
+                Asm("           plo     rf");
+                Asm("           irx");
+                Asm("           ghi     rf");
+                Asm("           adc");
+                Asm("           phi     rf");
+                isArray = 0;
                 }
+              Asm("           sex     r7");
+              if (variables[v].type == V_BYTE || variables[v].type == V_LOGICAL) {
+                Asm("           ldi     0                   ; place value onto expr stack");
+                Asm("           stxd");
+                Asm("           stxd");
+                Asm("           stxd");
+                Asm("           ldn     rf");
+                Asm("           stxd");
+                numbers[nstack++] = 'I';
+                }
+              else if (variables[v].type == V_SHORT) {
+                Asm("           ldi     0                   ; place value onto expr stack");
+                Asm("           stxd");
+                Asm("           stxd");
+                Asm("           lda     rf");
+                Asm("           stxd");
+                Asm("           ldn     rf");
+                Asm("           stxd");
+                numbers[nstack++] = 'I';
+                }
+              else if (variables[v].type == V_INTEGER ||
+                       variables[v].type == V_REAL ||
+                       variables[v].type == V_DEFAULT) {
+                Asm("           lda     rf                  ; place value onto expr stack");
+                Asm("           stxd");
+                Asm("           lda     rf");
+                Asm("           stxd");
+                Asm("           lda     rf");
+                Asm("           stxd");
+                Asm("           ldn     rf");
+                Asm("           stxd");
+                if (variables[v].type == V_INTEGER) numbers[nstack++] = 'I';
+                if (variables[v].type == V_REAL) numbers[nstack++] = 'R';
+                if (variables[v].type == V_DEFAULT) {
+                  if (variables[v].name[0] >= 'i' && variables[v].name[0] <= 'n') numbers[nstack++] = 'I';
+                  else if (variables[v].name[0] >= 'I' && variables[v].name[0] <= 'N') numbers[nstack++] = 'I';
+                  else numbers[nstack++] = 'R';
+                  }
+                }
+              Asm("           sex     r2");
               }
-            Asm("           sex     r2");
             term = -1;
             pos--;
             }
