@@ -473,6 +473,9 @@ nobs:       inc     ra
 #redefine ITOA32
 #redefine FTOA
 #redefine STRLEN
+#redefine USEFP
+#redefine DIVFP
+#redefine MULFP
 ; ****************************************
 ; ***** Formatted write              *****
 ; ***** R8 - Pointer to format list  *****
