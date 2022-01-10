@@ -167,11 +167,11 @@ int main(int argc, char** argv, char** envp) {
     if (strncasecmp(envp[i],"home=",5) == 0) {
       strcpy(temp,envp[i]+5);
       if (temp[strlen(temp)-1] != '/') strcat(temp,"/");
-      strcat(temp,".sbc.rc");
+      strcat(temp,".fortran.rc");
       optionFile(temp);
       }
     }
-  optionFile("sbc.rc");
+  optionFile("fortran.rc");
   strcpy(temp, baseName);
   strcat(temp, ".rc");
   optionFile(temp);
