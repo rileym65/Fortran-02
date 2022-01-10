@@ -50,6 +50,7 @@
 char* convertNumber(char* buffer, dword* value, byte* success, int* error, char* ntype) {
   char token[32];
   int  pos;
+  int  shift;
   INTREAL ir;
   *error = 0;
   *value = 0;
@@ -57,8 +58,12 @@ char* convertNumber(char* buffer, dword* value, byte* success, int* error, char*
   *ntype = 'I';
   if (*buffer == '\'') {
     buffer++;
+    shift = 24;
     while (*buffer != 0 && *buffer != '\'') {
-      *value = (*value << 8) + *buffer++;
+      if (shift >= 0)
+        *value |= (*buffer << shift);
+      shift -= 8;
+      buffer++;
       }
     if (*buffer == 0) {
       showError("Unexpected end of line");

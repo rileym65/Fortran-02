@@ -21,6 +21,7 @@ void cdata(char* line) {
   int  count;
   int  isFloat;
   int  flag;
+  int  shift;
   dword value;
   INTREAL ir;
   while (*line != 0) {
@@ -110,8 +111,13 @@ void cdata(char* line) {
         token[pos] = 0;
         if (token[0] == '\'') {
           ir.integer = 0;
-          for (j=1; j<strlen(token); j++)
-            ir.integer = (ir.integer << 8) | token[j];
+          shift = 24;
+          for (j=1; j<strlen(token); j++) {
+            if (shift >= 0) {
+              ir.integer |= (token[j] << shift);
+              shift -= 8;
+              }
+            }
           }
         else if (token[0] == 'X') {
           ir.integer = 0;

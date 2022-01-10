@@ -529,13 +529,72 @@ fmtwrt_x:   ldi     ' '                ; write a blank to output
             inc     r8
             lbr     fmtloop            ; otherwise check next specifier
 
-            /* ************************ */
-            /* ***** I Conversion ***** */
-            /* ************************ */
 fmtwrt_lp:  ldn     r8                 ; get current conversion
             smi     'I'                ; is it integer
             lbz     fmtwrt_i           ; jump if so
+            ldn     r8                 ; get current conversion
+            smi     'A'                ; check for A conversion
+            lbz     fmtwrt_a           ; jump if so
             lbr     fmtwrt_dn          ; done if not valid conversion
+
+            /* ************************ */
+            /* ***** A Conversion ***** */
+            /* ************************ */
+fmtwrt_a:   lda     r9                 ; get next variable type
+            plo     re                 ; save for now
+            lbz     fmtwrt_dn          ; done if no more variables
+            lda     r9                 ; retrieve address of variable
+            phi     rf
+            lda     r9
+            plo     rf
+            inc     r8                 ; get field width
+            ldn     r8
+            plo     rc
+            dec     r8
+            glo     re                 ; now check variable type
+            smi     'B'                ; check for byte
+            lbz     fmtwrt_a1          ; jump if so
+            glo     re                 ; now check variable type
+            smi     'L'                ; check for logical
+            lbz     fmtwrt_a1          ; jump if so
+            glo     re                 ; now check variable type
+            smi     'S'                ; check for short
+            lbz     fmtwrt_a2          ; jump if so
+            glo     re                 ; now check variable type
+            smi     'I'                ; check for integer
+            lbz     fmtwrt_a4          ; jump if so
+            glo     re                 ; now check variable type
+            smi     'R'                ; check for real
+            lbz     fmtwrt_a4          ; jump if so
+            lbr     fmtwrt_dn          ; invalid type ends write
+fmtwrt_a1:  ldi     1                  ; 1 character
+            lbr     fmtwrt_aa
+fmtwrt_a2:  ldi     2                  ; 2 characters
+            lbr     fmtwrt_aa
+fmtwrt_a4:  ldi     4                  ; 4 characters
+fmtwrt_aa:  phi     rc                 ; store count
+fmtwrt_ab:  lda     rf                 ; get byte from variable
+            lbz     fmtwrt_ac          ; jump if no more ascii data
+            str     rb                 ; write to output buffer
+            inc     rb
+            dec     rc                 ; decrement field width
+            glo     rc                 ; see if field width reached
+            lbz     fmtwrt_e1          ; end of entry if so
+            ghi     rc                 ; get source count
+            smi     1                  ; subtract 1
+            phi     rc                 ; and put it back
+            lbnz    fmtwrt_ab          ; continue copying if not done
+fmtwrt_ac:  ldi     ' '                ; write a space to the output
+            str     rb
+            inc     rb
+            dec     rc                 ; decrement field width
+            glo     rc                 ; see if done
+            lbnz    fmtwrt_ac          ; loop back if not
+            lbr     fmtwrt_e1          ; otherwise done with item
+
+            /* ************************ */
+            /* ***** I Conversion ***** */
+            /* ************************ */
 fmtwrt_i:   lda     r9                 ; get next variable type
             lbz     fmtwrt_dn          ; done if no more variables
             plo     re                 ; save type for a moment
