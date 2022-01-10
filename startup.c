@@ -9,12 +9,20 @@
 */
 
 #include "header.h"
+#include <sys/time.h>
+#include <time.h>
 
 // R7 - data stack
 
 void startup() {
   char ctmp;
   word t1,t2,t3;
+  struct tm tv;
+
+  time_t epochSeconds;
+  epochSeconds = time(NULL);
+  localtime_r(&(epochSeconds), &(tv));
+
   ctmp = showCompiler;
   showCompiler = 0;
   Asm("scall:      equ  r4");
@@ -29,7 +37,21 @@ void startup() {
     t3 = programStart;
     sprintf(buffer,"          dw   %d,%d,%d",t1,t2,t3); Asm(buffer);
     }
-  if (useElfos || useStg) {
+  if (useElfos ) {
+    Asm("init:       br   estart");
+    sprintf(buffer,"            db   %d,%d",tv.tm_mon+0x81,tv.tm_mday);
+    Asm(buffer);
+    sprintf(buffer,"            dw   %d",tv.tm_year+1900);
+    Asm(buffer);
+    sprintf(buffer,"            dw   %d",tv.tm_year+1900);
+    Asm("            dw   0");
+    sprintf(buffer,"            db   'Fortran/02 v%s %02d:%02d:%02d '",
+            VERSION,tv.tm_hour, tv.tm_min, tv.tm_sec);
+    Asm(buffer);
+    Asm("            db   '32-bits',0");
+    Asm("estart:     lbr  start");
+    }
+  else if (useStg) {
     Asm("init:       lbr  start");
     }
   else {

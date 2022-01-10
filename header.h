@@ -22,6 +22,8 @@
 #define LINK extern
 #endif
 
+#define VERSION  "0.1.0"
+
 typedef unsigned char byte;
 typedef unsigned short word;
 typedef unsigned int   dword;
