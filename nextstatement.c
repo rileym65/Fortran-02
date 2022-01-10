@@ -104,6 +104,8 @@ int nextStatement() {
       if (strlen(nextLine) > 0) {
         if (nextLine[0] == 'c' || nextLine[0] == 'C')
           strcpy(nextLine, "");
+        if (nextLine[0] == '.')
+          strcpy(nextLine, "");
         valid = 0;
         for (i=0; i<strlen(nextLine); i++)
           if (nextLine[i] > ' ') valid = -1;
