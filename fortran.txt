@@ -101,3 +101,65 @@ Still to implement:
       CALL sname(arg,arg,...)
       CALL sname
       BLOCK DATA
+
+Compiler Directives:
+.1805           - Enable 1804/5/6 assembler mode
+.32             - Enable 32-bit mode (on by default)
+.binary         - Output file as binary
+.fp             - Enable floating-point mode (on by default)
+.elfos          - Produce Elf/OS executable
+.list           - Show source list
+.nolist         - Turn off source list
+.noruntime      - Do not show runtime modules
+.nosymbols      - Do not show assembler symbols
+.novars         - Do not show variables
+.options        - Show options in effect
+.runtime        - Show runtime modules
+.symbols        - Show assembler symbols
+.vars           - Show variables
+
+Switches:
+-32             - compile in 32-bit mode (on by default)
+-fp             - enable floating point (on by default)
+-a              - produce assembly file
+-A              - display assembly
+-b              - output as binary
+-c              - show compiler output
+-i              - output as Intel hex
+-l              - show source list
+-L              - create .lst file
+-o              - show options in effect
+-r              - output as RCS hex
+-R              - show runtime modules
+-s              - show assembler symbols
+-v              - show variables
+-lf             - set line endings to line-feed
+-cr             - set line endings to carriag-return
+-lfcr           - set line endings to line-feed/carriage-return
+-crlf           - set line endings to carriage-return/line-feed
+-nq             - normal Q for internal serial port
+-rq             - reverse Q for internal serial port
+-ef?            - Set EF line for internal serial port (?=1-4)
+-ref?           - Set reverse EF line for internal serial port (?=1-4)
+-ram=start-end  - set ram address range
+-rom=start-end  - set rom address range
+-start=hex      - Set start address
+-exit=hex       - Set address to jump to on exit
+-vars=hex       - Start of variable table
+-stack=hex      - set address for top of stack
+-estack=hex     - set address for top of expression stack
+-heap=hex       - set address for top of heap
+-keybuf=hex     - size of key buffer
+-term=bios      - use BIOS terminal i/o (default)
+     =self      - use internal serial i/o
+     =none      - no terminal
+-elfos          - produce an Elf/OS executable
+-stg            - produce STG compatible image (sets -exit=8003)
+-melf           - -ram=0000-7fff -rom=8000-ffff -nq -ef2
+-pev            - -ram=0000-7fff -rom=8000-ffff -nq -ef2
+-pev2           - -ram=0000-7fff -rom=8000-ffff -rq -ref2
+-elf2k          - -ram=0000-7fff -rom=8000-ffff -nq -ef3
+-mclo           - -ram=0000-7fff -rom=8000-ffff -nq -ef3
+-mchi           - -ram=8000-ffff -rom=0000-7fff -nq -ef3
+-mchip          - -ram=8000-ffff -rom=0000-7fff -rq -ref3
+
