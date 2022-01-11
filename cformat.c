@@ -46,7 +46,7 @@ void cformat(char* line) {
       else count = 1;
       ftype = *line++;
       if (ftype >= 'a' && ftype <= 'z') ftype -= 32;
-      if (ftype != 'I' && ftype != 'X' && ftype != 'A') {
+      if (ftype != 'I' && ftype != 'X' && ftype != 'A' && ftype != 'L') {
         showError("Invalid format specifier");
         return;
         }
