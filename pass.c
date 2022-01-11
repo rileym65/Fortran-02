@@ -183,7 +183,7 @@ int pass(char* filename) {
 
   sprintf(buffer,"iobuffer:  ds    %d",iBufferSize); Asm(buffer);
   if (getDefine("FMTWRITE")) {
-    Asm("SCRATCH1_: ds    32");
+    Asm("SCRATCH1_: ds    64");
     Asm("SCRATCH2_: ds    32");
     }
   if (getDefine("LFSR")) {

@@ -504,6 +504,7 @@ nobs:       inc     ra
 #redefine USEFP
 #redefine DIVFP
 #redefine MULFP
+#redefine FROMSCI
 ; ****************************************
 ; ***** Formatted write              *****
 ; ***** R8 - Pointer to format list  *****
@@ -561,12 +562,240 @@ fmtwrt_lp:  ldn     r8                 ; get current conversion
             smi     'I'                ; is it integer
             lbz     fmtwrt_i           ; jump if so
             ldn     r8                 ; get current conversion
+            smi     'F'                ; check for F conversion
+            lbz     fmtwrt_f           ; jump if so
+            ldn     r8                 ; get current conversion
             smi     'A'                ; check for A conversion
             lbz     fmtwrt_a           ; jump if so
             ldn     r8                 ; get current conversion
             smi     'L'                ; check for L conversion
             lbz     fmtwrt_l           ; jump if so
             lbr     fmtwrt_dn          ; done if not valid conversion
+
+            /* ************************ */
+            /* ***** F Conversion ***** */
+            /* ************************ */
+fmtwrt_f:   lda     r9                 ; get next variable type
+            plo     re                 ; save for now
+            lbz     fmtwrt_dn          ; done if no more variables
+            lda     r9                 ; retrieve address of variable
+            phi     rf
+            lda     r9
+            plo     rf
+            glo     re                 ; now check variable type
+            smi     'B'                ; check for byte
+            lbz     fmtwrt_f1          ; jump if so
+            glo     re
+            smi     'L'                ; check for logical
+            lbz     fmtwrt_f1          ; jump if so
+            glo     re
+            smi     'S'                ; check for short
+            lbz     fmtwrt_f2          ; jump if so
+            glo     re
+            smi     'I'                ; check for integer
+            lbz     fmtwrt_f4          ; jump if so
+            glo     re
+            smi     'R'                ; check for real
+            lbz     fmtwrt_fr          ; jump if so
+            lbr     fmtwrt_dn          ; done if not valid conversion
+fmtwrt_f1:  ldi     0                  ; push byte variable to expr stack
+            sex     r7
+            stxd
+            stxd
+            stxd
+            lbr     fmtwrt_f1a         ; then retrieve variable
+fmtwrt_f2:  ldi     0                  ; push byte variable to expr stack
+            sex     r7
+            stxd
+            stxd
+            lbr     fmtwrt_f2a         ; then retrieve variable
+fmtwrt_f4:  sex     r7                 ; point x to expr stack
+            lda     rf                 ; copy variable contents to expr stack
+            stxd
+            lda     rf
+            stxd
+fmtwrt_f2a: lda     rf
+            stxd
+fmtwrt_f1a: lda     rf
+            stxd
+            sex     r2                 ; point x back to stack
+            ldi     scratch1_.1        ; where to put conversion
+            phi     rd
+            ldi     scratch1_.0
+            plo     rd
+            ghi     r8                 ; save consumed registers
+            stxd
+            glo     r8
+            stxd
+            ghi     r9
+            stxd
+            glo     r9
+            stxd
+            ghi     ra
+            stxd
+            glo     ra
+            stxd
+            ghi     rb
+            stxd
+            glo     rb
+            stxd
+            ghi     r7                 ; point to data item
+            phi     rf
+            glo     r7
+            plo     rf
+            inc     rf
+            sep     scall              ; convert integer to ascii
+            dw      itoa32
+            irx                        ; recover consumed registers
+            ldxa
+            plo     rb
+            ldxa
+            phi     rb
+            ldxa
+            plo     ra
+            ldxa
+            phi     ra
+            ldxa
+            plo     r9
+            ldxa
+            phi     r9
+            ldxa
+            plo     r8
+            ldx
+            phi     r8
+            inc     r7                 ; remove item from expr stack
+            inc     r7
+            inc     r7
+            inc     r7
+            ldi     '.'                ; need a decimal point
+            str     rd                 ; write to number buffer
+            inc     rd
+            inc     r8                 ; get number of decimal points
+            inc     r8
+            ldn     r8
+            plo     rc
+            dec     r8
+            dec     r8
+fmtwrt_fa:  glo     rc                 ; see if done
+            lbz     fmtwrt_fb          ; jump if so
+            ldi     '0'                ; write zero to output
+            str     rd
+            inc     rd
+            dec     rc                 ; decrement count
+            lbr     fmtwrt_fa          ; loop back for more
+fmtwrt_fb:  ldi     0                  ; terminate string
+            str     rd
+            lbr     fmtwrt_fi          ; then send to output
+
+fmtwrt_fr:  sex     r7                 ; point x to expr stack
+            lda     rf                 ; copy variable contents to expr stack
+            stxd
+            lda     rf
+            stxd
+            lda     rf
+            stxd
+            lda     rf
+            stxd
+            sex     r2                 ; point x back to stack
+            ldi     scratch2_.1        ; where to put conversion
+            phi     rd
+            ldi     scratch2_.0
+            plo     rd
+            ghi     r8                 ; save consumed registers
+            stxd
+            glo     r8
+            stxd
+            ghi     r9
+            stxd
+            glo     r9
+            stxd
+            ghi     ra
+            stxd
+            glo     ra
+            stxd
+            ghi     rb
+            stxd
+            glo     rb
+            stxd
+            ghi     r7                 ; point to data item
+            phi     rf
+            glo     r7
+            plo     rf
+            inc     rf
+            sep     scall              ; convert integer to ascii
+            dw      ftoa
+            irx                        ; recover consumed registers
+            ldxa
+            plo     rb
+            ldxa
+            phi     rb
+            ldxa
+            plo     ra
+            ldxa
+            phi     ra
+            ldxa
+            plo     r9
+            ldxa
+            phi     r9
+            ldxa
+            plo     r8
+            ldx
+            phi     r8
+            inc     r7                 ; remove item from expr stack
+            inc     r7
+            inc     r7
+            inc     r7
+            inc     r8                 ; get number of decimal points
+            inc     r8
+            ldn     r8
+            plo     rc
+            dec     r8
+            dec     r8
+            ldi     scratch2_.1        ; where to put conversion
+            phi     rf
+            ldi     scratch2_.0
+            plo     rf
+            ldi     scratch1_.1        ; where to put conversion
+            phi     rd
+            ldi     scratch1_.0
+            plo     rd
+            sep     scall              ; convert from scientific, if needed
+            dw      fromsci
+            inc     r8                 ; get decimal count
+            inc     r8
+            ldn     r8
+            plo     rc
+            dec     r8
+            dec     r8
+            ldi     scratch1_.1        ; point to converted number
+            phi     rf
+            ldi     scratch1_.0
+            plo     rf
+fmtwrt_fr1: lda     rf                 ; get byte from number
+            lbz     fmtwrt_fr4         ; jump if end found
+            smi     '.'                ; looking for a decimal point
+            lbnz    fmtwrt_fr1         ; loop until decimal or end found
+fmtwrt_fr2: lda     rf                 ; get byte from 
+            lbz     fmtwrt_fr3         ; jump if end found
+            dec     rc                 ; decrement count
+            glo     rc                 ; have enough digits been output
+            lbnz    fmtwrt_fr2         ; jump if not
+            ldi     0                  ; terminate the number
+            str     rf
+            lbr     fmtwrt_fi          ; then send to output
+fmtwrt_fr4: dec     rf                 ; move back to zero byte
+            ldi     '.'                ; write a decimal point
+            str     rf
+            inc     rf
+fmtwrt_fr3: ldi     '0'                ; write a zero to output
+            str     rf
+            inc     rf
+            dec     rc                 ; decrement count
+            glo     rc                 ; get count
+            lbnz    fmtwrt_fr3         ; loop until done
+            ldi     0                  ; terminate the number
+            str     rf
+            lbr     fmtwrt_fi          ; then send to output
 
             /* ************************ */
             /* ***** A Conversion ***** */
@@ -891,6 +1120,130 @@ fmtwrt_dn:  ldi     0                  ; terminate record
             dw      f_inmsg
             db      10,13,0
             sep     sret               ; then return to caller
+#endif
+
+#ifdef FROMSCI
+; ********************************************
+; ***** Convert from scientific notation *****
+; ***** RF - Pointer to ASCII number     *****
+; ***** RD - Where to put result         *****
+; ***** Uses: RC.0-exponent              *****
+; *****       RC.1-decimal count         *****
+; ********************************************
+fromsci:    ghi     rf                 ; safe RF for now
+            stxd
+            glo     rf
+            stxd
+fromsci_1:  lda     rf                 ; get byte from input
+            lbz     fromsci_no         ; jump if end reached
+            smi     'E'                ; check for E character
+            lbz     fromsci_y          ; jump if in scientific notation
+            smi     32                 ; check for e character
+            lbz     fromsci_y          ; jump if in scientific notation
+            lbr     fromsci_1          ; loop until either E or end
+fromsci_no: irx                        ; recover source
+            ldxa
+            plo     rf
+            ldx
+            phi     rf
+fromsci_n1: lda     rf                 ; copy input to output
+            str     rd
+            inc     rd
+            lbnz    fromsci_n1         ; loop until terminator copied
+            sep     sret               ; return to caller
+fromsci_y:  ldn     rf                 ; get byte following E
+            smi     '+'                ; is it plus
+            lbz     fromsci_p          ; jump if so
+            ldn     rf                 ; recover byte
+            smi     '-'                ; check for minus
+            lbz     fromsci_n
+            dec     rf                 ; compensate for later increment
+fromsci_p:  ldi     0                  ; signal negative exponent
+            lskp
+fromsci_n:  ldi     1                  ; signal positive exponent
+            phi     rc
+            inc     rf                 ; point to exponent field
+            ldi     0                  ; start exponent at zero
+            plo     rc
+fromsci_l1: lda     rf                 ; get byte from exponent field
+            smi     '0'                ; check if below numbers
+            plo     re                 ; keep a copy
+            lbnf    fromsci_2          ; jump if done reading exponent
+            smi     10                 ; check if above numbers
+            lbdf    fromsci_2          ; jump if done reading exponent
+            glo     rc                 ; multiply rc.0 by 10
+            shl
+            str     r2
+            shl
+            shl
+            or
+            str     r2                 ; now add in new digit
+            glo     re
+            add
+            plo     rc                 ; put result back
+            lbr     fromsci_l1         ; loop until done
+fromsci_2:  irx                        ; recover source
+            ldxa
+            plo     rf
+            ldx
+            phi     rf
+            ldn     rf                 ; get first byte of source
+            smi     '-'                ; check for negative sign
+            lbnz    fromsci_3          ; jump if not
+            ldi     '-'                ; write negative sign to output
+            str     rd
+            inc     rd
+            inc     rf                 ; move past negative sign
+; Need to look for negative exponents here
+fromsci_3:  ghi     rc                 ; check for negative exponent
+            shr
+            lbnf    fromsci_4          ; jump if not
+            idl
+; code following is for positive exponents
+; first part, copy until decimal point is found
+fromsci_4:  lda     rf                 ; get byte from input
+            plo     re                 ; keep a copy
+            smi     '.'                ; is it decimal point
+            lbz     fromsci_4a         ; jump if so
+            glo     re                 ; get character
+            smi     'E'                ; check for E
+            lbz     fromsci_4b 
+            smi     32                 ; check for e
+            lbz     fromsci_4b 
+            glo     re                 ; recover character
+            str     rd                 ; and output it
+            inc     rd
+            lbr     fromsci_4          ; loop back for more
+; now after decimal point through E
+fromsci_4a: lda     rf                 ; get next digit
+            plo     re                 ; keep a copy
+            smi     'E'                ; check for end
+            lbz     fromsci_4b 
+            smi     32
+            lbz     fromsci_4b 
+            glo     re                 ; copy character to output
+            str     rd
+            inc     rd
+            dec     rc                 ; increment count
+            glo     rc                 ; get current count
+            lbnz    fromsci_4a         ; jump if not zero
+            ldi     '.'                ; output a decimal point
+            str     rd
+            inc     rd
+            lbr     fromsci_4a         ; loop until done
+fromsci_4b: glo     rc                 ; get count remaining
+            shl                        ; see if negative
+            lbdf    fromsci_4d         ; jump if done
+fromsci_4c: ldi     '0'                ; write zero to output
+            str     rd
+            inc     rd
+            dec     rc                 ; decrement count
+            glo     rc                 ; see if done
+            lbnz    fromsci_4c         ; loop back if not
+fromsci_4d: ldi     0                  ; terminate result
+            str     rd
+            sep     sret               ; and return to caller
+            
 #endif
 
 ; ***********************************************************************

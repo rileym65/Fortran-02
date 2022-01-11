@@ -46,10 +46,12 @@ void cformat(char* line) {
       else count = 1;
       ftype = *line++;
       if (ftype >= 'a' && ftype <= 'z') ftype -= 32;
-      if (ftype != 'I' && ftype != 'X' && ftype != 'A' && ftype != 'L') {
+      if (ftype != 'I' && ftype != 'X' && ftype != 'A' && ftype != 'L' &&
+          ftype != 'F') {
         showError("Invalid format specifier");
         return;
         }
+      size2 = -1;
       if (*line >= '0' && *line <= '9') {
         size1 = 0;
         while (*line >= '0' && *line <= '9') {
@@ -61,6 +63,16 @@ void cformat(char* line) {
         size1 = 1;
         }
       if (*line == '.') {
+        if (ftype != 'F') {
+          showError("Invalid specifier");
+          return;
+          }
+        size2 = 0;
+        line++;
+        while (*line >= '0' && *line <= '9') {
+          size2 = (size2 * 10) + (*line - '0');
+          line++;
+          }
         }
       else size2 = 0;
       sprintf(buffer,"           db      %d,%d,%d,%d",count,ftype,size1,size2);
