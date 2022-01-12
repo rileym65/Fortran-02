@@ -1189,7 +1189,7 @@ fromsci_l1: lda     rf                 ; get byte from exponent field
             str     r2
             shl
             shl
-            or
+            add
             str     r2                 ; now add in new digit
             glo     re
             add
@@ -1309,6 +1309,7 @@ fromsci_4a: lda     rf                 ; get next digit
             inc     rd
             lbr     fromsci_4a         ; loop until done
 fromsci_4b: glo     rc                 ; get count remaining
+            lbz     fromsci_4d         ; jump if no more decimals
             shl                        ; see if negative
             lbdf    fromsci_4d         ; jump if done
 fromsci_4c: ldi     '0'                ; write zero to output
@@ -1317,6 +1318,9 @@ fromsci_4c: ldi     '0'                ; write zero to output
             dec     rc                 ; decrement count
             glo     rc                 ; see if done
             lbnz    fromsci_4c         ; loop back if not
+            ldi     '.'                ; output a decimal point
+            str     rd
+            inc     rd
 fromsci_4d: ldi     0                  ; terminate result
             str     rd
             sep     sret               ; and return to caller
@@ -5202,9 +5206,12 @@ ftoa_3:     ghi      rd           ; save destination pointer
             stxd
             ldi      0            ; clear E
             phi      r9
-            glo      r9           ; check exponent for greater than 150
-            smi      151
-            lbnf     ftoa_4       ; jump if <= 150
+//            glo      r9           ; check exponent for greater than 150
+//            smi      151
+            glo      r9           ; check exponent for greater than 129
+            smi      129
+
+            lbnf     ftoa_4       ; jump if <= 129
             ghi      r7           ; put number on the stack
             stxd
             glo      r7
@@ -5214,7 +5221,8 @@ ftoa_3:     ghi      rd           ; save destination pointer
             glo      r8
             stxd
 ftoa_3a:    glo      r9           ; get exponent
-            smi      131          ; looking for below 131
+//            smi      131          ; looking for below 131
+            smi      130          ; looking for below 131
             lbnf     ftoa_3z      ; jump if done scaling
             glo      r2           ; point to number
             plo      rf
@@ -5254,9 +5262,11 @@ ftoa_3z:    irx                   ; retrieve the number from the stack
             plo      r7
             ldx
             phi      r7
-ftoa_4:     glo      r9           ; check exponent for less than 114
-            smi      114
-            lbdf     ftoa_5       ; jump if > 114
+; ftoa_4:     glo      r9           ; check exponent for less than 114
+;             smi      114
+ftoa_4:     glo      r9           ; check exponent for less than 127
+            smi      127
+            lbdf     ftoa_5       ; jump if > 127
             ghi      r7           ; put number on the stack
             stxd
             glo      r7
