@@ -1062,6 +1062,7 @@ fmtwrt_ia:  sex     r2                 ; point x back to stack
             inc     r7
             inc     r7
             inc     r7
+
 fmtwrt_fi:  ldi     scratch1_.1        ; point to ascii value
             phi     rf
             ldi     scratch1_.0
@@ -1078,6 +1079,13 @@ fmtwrt_fi:  ldi     scratch1_.1        ; point to ascii value
             ldn     r8
             dec     r8
             sm                         ; subtract data size
+            lbdf    fmtwrt_fi2         ; jump if no overflow
+            plo     re
+            ldi     '*'                ; signal overflow in output
+            str     rb
+            inc     rb
+            inc     rf
+            glo     re
 fmtwrt_fi2: lbz     fmtwrt_c1          ; jump if data matches field size
             plo     rc                 ; put back into counter
             lbnf    fmtwrt_fi1         ; jump if data was wider
