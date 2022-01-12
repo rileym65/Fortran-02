@@ -767,6 +767,8 @@ fmtwrt_fr:  sex     r7                 ; point x to expr stack
             plo     rc
             dec     r8
             dec     r8
+            shl                        ; check for unspecified digits
+            lbdf    fmtwrt_fi          ; jump straitght to output if so
             ldi     scratch1_.1        ; point to converted number
             phi     rf
             ldi     scratch1_.0
@@ -775,12 +777,13 @@ fmtwrt_fr1: lda     rf                 ; get byte from number
             lbz     fmtwrt_fr4         ; jump if end found
             smi     '.'                ; looking for a decimal point
             lbnz    fmtwrt_fr1         ; loop until decimal or end found
-fmtwrt_fr2: lda     rf                 ; get byte from 
+fmtwrt_fr2: glo     rc                 ; see if enough digits have been output
+            lbz     fmtwrt_fr5
+            lda     rf                 ; get byte from 
             lbz     fmtwrt_fr3         ; jump if end found
             dec     rc                 ; decrement count
-            glo     rc                 ; have enough digits been output
-            lbnz    fmtwrt_fr2         ; jump if not
-            ldi     0                  ; terminate the number
+            lbr     fmtwrt_fr2         ; jump if not
+fmtwrt_fr5: ldi     0                  ; terminate the number
             str     rf
             lbr     fmtwrt_fi          ; then send to output
 fmtwrt_fr4: dec     rf                 ; move back to zero byte

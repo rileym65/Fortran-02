@@ -74,7 +74,7 @@ void cformat(char* line) {
           line++;
           }
         }
-      else size2 = 0;
+      else size2 = 0xff;
       sprintf(buffer,"           db      %d,%d,%d,%d",count,ftype,size1,size2);
       Asm(buffer);
       }
