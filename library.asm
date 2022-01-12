@@ -1381,7 +1381,7 @@ round45_lp: str     rf
 round45_l1: dec     rf                 ; point to prior character
             dec     rc                 ; decrement count
             glo     rc                 ; get count
-            lbz     round45_rt         ; done if zero
+            lbz     round45_e          ; done if zero
             ldn     rf                 ; get next digit
             smi     '.'                ; is it the decimal
             lbz     round45_l1         ; jump if so
@@ -1393,6 +1393,20 @@ round45_l1: dec     rf                 ; point to prior character
             ldn     rf                 ; recover character
             smi     10                 ; subtract 10
             lbr     round45_lp         ; and loop back
+round45_e:  inc     rf                 ; move back to first byte
+            ldn     rf                 ; get current byte
+            str     r2                 ; set aside
+            ldi     '1'                ; need a 1
+            str     rf                 ; write it
+round45_e1: inc     rf
+            ldn     rf                 ; get next byte
+            plo     re                 ; set aside
+            ldx                        ; get last byte
+            str     rf                 ; store it
+            lbz     round45_rt         ; done if stored a null
+            glo     re                 ; otherwise get current character
+            str     r2                 ; and save it
+            lbr     round45_e1         ; loop for next character
 #endif
 
 ; ***********************************************************************
