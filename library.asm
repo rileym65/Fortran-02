@@ -790,12 +790,14 @@ fmtwrt_fr4: dec     rf                 ; move back to zero byte
             ldi     '.'                ; write a decimal point
             str     rf
             inc     rf
-fmtwrt_fr3: ldi     '0'                ; write a zero to output
+            skp
+fmtwrt_fr3: dec     rf                 ; move back to terminator
+fmtwrt_fr6: ldi     '0'                ; write a zero to output
             str     rf
             inc     rf
             dec     rc                 ; decrement count
             glo     rc                 ; get count
-            lbnz    fmtwrt_fr3         ; loop until done
+            lbnz    fmtwrt_fr6         ; loop until done
             ldi     0                  ; terminate the number
             str     rf
             lbr     fmtwrt_fi          ; then send to output
@@ -1157,10 +1159,10 @@ fromsci_no: irx                        ; recover source
             plo     rf
             ldx
             phi     rf
-fromsci_n1: lda     rf                 ; copy input to output
+fromsci_x1: lda     rf                 ; copy input to output
             str     rd
             inc     rd
-            lbnz    fromsci_n1         ; loop until terminator copied
+            lbnz    fromsci_x1         ; loop until terminator copied
             sep     sret               ; return to caller
 fromsci_y:  ldn     rf                 ; get byte following E
             smi     '+'                ; is it plus
@@ -1209,7 +1211,71 @@ fromsci_2:  irx                        ; recover source
 fromsci_3:  ghi     rc                 ; check for negative exponent
             shr
             lbnf    fromsci_4          ; jump if not
-            idl
+            ghi     rf                 ; save source
+            stxd
+            glo     rf
+            stxd
+            ldi     0                  ; clear count
+            phi     rc
+fromsci_n1: lda     rf                 ; get byte from input
+            plo     re                 ; keep a copy
+            smi     '.'                ; check for period
+            lbz     fromsci_n2         ; jump if decimal found
+            ghi     re                 ; recover character
+            smi     'E'                ; check for E
+            lbz     fromsci_n2         ; jump if E
+            smi     32                 ; check for e
+            lbz     fromsci_n2         ; jump if so
+            ghi     rc                 ; increment count
+            adi     1
+            phi     rc
+            lbr     fromsci_n1         ; loop until . or E found
+fromsci_n2: irx                        ; recover source address
+            ldxa
+            plo     rf
+            ldx
+            phi     rf
+            glo     rc                 ; subtract exponent from count
+            str     r2
+            ghi     rc
+            sm
+            phi     rc
+            lbnf    fromsci_n3         ; jump if negative result
+            lbz     fromsci_n3         ; or zero
+fromsci_n7: lda     rf                 ; read from source
+            str     rd                 ; write to destination
+            inc     rd
+            ghi     rc                 ; get count
+            smi     1                  ; and decrement
+            phi     rc                 ; put it back
+            lbnz    fromsci_n7         ; loop until correct number copied
+            lbr     fromsci_n8         ; add a dot and remaining chars
+fromsci_n3: ldi     '0'                ; need to write a zero
+            str     rd                 ; write to output
+            inc     rd
+fromsci_n8: ldi     '.'                ; next a period
+fromsci_n6: str     rd                 ; write to output
+            inc     rd
+fromsci_n4: ghi     rc                 ; see if done with leading zeros
+            lbz     fromsci_n5         ; jump if so
+            adi     1                  ; increment count
+            phi     rc                 ; put it back
+            ldi     '0'                ; write a 0 to the output
+            lbr     fromsci_n6
+fromsci_n5: lda     rf                 ; get byte from input
+            lbz     fromsci_4d         ; jump if end found
+            plo     re                 ; save a copy
+            smi     '.'                ; check for period
+            lbz     fromsci_n5         ; ignore it
+            glo     re                 ; check for E
+            smi     'E'
+            lbz     fromsci_4d         ; done if E
+            smi     32                 ; check for e
+            lbz     fromsci_4d         ; done if so
+            glo     re                 ; recover character
+            str     rd                 ; otherwise write to output
+            inc     rd
+            lbr     fromsci_n5         ; loop until done
 ; code following is for positive exponents
 ; first part, copy until decimal point is found
 fromsci_4:  lda     rf                 ; get byte from input
