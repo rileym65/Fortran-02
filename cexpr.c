@@ -135,6 +135,13 @@ char* evaluate(char *pos, int *err, char* rtype) {
   ostack = 0;
   op = 0;
   *err = 0;
+  if (*pos == '-' && (*(pos+1) < '0' || *(pos+1) > '9')) {
+    Asm("           sep     scall                     ; push constant to expr stack");
+    Asm("           dw      epush");
+    Asm("           db      0,0,0,0");
+    ops[ostack++] = OP_SUB;
+    pos++;
+    }
   while (*pos  != 0 && op != OP_END) {
     flag = -1;
     isArray = 0;
