@@ -5181,7 +5181,7 @@ ftoa_1:     glo      r7           ; get low bit of exponent
             str      rd
             inc      rd
 ftoa_t:     ldi      0            ; terminate output
-            str      rf
+            str      rd
             irx                   ; recover expr stack
             ldxa
             plo      r7
