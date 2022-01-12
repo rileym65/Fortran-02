@@ -69,8 +69,10 @@ Expression operators:
       TAN(n)
 
 Format specifiers:
-      [n]A[size]
-      [n]I[size]
+      [n]A[width]
+      [n]F[width][.decimal]
+      [n]I[width]
+      [n]L[width]
       [n]X
       'string'
 
