@@ -181,24 +181,6 @@ int pass(char* filename) {
       }
     }
 
-  sprintf(buffer,"iobuffer:  ds    %d",iBufferSize); Asm(buffer);
-  if (getDefine("FMTWRITE")) {
-    Asm("SCRATCH1_: ds    64");
-    Asm("SCRATCH2_: ds    32");
-    }
-  if (getDefine("LFSR")) {
-    Asm("LFSR_:     dw    0");
-    Asm("LFSR__:    dw    0");
-    }
-  if (useData) {
-    Asm("DATA_:     dw    0");
-    }
-  if (getDefine("HEAP")) {
-    Asm("HEAP_:     dw    0");
-    }
-  if (useStg) {
-    Asm("STG_:      dw    0");
-    }
 /* ************************************* */
 /* ***** File record               ***** */
 /* ***** byte 0 - 0-closed         ***** */
@@ -233,6 +215,25 @@ int pass(char* filename) {
     Asm("fildes4_:  db    0,0,0,0");
     Asm("           dw    FREE_+1538");
     Asm("           db    0,0,0,0,0,0,0,0,0,0,0");
+    }
+
+  sprintf(buffer,"iobuffer:  ds    %d",iBufferSize); Asm(buffer);
+  if (getDefine("FMTWRITE")) {
+    Asm("SCRATCH1_: ds    64");
+    Asm("SCRATCH2_: ds    32");
+    }
+  if (getDefine("LFSR")) {
+    Asm("LFSR_:     dw    0");
+    Asm("LFSR__:    dw    0");
+    }
+  if (useData) {
+    Asm("DATA_:     dw    0");
+    }
+  if (getDefine("HEAP")) {
+    Asm("HEAP_:     dw    0");
+    }
+  if (useStg) {
+    Asm("STG_:      dw    0");
     }
   Asm("FREE_:    dw    0");
   if (useElfos) {

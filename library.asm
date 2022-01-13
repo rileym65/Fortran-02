@@ -1432,6 +1432,8 @@ fwrite:       sep      scall           ; get file record for file
               inc      rd              ; point to record size
               lda      rd
               plo      rc              ; put into count
+              ldi      0
+              phi      rc
               inc      rd              ; move to Elf/OS FILDES
               inc      rd
               inc      rd
@@ -1446,7 +1448,12 @@ fwrite:       sep      scall           ; get file record for file
               ldi      0               ; get restult flag
               shlc
               str      rd              ; and store it
+              lbz      fwrite_gd       ; jumpt if good read
               sep      sret            ; return to caller
+fwrite_gd:    inc      rd              ; back to status field
+              glo      rc              ; get bytes written
+              str      rd
+              sep      sret
 #endif
 
 #ifdef FOPEN
