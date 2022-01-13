@@ -18,12 +18,15 @@ OBJS = \
 	cdimension.o \
 	cdo.o \
 	cend.o \
+	cendfile.o \
 	cexpr.o \
 	cformat.o \
 	cif.o \
 	clet.o \
 	cgoto.o \
+	copen.o \
 	cpause.o \
+	crewind.o \
 	cstop.o \
 	ctype.o \
 	cwrite.o \
@@ -73,6 +76,7 @@ cdata.o:         header.h cdata.c
 cdimension.o:    header.h cdimension.c
 cdo.o:           header.h cdo.c
 cend.o:          header.h cend.c
+cendfile.o:      header.h cendfile.c
 cexpr.o:         header.h cexpr.c
 cformat.o:       header.h cformat.c
 cgoto.o:         header.h cgoto.c
@@ -81,7 +85,9 @@ ctype.o:         header.h ctype.c
 clet.o:          header.h clet.c
 ccommon.o:       header.h ccommon.c
 compileline.o:   header.h compileline.c
+copen.o:         header.h copen.c
 cpause.o:        header.h cpause.c
+crewind.o:       header.h crewind.c
 cstop.o:         header.h cstop.c
 cwrite.o:        header.h cwrite.c
 findline.o:      header.h findline.c

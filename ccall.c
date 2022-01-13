@@ -11,6 +11,11 @@
 #include "header.h"
 
 void ccall(char* line) {
+  if (strncasecmp(line, "open(", 5) == 0) {
+    copen(line+5);
+    return;
+    }
+
   if (strncasecmp(line, "poke(", 5) == 0) {
     line += 5;
     line = cexpr(line, 0);

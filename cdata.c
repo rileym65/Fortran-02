@@ -22,7 +22,6 @@ void cdata(char* line) {
   int  isFloat;
   int  flag;
   int  shift;
-  dword value;
   INTREAL ir;
   while (*line != 0) {
     numVars = 0;

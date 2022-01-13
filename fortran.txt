@@ -20,12 +20,15 @@ C comment line
       GO TO line
       GO TO (line,line,line,...),var
       GO TO var
-      WRITE(lun,fline)var,var,...         (for lun 0, terminal)
+      WRITE(lun,fline)var,var,...
       CONTINUE
       PAUSE [c]
       STOP [c]
       END
       ASM
+      CALL OPEN(lun,filename,reclen)
+      REWIND lun
+      ENDFILE lun
 
 Expression operators:
       +
@@ -85,11 +88,10 @@ Still to implement:
 
       GO TO var,(line,line,...)
       CALL subr(arg,arg,...)
-      CALL OPEN(lun,filename,reclen)
-      CALL REWIND(lun)
       CALL APPEND(lun,filename,reclen)
-      CALL CLOSE(lun)
       RETURN
+      IOFLAG(lun)    (expression)
+      IOSTATUS(lun)  (expression)
       READ(lun[,REC=index],fline,ERR=line,END=line)var,var,...
       WRITE(lun[,REC=index],fline,ERR=line,END=line)var,var,...
       FORMAT(spec,spec,...)

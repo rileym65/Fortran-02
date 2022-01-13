@@ -31,6 +31,7 @@ int compileLine(char* line) {
   else if (strncasecmp(line, "data", 4) == 0)      cdata(line+4);
   else if (strncasecmp(line, "dimension", 9) == 0) cdimension(line+9);
   else if (strncasecmp(line, "do", 2) == 0)        cdo(line+2);
+  else if (strncasecmp(line, "endfile", 7) == 0)   cendfile(line+7);
   else if (strncasecmp(line, "end", 3) == 0)       cend(line+3);
   else if (strncasecmp(line, "format", 6) == 0)    cformat(line+6);
   else if (strncasecmp(line, "goto", 4) == 0)      cgoto(line+4);
@@ -39,6 +40,7 @@ int compileLine(char* line) {
   else if (strncasecmp(line, "logical", 7) == 0)   ctype(line+7,V_LOGICAL);
   else if (strncasecmp(line, "pause", 5) == 0)     cpause(line+5);
   else if (strncasecmp(line, "real", 4) == 0)      ctype(line+4,V_REAL);
+  else if (strncasecmp(line, "rewind", 6) == 0)    crewind(line+6);
   else if (strncasecmp(line, "short", 5) == 0)     ctype(line+5,V_SHORT);
   else if (strncasecmp(line, "stop", 4) == 0)      cstop(line+4);
   else if (strncasecmp(line, "write", 5) == 0)     cwrite(line+5);

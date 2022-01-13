@@ -10,6 +10,8 @@
 
 #include "header.h"
 
+#define OP_IOSTATUS 0xa3
+#define OP_IOFLAG   0xa2
 #define OP_INP   0xa1
 #define OP_EXP   0xa0
 #define OP_LN    0x9f
@@ -253,6 +255,29 @@ char* evaluate(char *pos, int *err, char* rtype) {
         pos += 3;
         flag = -1;
         }
+      else if (strncasecmp(pos, "ioflag(", 7) == 0) {
+        if (!useElfos) {
+          showError("Elf/OS mode not enabled");
+          *err = -1;
+          return pos;
+          }
+        ops[ostack++] = OP_IOFLAG;
+        ops[ostack++] = OP_OP;
+        pos += 6;
+        flag = -1;
+        }
+      else if (strncasecmp(pos, "iostatus(", 9) == 0) {
+        if (!useElfos) {
+          showError("Elf/OS mode not enabled");
+          *err = -1;
+          return pos;
+          }
+        ops[ostack++] = OP_IOSTATUS;
+        ops[ostack++] = OP_OP;
+        pos += 8;
+        flag = -1;
+        }
+      
 
       else {
         term = 0;
@@ -813,6 +838,28 @@ char* evaluate(char *pos, int *err, char* rtype) {
                Asm("           ldx                         ; Retrieve value from INP");
                Asm("           str     r7");
                Asm("           dec     r7");
+               break;
+          case OP_IOFLAG :
+               if (numbers[nstack] == 'R') {
+                 Asm("           sep     scall               ; Convert to floating point");
+                 Asm("           dw      ftoi");
+                 addDefine("USEFP",1,1);
+                 numbers[nstack] = 'I';
+                 }
+               Asm("           sep     scall               ; Perform ioflag()");
+               Asm("           dw      ioflag");
+               addDefine("IOFLAG",1,1);
+               break;
+          case OP_IOSTATUS :
+               if (numbers[nstack] == 'R') {
+                 Asm("           sep     scall               ; Convert to floating point");
+                 Asm("           dw      ftoi");
+                 addDefine("USEFP",1,1);
+                 numbers[nstack] = 'I';
+                 }
+               Asm("           sep     scall               ; Perform iostatus()");
+               Asm("           dw      iostatus");
+               addDefine("IOSTATUS",1,1);
                break;
           }
         if (ops[ostack] >= 0x90) nstack++;

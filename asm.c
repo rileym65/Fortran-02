@@ -594,6 +594,7 @@ char* asm_evaluate(char* buffer) {
   while (asm_reduce(-1));
   if (asm_numTokens != 2) {
     showError("<ASM>Expression error, expression does not reduce to 1 value\n");
+    printf("%s\n",sourceLine);
     exit(1);
     }
   return buffer;

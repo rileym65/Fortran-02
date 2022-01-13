@@ -505,6 +505,7 @@ nobs:       inc     ra
 #redefine DIVFP
 #redefine MULFP
 #redefine FROMSCI
+#redefine FWRITE
 ; ****************************************
 ; ***** Formatted write              *****
 ; ***** R8 - Pointer to format list  *****
@@ -1127,12 +1128,17 @@ fmtwrt_dn:  ldi     0                  ; terminate record
             phi     rf
             ldi     iobuffer.0
             plo     rf
+            ghi     ra                 ; need to get LUN
+            lbnz    fmtwrt_dsk         ; jump if a disk file
             sep     scall              ; display it
             dw      f_msg
             sep     scall              ; display cr/lf
             dw      f_inmsg
             db      10,13,0
             sep     sret               ; then return to caller
+fmtwrt_dsk: sep     scall              ; call disk write
+            dw      fwrite
+            sep     sret               ; and then return
 #endif
 
 #ifdef FROMSCI
@@ -1407,6 +1413,292 @@ round45_e1: inc     rf
             glo     re                 ; otherwise get current character
             str     r2                 ; and save it
             lbr     round45_e1         ; loop for next character
+#endif
+
+
+/* *********************************************************************** */
+/* *********************************************************************** */
+/* *****                       File Library                          ***** */
+/* *********************************************************************** */
+/* *********************************************************************** */
+#ifdef FWRITE
+#redefine FILDES
+#redefine FSTATUS
+fwrite:       sep      scall           ; get file record for file
+              dw       fildes
+              lbdf     fclose_rt       ; return if invalid file
+              ldn      rd              ; get file open flag
+              lbz      ferr_no         ; jump if file not open
+              inc      rd              ; point to record size
+              lda      rd
+              plo      rc              ; put into count
+              inc      rd              ; move to Elf/OS FILDES
+              inc      rd
+              inc      rd
+              inc      rd
+              sep      scall           ; call Elf/OS to write the record
+              dw       030ch
+              dec      rd              ; move back to IOSTATUS field
+              dec      rd
+              dec      rd
+              str      rd              ; store status into record
+              dec      rd              ; point to IORESULT
+              ldi      0               ; get restult flag
+              shlc
+              str      rd              ; and store it
+              sep      sret            ; return to caller
+#endif
+
+#ifdef FOPEN
+#redefine FILDES
+#redefine FSTATUS
+fopen:        sep      scall           ; get file record for file
+              dw       fildes
+              lbdf     fopen_rt        ; return if invalid file
+              ldn      rd              ; get file open flag
+              lbnz     ferr_ao         ; jump if already open
+              inc      rd              ; move to record length
+              glo      rc              ; store record length
+              str      rd
+              inc      rd              ; then move to Elf/OS FILDES
+              inc      rd
+              inc      rd
+              inc      rd
+              inc      rd
+              ghi      r7              ; preserver R7
+              stxd
+              glo      r7
+              stxd
+              ldi      1               ; create file if it does not exist
+              plo      r7
+              ldi      0
+              phi      r7
+              sep      scall           ; call Elf/OS to open the file
+              dw       0306h
+              dec      rd              ; move back to IOSTATUS field
+              dec      rd
+              dec      rd
+              str      rd              ; store status into record
+              dec      rd              ; point to IORESULT
+              ldi      0               ; get restult flag
+              shlc
+              str      rd              ; and store it
+              shr                      ; put success back into DF
+              irx                      ; recover R7
+              ldxa
+              plo      r7
+              ldx
+              phi      r7
+              lbdf     fopen_rt        ; return on error
+              dec      rd              ; move back to open flag
+              dec      rd
+              ldi      1               ; signal file is open
+              str      rd
+fopen_rt:     sep      sret            ; return to caller
+#endif
+
+#ifdef FCLOSE
+#redefine FILDES
+#redefine FSTATUS
+; *****************************************
+; ***** Close a file                  *****
+; ***** D - File number (starts at 1) *****
+; *****************************************
+fclose:       sep      scall           ; get file record for file
+              dw       fildes
+              lbdf     fclose_rt       ; return if invalid file
+              ldn      rd              ; get file open flag
+              lbz      ferr_no         ; jump if file not open
+              ldi      0               ; mark file as closed
+              str      rd
+              inc      rd              ; now move to Elf/OS FILDES
+              inc      rd
+              inc      rd
+              inc      rd
+              inc      rd
+              inc      rd
+              sep      scall           ; call Elf/OS to close the file
+              dw       0312h
+              dec      rd              ; move back to IOSTATUS field
+              dec      rd
+              dec      rd
+              str      rd              ; store status into record
+              dec      rd              ; point to IORESULT
+              ldi      0               ; get restult flag
+              shlc
+              str      rd              ; and store it
+fclose_rt:    sep      sret            ; return to caller
+#endif
+
+#ifdef FREWIND
+#redefine FILDES
+#redefine FSTATUS
+; *****************************************
+; ***** Rewind a file                 *****
+; ***** D - File number (starts at 1) *****
+; *****************************************
+frewind:      sep      scall           ; get file record for file
+              dw       fildes
+              lbdf     frewind_rt      ; return if invalid file
+              ldn      rd              ; get file open flag
+              lbz      ferr_no         ; jump if file not open
+              inc      rd              ; now move to Elf/OS FILDES
+              inc      rd
+              inc      rd
+              inc      rd
+              inc      rd
+              inc      rd
+              ghi      r7              ; preserver R7
+              stxd
+              glo      r7
+              stxd
+              ldi      0               ; set seek position to zero
+              plo      r7
+              phi      r7
+              plo      r8
+              phi      r8
+              plo      rc              ; seek from beginning
+              phi      rc
+              sep      scall           ; call Elf/OS to rewind the file
+              dw       030fh
+              dec      rd              ; move back to IOSTATUS field
+              dec      rd
+              dec      rd
+              str      rd              ; store status into record
+              dec      rd              ; point to IORESULT
+              ldi      0               ; get restult flag
+              shlc
+              str      rd              ; and store it
+              irx                      ; recover R7
+              ldxa
+              plo      r7
+              ldx
+              phi      r7
+frewind_rt:   sep      sret            ; return to caller
+#endif
+
+#ifdef FSTATUS
+ferr_no:      inc      rd              ; move to IOFLAG
+              inc      rd
+              ldi      1               ; signal error
+              str      rd
+              inc      rd
+              ldi      020h            ; signal file not open
+              str      rd              ; store into IORESULT
+              sep      sret            ; and return to caller
+ferr_ao:      inc      rd              ; move to IOFLAG
+              inc      rd
+              ldi      1               ; signal error
+              str      rd
+              inc      rd
+              ldi      021h            ; signal file already open
+              str      rd              ; store into IORESULT
+              sep      sret            ; and return to caller
+#endif
+
+#ifdef IOFLAG
+#redefine FILDES
+ioflag:       inc      r7              ; get LUN from stack
+              lda      r7
+              inc      r7              ; remove remainder of number
+              inc      r7
+              plo      re              ; set number aside
+              ldi      0               ; high 3 bytes of result are zero
+              str      r7
+              dec      r7
+              str      r7
+              dec      r7
+              str      r7
+              dec      r7
+              glo      re              ; recover file number
+              sep      scall           ; get file record for file
+              dw       fildes
+              lbdf     ioflag_er       ; jump if bad file number
+              inc      rd              ; point to ioflag field
+              inc      rd
+              lda      rd              ; and retrieve it
+              str      r7              ; place on expr stack
+              dec      r7
+              sep      sret            ; and return
+ioflag_er:    ldi      0xff            ; indicate bad file number
+              str      r7              ; place on expr stack
+              dec      r7
+              sep      sret            ; and return
+#endif
+
+#ifdef IOSTATUS
+#redefine FILDES
+iostatus:     inc      r7              ; get LUN from stack
+              lda      r7
+              inc      r7              ; remove remainder of number
+              inc      r7
+              plo      re              ; set number aside
+              ldi      0               ; high 3 bytes of result are zero
+              str      r7
+              dec      r7
+              str      r7
+              dec      r7
+              str      r7
+              dec      r7
+              glo      re              ; recover file number
+              sep      scall           ; get file record for file
+              dw       fildes
+              lbdf     iostatus_er     ; jump if bad file number
+              inc      rd              ; point to iostatus field
+              inc      rd
+              inc      rd
+              lda      rd              ; and retrieve it
+              str      r7              ; place on expr stack
+              dec      r7
+              sep      sret            ; and return
+iostatus_er:  ldi      0xff            ; indicate bad file number
+              str      r7              ; place on expr stack
+              dec      r7
+              sep      sret            ; and return
+#endif
+
+#ifdef FILDES
+; **********************************************
+; ***** Find file record for a file number *****
+; ***** D - File number (starts at 1)      *****
+; ***** Returns: DF=0 - file good          *****
+; *****          DF=1 - Invalid number     *****
+; *****          RD   - File record        *****
+; **********************************************
+fildes:       smi      1               ; File numbers start at 1
+              lbz      fildes1         ; jump if file 1
+              smi      1               ; check for file 2
+              lbz      fildes2
+              smi      1               ; check for file 3
+              lbz      fildes3
+              smi      1               ; check for file 4
+              lbz      fildes4
+              smi      0               ; set DF to indicate invalid
+              sep      sret            ; and return to caller
+fildes1:      ldi      file1_.1        ; point file 1 record
+              phi      rd
+              ldi      file1_.0
+              plo      rd
+              adi      0               ; signal good
+              sep      sret            ; and return
+fildes2:      ldi      file2_.1        ; point file 1 record
+              phi      rd
+              ldi      file2_.0
+              plo      rd
+              adi      0               ; signal good
+              sep      sret            ; and return
+fildes3:      ldi      file3_.1        ; point file 1 record
+              phi      rd
+              ldi      file3_.0
+              plo      rd
+              adi      0               ; signal good
+              sep      sret            ; and return
+fildes4:      ldi      file4_.1        ; point file 1 record
+              phi      rd
+              ldi      file4_.0
+              plo      rd
+              adi      0               ; signal good
+              sep      sret            ; and return
 #endif
 
 ; ***********************************************************************

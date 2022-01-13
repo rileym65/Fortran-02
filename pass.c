@@ -199,18 +199,48 @@ int pass(char* filename) {
   if (useStg) {
     Asm("STG_:      dw    0");
     }
-  if (getDefine ("FILES")) {
-    Asm("file1_:    dw    0");
-    Asm("file2_:    dw    0");
-    Asm("file3_:    dw    0");
-    Asm("file4_:    dw    0");
-    Asm("file5_:    dw    0");
-    Asm("file6_:    dw    0");
-    Asm("file7_:    dw    0");
-    Asm("file8_:    dw    0");
+/* ************************************* */
+/* ***** File record               ***** */
+/* ***** byte 0 - 0-closed         ***** */
+/* ***** byte 1 - record length    ***** */
+/* ***** byte 2 - ioflag           ***** */
+/* ***** byte 3 - ioresult         ***** */
+/* ***** byte 4-5 - current record ***** */
+/* ***** Elf/OS Fildes follows     ***** */
+/* ************************************* */
+  if (useElfos) {
+    Asm("file1_:    db    0,0");
+    Asm("           db    0,0");
+    Asm("           dw    0");
+    Asm("fildes1_:  db    0,0,0,0");
+    Asm("           dw    FREE_+2");
+    Asm("           db    0,0,0,0,0,0,0,0,0,0,0");
+    Asm("file2_:    db    0,0");
+    Asm("           db    0,0");
+    Asm("           dw    0");
+    Asm("fildes2_:  db    0,0,0,0");
+    Asm("           dw    FREE_+514");
+    Asm("           db    0,0,0,0,0,0,0,0,0,0,0");
+    Asm("file3_:    db    0,0");
+    Asm("           db    0,0");
+    Asm("           dw    0");
+    Asm("fildes3_:  db    0,0,0,0");
+    Asm("           dw    FREE_+1026");
+    Asm("           db    0,0,0,0,0,0,0,0,0,0,0");
+    Asm("file4_:    db    0,0");
+    Asm("           db    0,0");
+    Asm("           dw    0");
+    Asm("fildes4_:  db    0,0,0,0");
+    Asm("           dw    FREE_+1538");
+    Asm("           db    0,0,0,0,0,0,0,0,0,0,0");
     }
   Asm("FREE_:    dw    0");
-  Asm("end__:    equ   $");
+  if (useElfos) {
+    Asm("end__:    equ   $+2048");
+    }
+  else {
+    Asm("end__:    equ   $");
+    }
   return(0);
   }
 

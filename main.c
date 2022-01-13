@@ -344,6 +344,11 @@ int main(int argc, char** argv, char** envp) {
     if (getDefine("CMP16") != 0)      printf("  true       %04xh\n",getLabel("true"));
     if (getDefine("XOR16") != 0)      printf("  xor16      %04xh\n",getLabel("xor16"));
     if (getDefine("LFSR") != 0)       printf("  lfsr       %04xh\n",getLabel("lfsr_lp"));
+    if (getDefine("FOPEN") != 0)      printf("  fopen      %04xh\n",getLabel("fopen"));
+    if (getDefine("FCLOSE") != 0)     printf("  fclose     %04xh\n",getLabel("fclose"));
+    if (getDefine("FREWIND") != 0)    printf("  frewind    %04xh\n",getLabel("frewind"));
+    if (getDefine("IOFLAG") != 0)     printf("  ioflag     %04xh\n",getLabel("ioflag"));
+    if (getDefine("IOSTATUS") != 0)   printf("  iostatus   %04xh\n",getLabel("iostatus"));
   
     if (getDefine("ABS32") != 0)      printf("  abs32      %04xh\n",getLabel("abs32"));
     if (getDefine("ADD32") != 0)      printf("  add32      %04xh\n",getLabel("add32"));
