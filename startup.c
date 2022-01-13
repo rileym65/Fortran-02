@@ -32,10 +32,8 @@ void startup() {
     }
   if (useElfos) {
     t1 = programStart;
-    t2 = (highest - programStart + 1);
     t2 = (getLabel("FREE_") - programStart + 1);
     t3 = programStart;
-printf("%04x %04x %04x , %04x\n",t1,t2,t3,getLabel("FREE_"));
     sprintf(buffer,"          dw   %d,%d,%d",t1,t2,t3); Asm(buffer);
     }
   if (useElfos ) {
