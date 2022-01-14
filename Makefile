@@ -33,6 +33,7 @@ OBJS = \
 	compileline.o \
 	findline.o \
 	findvariable.o \
+	getarg.o \
 	getcommon.o \
 	gethex.o \
 	getnumber.o \
@@ -92,6 +93,7 @@ cstop.o:         header.h cstop.c
 cwrite.o:        header.h cwrite.c
 findline.o:      header.h findline.c
 findvariable.o:  header.h findvariable.c
+getarg.o:        header.h getarg.c
 getcommon.o:     header.h getcommon.c
 gethex.o:        header.h gethex.c
 getnumber.o:     header.h getnumber.c

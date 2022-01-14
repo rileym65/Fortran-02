@@ -318,6 +318,7 @@ extern void crewind(char* line);
 extern void cstop(char* line);
 extern void cwrite(char* line);
 extern void ctype(char* line,int vtype);
+extern char* getArg(char*line, char dest, char* rem);
 extern word getCommon(char* name, char* module);
 extern int  getVariable(char* name, char* module);
 extern char* getVarName(char *line, char* token);

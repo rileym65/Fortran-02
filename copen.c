@@ -22,69 +22,9 @@ void copen(char* line) {
     showError("Elf/OS mode not enabled");
     return;
     }
-  if (*line >= '0' && *line <= '9') {
-    i = 0;
-    while (*line >= '0' && *line <= '9') {
-      i = (i * 10) + (*line - '0');
-      line++;
-      }
-    sprintf(buffer,"              ldi   %d                 ; Point to LUN'",i);
-    Asm(buffer);
-    }
-  else if ((*line >= 'a' && *line <= 'z') ||
-           (*line >= 'A' && *line <= 'Z')) {
-    pos = 0;
-    while ((*line >= 'a' && *line <= 'z') ||
-           (*line >= 'A' && *line <= 'Z') ||
-           (*line >= '0' && *line <= '9') ||
-           *line == '_') token[pos++] = *line++;
-    if (pos == 0 || *line != 0) {
-      showError("Syntax error");
-      return;
-      }
-    token[pos] = 0;
-    v = getVariable(token, module);
-    if (v < 0) return;
-    if (varType(v) == 'R') {
-      showError("Invalid variable type");
-      return;
-      }
-    if (varType(v) == 'I') {
-      sprintf(buffer,"              ldi   (%s_%s+3).1        ; Point variable",
-        variables[v].module, variables[v].name);
-      Asm(buffer);
-      Asm("              phi   rf");
-      sprintf(buffer,"              ldi   (%s_%s+3).0",
-        variables[v].module, variables[v].name);
-      Asm(buffer);
-      Asm("              plo   rf");
-      }
-    else if (varType(v) == 'S') {
-      sprintf(buffer,"              ldi   (%s_%s+1).1        ; Point variable",
-        variables[v].module, variables[v].name);
-      Asm(buffer);
-      Asm("              phi   rf");
-      sprintf(buffer,"              ldi   (%s_%s+1).0",
-        variables[v].module, variables[v].name);
-      Asm(buffer);
-      Asm("              plo   rf");
-      }
-    else {
-      sprintf(buffer,"              ldi   (%s_%s).1          ; Point variable",
-        variables[v].module, variables[v].name);
-      Asm(buffer);
-      Asm("              phi   rf");
-      sprintf(buffer,"              ldi   (%s_%s).0",
-        variables[v].module, variables[v].name);
-      Asm(buffer);
-      Asm("              plo   rf");
-      }
-    Asm("              lda   rf                 ; Retrieve lsb");
-    }
-    else {
-      showError("Syntax error");
-      return;
-      }
+
+  line = getArg(line, 'd', "set LUN");
+  if (line == NULL) return;
   Asm("              stxd                     ; save for now");
   if (*line != ',') {
     showError("Syntax error");
@@ -115,27 +55,15 @@ void copen(char* line) {
   Asm(buffer);
   if (*line == ',') {
     line++;
-    reclen = 0;
-    while (*line >='0' && *line <= '9') {
-      reclen = (reclen * 10) + (*line - '0');
-      line++;
-      }
-    if (reclen == 0 || reclen > 256) {
-      showError("Invalid record length");
-      return;
-      }
-    sprintf(buffer,"              ldi   %d                 ; Set record length", reclen);
-    Asm(buffer);
-    Asm("              plo   rc");
-    if (reclen > iBufferSize) iBufferSize = reclen + 1;
+    line = getArg(line, 'd', "Set record length");
+    if (line == NULL) return;
     }
   else {
     reclen = 128;
     sprintf(buffer,"              ldi   %d                 ; Set record length", reclen);
     Asm(buffer);
-    Asm("              plo   rc");
-    if (reclen > iBufferSize) iBufferSize = reclen + 1;
     }
+  Asm("              plo   rc");
   sprintf(buffer,"              ldi   lbl_%d.1           ; Point to filename",labelFName);
   Asm(buffer);
   Asm("              phi   rf");
