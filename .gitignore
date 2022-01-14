@@ -4,4 +4,6 @@ fortran
 *.lst
 *.prg
 *.bin
+*.asm
++library.asm
 

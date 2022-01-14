@@ -70,6 +70,8 @@ Expression operators:
       SIN(n)
       SQRT(n)
       TAN(n)
+      IOFLAG(lun)    (expression)
+      IOSTATUS(lun)  (expression)
 
 Format specifiers:
       [n]A[width]
@@ -90,8 +92,6 @@ Still to implement:
       CALL subr(arg,arg,...)
       CALL APPEND(lun,filename,reclen)
       RETURN
-      IOFLAG(lun)    (expression)
-      IOSTATUS(lun)  (expression)
       READ(lun[,REC=index],fline,ERR=line,END=line)var,var,...
       WRITE(lun[,REC=index],fline,ERR=line,END=line)var,var,...
       FORMAT(spec,spec,...)

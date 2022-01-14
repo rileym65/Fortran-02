@@ -1424,6 +1424,7 @@ round45_e1: inc     rf
 #ifdef FWRITE
 #redefine FILDES
 #redefine FSTATUS
+#redefine FCLOSE
 fwrite:       sep      scall           ; get file record for file
               dw       fildes
               lbdf     fclose_rt       ; return if invalid file
@@ -1459,6 +1460,7 @@ fwrite_gd:    inc      rd              ; back to status field
 #ifdef FOPEN
 #redefine FILDES
 #redefine FSTATUS
+#redefine FCLOSE
 fopen:        sep      scall           ; get file record for file
               dw       fildes
               lbdf     fopen_rt        ; return if invalid file

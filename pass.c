@@ -216,6 +216,12 @@ int pass(char* filename) {
     Asm("           dw    FREE_+1538");
     Asm("           db    0,0,0,0,0,0,0,0,0,0,0");
     }
+  else {
+    Asm("file1_:    equ   $");
+    Asm("file2_:    equ   $");
+    Asm("file3_:    equ   $");
+    Asm("file4_:    equ   $");
+    }
 
   sprintf(buffer,"iobuffer:  ds    %d",iBufferSize); Asm(buffer);
   if (getDefine("FMTWRITE")) {
