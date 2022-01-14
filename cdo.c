@@ -371,9 +371,10 @@ void cDoEnd() {
         else
           Asm("          adc");
         Asm("          str   rf");
-        if (i < s2-1) 
+        if (i < s2-1) {
           Asm("          dec   rf");
           Asm("          dec   rd");
+          }
         }
       else {
         Asm("          ldn   rf");
