@@ -23,7 +23,7 @@ void cwrite(char* line) {
   line++;
   line = cexpr(line,0);
   if (exprErrors > 0) return;
-  if (*line != ',') {
+  if (*line != ',' && *line != ')') {
     showError("Syntax error");
     return;
     }
@@ -101,6 +101,52 @@ void cwrite(char* line) {
     /* ***************************** */
     /* ***** Unformatted write ***** */
     /* ***************************** */
+printf("unformatted write: %s\n",line);
+    varLabel = nextLabel++;
+    eolLabel = nextLabel++;
+    sprintf(buffer,"           ldi     lbl_%d.1                 ; point variable data",
+      varLabel);
+    Asm(buffer);
+    Asm("           phi     r9");
+    sprintf(buffer,"           ldi     lbl_%d.0", varLabel);
+    Asm(buffer);
+    Asm("           plo     r9");
+    Asm("           inc     r7                  ; Retrieve LUN");
+    Asm("           lda     r7");
+    Asm("           phi     ra");
+    Asm("           inc     r7");
+    Asm("           inc     r7");
+    Asm("           sep     scall               ; Process write list");
+    Asm("           dw      uwrite");
+    sprintf(buffer,"           lbr     lbl_%d",eolLabel);
+    Asm(buffer);
+    sprintf(buffer,"lbl_%d:",varLabel);
+    Asm(buffer);
+    while (*line != 0) {
+      line = getVarName(line, token);
+      if (strlen(token) == 0) {
+        showError("Invalid variable name");
+        return;
+        }
+      v = getVariable(token, module);
+      if (v < 0) {
+        showError("Invalid variable name");
+        return;
+        }
+      sprintf(buffer,"           db      %d",varType(v));
+      Asm(buffer);
+      sprintf(buffer,"           dw      %s_%s",variables[v].module, variables[v].name);
+      Asm(buffer);
+      if (*line != ',' && *line != 0) {
+        showError("Syntax error");
+        return;
+        }
+      if (*line == ',') line++;
+      }
+    Asm("           db      0");
+    sprintf(buffer,"lbl_%d:",eolLabel);
+    Asm(buffer);
+    addDefine("UWRITE",1,1);
     }
   }
 

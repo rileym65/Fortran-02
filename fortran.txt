@@ -21,6 +21,7 @@ C comment line
       GO TO line
       GO TO (line,line,line,...),var
       GO TO var
+      WRITE(lun)var,var,...
       WRITE(lun,fline)var,var,...
       CONTINUE
       PAUSE [c]
