@@ -12,6 +12,8 @@ x.x
 *.asm
 *.txt
 *.pl
+*.swp
+*.f
 +library.asm
 +fortran.txt
 
