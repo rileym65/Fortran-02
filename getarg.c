@@ -65,6 +65,7 @@ char* getArg(char*line, char dest, char* rem) {
       case 'I': ofs = 3; break;
       default : ofs = 3; break;
       }
+    if (dest == 'e') ofs = 0;
     sprintf(buffer,"              ldi   (%s_%s+%d).1        ; Point to variable",
       variables[v].module, variables[v].name, ofs);
     Asm(buffer);
@@ -95,6 +96,69 @@ char* getArg(char*line, char dest, char* rem) {
         strcat(buffer,rem);
         }
       Asm(buffer);
+      }
+    return line;
+    }
+
+  if (dest == 'e') {
+    if (argType == 'N') {
+      sprintf(buffer, "              sex   r7");
+      if (rem != NULL && strlen(rem) > 0) {
+        strcat(buffer,"                 ; ");
+        strcat(buffer,rem);
+        }
+      Asm(buffer);
+      sprintf(buffer,"              ldi   %d", (value >> 24) & 0xff);
+      Asm(buffer);
+      Asm("              stxd");
+      sprintf(buffer,"              ldi   %d", (value >> 16) & 0xff);
+      Asm(buffer);
+      Asm("              stxd");
+      sprintf(buffer,"              ldi   %d", (value >> 8) & 0xff);
+      Asm(buffer);
+      Asm("              stxd");
+      sprintf(buffer,"              ldi   %d", value & 0xff);
+      Asm(buffer);
+      Asm("              stxd");
+      Asm("              sex   r2");
+      return line;
+      }
+    else {
+      switch (varType(v)) {
+        case 'B':
+        case 'L':
+             Asm("              sex   r7");
+             Asm("              ldi   0");
+             Asm("              stxd");
+             Asm("              stxd");
+             Asm("              stxd");
+             Asm("              lda   rf");
+             Asm("              stxd");
+             Asm("              sex   r2");
+             break;
+        case 'S':
+             Asm("              sex   r7");
+             Asm("              ldi   0");
+             Asm("              stxd");
+             Asm("              lda   rf");
+             Asm("              stxd");
+             Asm("              lda   rf");
+             Asm("              stxd");
+             Asm("              sex   r2");
+             break;
+        default:
+             Asm("              sex   r7");
+             Asm("              lda   rf");
+             Asm("              stxd");
+             Asm("              lda   rf");
+             Asm("              stxd");
+             Asm("              lda   rf");
+             Asm("              stxd");
+             Asm("              lda   rf");
+             Asm("              stxd");
+             Asm("              sex   r2");
+             break;
+        }
       }
     return line;
     }

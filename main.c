@@ -163,6 +163,9 @@ int main(int argc, char** argv, char** envp) {
   if (strstr(baseName,".for") != NULL) {
     *(strstr(baseName,".for")) = 0;
     }
+  if (strstr(baseName,".f") != NULL) {
+    *(strstr(baseName,".f")) = 0;
+    }
   for (i=0; envp[i] != NULL; i++) {
     if (strncasecmp(envp[i],"home=",5) == 0) {
       strcpy(temp,envp[i]+5);

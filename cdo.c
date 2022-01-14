@@ -17,9 +17,11 @@ void cdo(char* line) {
   char step[32];
   int  pos;
   int  v;
-  int  ve;
-  int  vs;
+  int  vstart;
+  int  vend;
+  int  vstep;
   int  lnum;
+  char *argret;
   dword value;
   lnum = 0;
   if (*line < '0' || *line > '9') {
@@ -130,6 +132,10 @@ void cdo(char* line) {
     showError("End of line expected");
     return;
     }
+
+  /* *************************************************** */
+  /* ***** Case where all parameters are constants ***** */
+  /* *************************************************** */
   if ( (start[0] == '-' || (start[0] >= '0' && start[0] <= '9')) &&
        (end[0] == '-' || (end[0] >= '0' && end[0] <= '9')) &&
        (step[0] >= '0' && step[0] <= '9') ) {
@@ -179,10 +185,110 @@ void cdo(char* line) {
     Asm(buffer);
     Asm("          stxd");
     }
+  /* ************************************************** */
+  /* ***** Case where any parameter is a variable ***** */
+  /* ************************************************** */
   else {
-printf("some variables\n");
+doLoops[numDoLoops].varStep = 'N';
+doLoops[numDoLoops].step = atoi(step);
+    argret = getArg(end, 'e', "Push end to expr stack");
+    if (argret == NULL) return;
+    argret = getArg(start, 'e', "Push start to expr stack");
+    if (argret == NULL) return;
+    sprintf(buffer,"          ldi   (%s_%s).1                 ; point to variable",variables[v].module, variables[v].name);
+    Asm(buffer);
+    Asm("          phi   rf");
+    sprintf(buffer,"          ldi   (%s_%s).0",variables[v].module, variables[v].name);
+    Asm(buffer);
+    Asm("          plo   rf");
+    switch (varType(v)) {
+      case 'B':
+      case 'L':
+           Asm("              inc   r7                 ; point to start");
+           Asm("              ldn   r7                 ; Retrieve LSB");
+           Asm("              str   rf                 ; store into variable");
+           Asm("              dec   r7                 ; restore R7");
+           break;
+      case 'S':
+           Asm("              inc   r7                 ; point to start");
+           Asm("              inc   r7");
+           Asm("              ldn   r7                 ; Retrieve MSB");
+           Asm("              str   rf                 ; store into variable");
+           Asm("              inc   rf");
+           Asm("              dec   r7");
+           Asm("              ldn   r7                 ; Retrieve LSB");
+           Asm("              str   rf                 ; store into variable");
+           Asm("              dec   r7                 ; restore R7");
+           break;
+      case 'I':
+           Asm("              inc   r7                 ; point to start");
+           Asm("              inc   r7");
+           Asm("              inc   r7");
+           Asm("              inc   r7");
+           Asm("              ldn   r7                 ; Retrieve MSB");
+           Asm("              str   rf                 ; store into variable");
+           Asm("              inc   rf");
+           Asm("              dec   r7");
+           Asm("              ldn   r7                 ; Retrieve MSB");
+           Asm("              str   rf                 ; store into variable");
+           Asm("              inc   rf");
+           Asm("              dec   r7");
+           Asm("              ldn   r7                 ; Retrieve MSB");
+           Asm("              str   rf                 ; store into variable");
+           Asm("              inc   rf");
+           Asm("              dec   r7");
+           Asm("              ldn   r7                 ; Retrieve LSB");
+           Asm("              str   rf                 ; store into variable");
+           Asm("              dec   r7                 ; restore R7");
+           break;
+      }
+    Asm("              sep   scall              ; subtract");
+    Asm("              dw    sub32");
+    addDefine("SUB32",1,1);
+    argret = getArg(step, 'e', "Push step to expr stack");
+    if (argret == NULL) return;
+    Asm("              sep   scall              ; subtract");
+    Asm("              dw    div32");
+    addDefine("DIV32",1,1);
+    Asm("              sep   scall              ; Add 1");
+    Asm("              dw    epush");
+    Asm("              db    0,0,0,1");
+    Asm("              sep   scall              ; and add");
+    Asm("              dw    add32");
+    addDefine("ADD32",1,1);
+    Asm("              inc   r7                 ; retrieve loops");
+    Asm("              lda   r7");
+    Asm("              plo   rb");
+    Asm("              lda   r7");
+    Asm("              phi   rb");
+    Asm("              lda   r7");
+    Asm("              plo   ra");
+    Asm("              lda   r7");
+    Asm("              phi   ra");
+    switch(varType(v)) {
+      case 'B':
+      case 'L':
+           Asm("              glo   rb                 ; push to stack");
+           Asm("              stxd");
+           break;
+      case 'S':
+           Asm("              ghi   rb                 ; push to stack");
+           Asm("              stxd");
+           Asm("              glo   rb");
+           Asm("              stxd");
+           break;
+      case 'I':
+           Asm("              ghi   ra                 ; push to stack");
+           Asm("              stxd");
+           Asm("              glo   ra");
+           Asm("              stxd");
+           Asm("              ghi   rb");
+           Asm("              stxd");
+           Asm("              glo   rb");
+           Asm("              stxd");
+           break;
+      }
     }
-  
   sprintf(buffer, "lbl_%d:",doLoops[numDoLoops].loopStart); Asm(buffer);
   numDoLoops++;
   }
