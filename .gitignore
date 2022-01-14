@@ -1,9 +1,17 @@
 fortran
+library.h
+x.x
 *.o
+*.dat
+*.bak
+*.rc
 *.for
 *.lst
 *.prg
 *.bin
 *.asm
+*.txt
+*.pl
 +library.asm
++fortran.txt
 
