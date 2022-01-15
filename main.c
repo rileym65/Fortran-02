@@ -348,6 +348,8 @@ int main(int argc, char** argv, char** envp) {
     if (getDefine("XOR16") != 0)      printf("  xor16      %04xh\n",getLabel("xor16"));
     if (getDefine("LFSR") != 0)       printf("  lfsr       %04xh\n",getLabel("lfsr_lp"));
     if (getDefine("FOPEN") != 0)      printf("  fopen      %04xh\n",getLabel("fopen"));
+    if (getDefine("UWRITE") != 0)     printf("  uwrite     %04xh\n",getLabel("uwrite"));
+    if (getDefine("UREAD") != 0)      printf("  uread      %04xh\n",getLabel("uread"));
     if (getDefine("FCLOSE") != 0)     printf("  fclose     %04xh\n",getLabel("fclose"));
     if (getDefine("FREWIND") != 0)    printf("  frewind    %04xh\n",getLabel("frewind"));
     if (getDefine("IOFLAG") != 0)     printf("  ioflag     %04xh\n",getLabel("ioflag"));

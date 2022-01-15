@@ -314,6 +314,7 @@ extern void cif(char* line);
 extern void clet(char* line);
 extern void copen(char* line);
 extern void cpause(char* line);
+extern void cread(char* line);
 extern void crewind(char* line);
 extern void cstop(char* line);
 extern void cwrite(char* line);

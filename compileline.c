@@ -39,6 +39,7 @@ int compileLine(char* line) {
   else if (strncasecmp(line, "integer", 7) == 0)   ctype(line+7,V_INTEGER);
   else if (strncasecmp(line, "logical", 7) == 0)   ctype(line+7,V_LOGICAL);
   else if (strncasecmp(line, "pause", 5) == 0)     cpause(line+5);
+  else if (strncasecmp(line, "read", 4) == 0)      cread(line+4);
   else if (strncasecmp(line, "real", 4) == 0)      ctype(line+4,V_REAL);
   else if (strncasecmp(line, "rewind", 6) == 0)    crewind(line+6);
   else if (strncasecmp(line, "short", 5) == 0)     ctype(line+5,V_SHORT);

@@ -101,7 +101,6 @@ void cwrite(char* line) {
     /* ***************************** */
     /* ***** Unformatted write ***** */
     /* ***************************** */
-printf("unformatted write: %s\n",line);
     varLabel = nextLabel++;
     eolLabel = nextLabel++;
     sprintf(buffer,"           ldi     lbl_%d.1                 ; point variable data",

@@ -26,6 +26,7 @@ OBJS = \
 	cgoto.o \
 	copen.o \
 	cpause.o \
+	cread.o \
 	crewind.o \
 	cstop.o \
 	ctype.o \
@@ -88,6 +89,7 @@ ccommon.o:       header.h ccommon.c
 compileline.o:   header.h compileline.c
 copen.o:         header.h copen.c
 cpause.o:        header.h cpause.c
+cread.o:         header.h cread.c
 crewind.o:       header.h crewind.c
 cstop.o:         header.h cstop.c
 cwrite.o:        header.h cwrite.c
