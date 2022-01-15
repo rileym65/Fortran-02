@@ -16,7 +16,6 @@ char* arrayRef(char* line, int v) {
 /* *********************************** */
 /* ***** Process array reference ***** */
 /* *********************************** */
-printf("***** Array dereference %s *******\n",line);
   if (v < 0) return NULL;
   if (variables[v].dimensions == 0) {
     showError("Array reference on non-array variable");
