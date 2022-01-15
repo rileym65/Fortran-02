@@ -16,6 +16,7 @@ char* arrayRef(char* line, int v) {
 /* *********************************** */
 /* ***** Process array reference ***** */
 /* *********************************** */
+printf("***** Array dereference %s *******\n",line);
   if (v < 0) return NULL;
   if (variables[v].dimensions == 0) {
     showError("Array reference on non-array variable");
@@ -26,6 +27,8 @@ char* arrayRef(char* line, int v) {
   while (*line != ')' && *line != 0) {
     line = cexpr(line, 0);
     if (exprErrors > 0) return NULL;
+    Asm("           sep     scall                     ; subtract 1");
+    Asm("           dw      dec32");
     if (dims > 1) {
       if (dims == 2) d1 = variables[v].sizes[0];
         else d1 = variables[v].sizes[0] * variables[v].sizes[1];
@@ -91,5 +94,6 @@ char* arrayRef(char* line, int v) {
     Asm("           shlc");
     Asm("           phi     rf");
     }
+  addDefine("DEC32",1,1);
   return line;
   }

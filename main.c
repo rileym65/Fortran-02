@@ -359,6 +359,7 @@ int main(int argc, char** argv, char** envp) {
     if (getDefine("ATOI32") != 0)     printf("  atoi32     %04xh\n",getLabel("atoi32"));
     if (getDefine("CMP32") != 0)      printf("  cmp32      %04xh\n",getLabel("cmp32"));
     if (getDefine("COMP32") != 0)     printf("  comp32     %04xh\n",getLabel("comp32"));
+    if (getDefine("DEC32") != 0)      printf("  dec32      %04xh\n",getLabel("dec32"));
     if (getDefine("DIV32") != 0)      printf("  div32      %04xh\n",getLabel("div32"));
     if (getDefine("EQ32") != 0)       printf("  eq32       %04xh\n",getLabel("eq32"));
     if (getDefine("CMP32") != 0)      printf("  false32    %04xh\n",getLabel("false32"));
