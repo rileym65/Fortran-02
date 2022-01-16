@@ -558,6 +558,12 @@ uwrite_dn:  ghi     ra
             dec     rd
             lbdf    uwrite_er          ; jump if error occured
             glo     rc                 ; otherwise get count written
+            str     rd
+            dec     rd
+            ldi     0
+            str     rd
+            glo     rc
+            sep     sret
 uwrite_er:  str     rd                 ; write D to status
             dec     rd                 ; point to flag field
             ldi     0
