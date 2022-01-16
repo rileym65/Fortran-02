@@ -630,15 +630,16 @@ uread_lp:   lda     r9                 ; get next variable type
 uread_1:    ldi     1
             lskp
 uread_2:    ldi     2
-            plo     rc                 ; set count
+            plo     ra                 ; set count
 uread_l2:   lda     rf                 ; get byte from io buffer
             str     rd                 ; write to variable
             inc     rd
-            dec     rc                 ; decrement count
-            glo     rc                 ; see if done
+            dec     ra                 ; decrement count
+            glo     ra                 ; see if done
             lbnz    uread_l2           ; loop until done
             lbr     uread_lp           ; on to next variable
 uread_dn:   adi     0                  ; signal no error
+            glo     rc                 ; get byte count
             sep     sret               ; and return
 uread_er:   str     rd                 ; store status
             dec     rd                 ; point to ioflag
@@ -1749,6 +1750,7 @@ ferr_no:      inc      rd              ; move to IOFLAG
               inc      rd
               ldi      020h            ; signal file not open
               str      rd              ; store into IORESULT
+              smi      0               ; Set DF to signal error
               sep      sret            ; and return to caller
 ferr_ao:      inc      rd              ; move to IOFLAG
               inc      rd
@@ -1757,6 +1759,7 @@ ferr_ao:      inc      rd              ; move to IOFLAG
               inc      rd
               ldi      021h            ; signal file already open
               str      rd              ; store into IORESULT
+              smi      0               ; Set DF to signal error
               sep      sret            ; and return to caller
 #endif
 

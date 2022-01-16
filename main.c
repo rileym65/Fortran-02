@@ -118,6 +118,7 @@ int main(int argc, char** argv, char** envp) {
     }
   errorCount = 0;
   iBufferSize = 0;
+  debug = 0;
   outMode = 'R';
   programStart = 0xffff;
   variableStart = 0xffff;

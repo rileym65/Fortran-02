@@ -278,6 +278,7 @@ LINK byte   use32Bits;
 LINK byte   useFp;
 LINK byte   useStep32;
 LINK byte   useStrings;
+LINK byte   debug;
 
 LINK char **variableNames;
 LINK word  *variableAddresses;

@@ -1,6 +1,13 @@
 00001 statement area
 C comment line
+Dlabl statement
      1 Any character is continuation line
+
+  A line beginning with 'c' or 'C' is a comment line and will be ignored
+by the compiler
+
+  A line beginning with 'd' or 'D' is a debug line and will only be compiled
+if the -d command line switch is specified
 
       INTEGER var,var,...
       LOGICAL var,var,...
@@ -23,7 +30,7 @@ C comment line
       GO TO var
       WRITE(lun)var,var,...
       WRITE(lun,fline)var,var,...
-      READ(lun)var,var,...
+      READ(lun[,err=line][,eof=line])var,var,...
       CONTINUE
       PAUSE [c]
       STOP [c]
@@ -132,6 +139,7 @@ Switches:
 -A              - display assembly
 -b              - output as binary
 -c              - show compiler output
+-d              - Compile lines beginning with D
 -i              - output as Intel hex
 -l              - show source list
 -L              - create .lst file
