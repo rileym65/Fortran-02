@@ -15,7 +15,7 @@ char varType(int varNum) {
   if (variables[varNum].type == V_LOGICAL) return 'L';
   if (variables[varNum].type == V_SHORT) return 'S';
   if (variables[varNum].type == V_INTEGER) return 'I';
-  if (variables[varNum].type == V_INTEGER) return 'R';
+  if (variables[varNum].type == V_REAL) return 'R';
   if (variables[varNum].name[0] >= 'i' && variables[varNum].name[0] <= 'n') return 'I';
   if (variables[varNum].name[0] >= 'I' && variables[varNum].name[0] <= 'N') return 'I';
   return 'R';
