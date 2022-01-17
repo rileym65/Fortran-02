@@ -695,6 +695,9 @@ fmtread_lp: lda     r8                 ; get count for next format item
 fmtr_loop:  ldn     r8                 ; recover type
             smi     'I'                ; check for integer
             lbz     fmtrd_i            ; jump if so
+            ldn     r8                 ; recover type
+            smi     'L'                ; check for logical
+            lbz     fmtrd_l            ; jump if so
             ldi     0x22               ; error code
             smi     0                  ; invalid type, so error
             sep     sret               ; return to caller
@@ -710,6 +713,55 @@ fmtrd_x:    glo     ra                 ; get item count
             inc     r8
             inc     r8
             lbr     fmtread_lp         ; loop for next item
+
+fmtrd_l:    inc     r8                 ; get size
+            ldn     r8
+            plo     rc
+            dec     r8
+            ldi     0                  ; set field initially to false
+            phi     rf
+fmtrd_l_1:  lda     rb                 ; get byte from input
+            plo     re                 ; keep a copy
+            smi     'T'                ; check for true
+            lbz     fmtrd_l_t          ; jump if so
+            smi     32                 ; lowercase t
+            lbz     fmtrd_l_t          ; jump if so
+fmtrd_l_2:  dec     rc                 ; decrement width count
+            glo     rc                 ; see if done
+            lbnz    fmtrd_l_1          ; loop back if not
+            lda     r9                 ; get next variable type
+            lbz     fmtrd_dn           ; jump if no more variables
+            plo     re                 ; save variable type
+            lda     r9                 ; retrieve address
+            phi     rd
+            lda     r9
+            plo     rd
+            glo     re                 ; get variable type
+            smi     'B'                ; check for byte
+            lbz     fmtrd_l_b          ; jump if so
+            glo     re                 ; get variable type
+            smi     'L'                ; check for logical
+            lbz     fmtrd_l_b          ; jump if so
+            glo     re                 ; get variable type
+            smi     'S'                ; check for short
+            lbz     fmtrd_l_s          ; jump if so
+            ldi     4                  ; 4 bytes to set
+            lskp
+fmtrd_l_s:  ldi     2
+            lskp
+fmtrd_l_b:  ldi     1
+            plo     rf                 ; set counter
+fmtrd_l_3:  ghi     rf                 ; get read value
+            str     rd                 ; write into variable
+            inc     rd
+            dec     rf                 ; decrement count
+            glo     rf                 ; see if done
+            lbnz    fmtrd_l_3          ; loop back if not
+            lbr     fmtrd_nx           ; otherwise on to the next
+fmtrd_l_t:  ldi     0ffh               ; mark as true
+            phi     rf
+            lbr     fmtrd_l_2          ; finish checking field
+
 fmtrd_i:    inc     r8                 ; get size
             ldn     r8
             plo     rc
