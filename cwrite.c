@@ -78,9 +78,9 @@ void cwrite(char* line) {
         }
       }
 
-    else if (strncasecmp(line, "eof=",4) == 0) {
+    else if (strncasecmp(line, "end=",4) == 0) {
       if (eof >= 0) {
-        showError("Duplicate EOF=");
+        showError("Duplicate END=");
         return;
         }
       line += 4;

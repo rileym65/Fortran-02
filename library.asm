@@ -659,6 +659,186 @@ uread_rt:   smi     0                  ; indicate error
 
 #endif
 
+#ifdef FMTREAD
+#redefine FREAD
+#redefine ATOI32
+#redefine ISNUMERAL
+fmtread:    ghi     ra                 ; get lun
+            lbz     fmtread_0          ; jump if from terminal
+            sep     scall              ; othereise read from disk
+            dw      fread
+            lbdf    fmtread_er         ; jump on file error
+            lbnz    fmtread_st         ; jump if bytes read
+fmtread_er: sep     sret               ; return to caller
+fmtread_0:  sep     scall              ; display prompt
+            dw      f_inmsg
+            db      '? ',0
+            ldi     iobuffer.1         ; point to io buffer
+            phi     rf
+            ldi     iobuffer.0
+            plo     rf
+            sep     scall              ; read line from terminal
+            dw      f_input
+            sep     scall              ; output a cr/lf
+            dw      f_inmsg
+            db      10,13,0
+fmtread_st: ldi     iobuffer.1         ; point to io buffer
+            phi     rb
+            ldi     iobuffer.0
+            plo     rb
+fmtread_lp: lda     r8                 ; get count for next format item
+            lbz     fmtrd_dn           ; jump if no more items
+            plo     ra
+            ldn     r8                 ; get format type
+            smi     'X'                ; check for X
+            lbz     fmtrd_x            ; jump if so
+fmtr_loop:  ldn     r8                 ; recover type
+            smi     'I'                ; check for integer
+            lbz     fmtrd_i            ; jump if so
+            ldi     0x22               ; error code
+            smi     0                  ; invalid type, so error
+            sep     sret               ; return to caller
+fmtrd_x:    glo     ra                 ; get item count
+            str     r2                 ; store for add
+            glo     rb                 ; add to buffer position
+            add
+            plo     rb
+            ghi     rb
+            adci    0
+            phi     rb
+            inc     r8                 ; move to next format item
+            inc     r8
+            inc     r8
+            lbr     fmtread_lp         ; loop for next item
+fmtrd_i:    inc     r8                 ; get size
+            ldn     r8
+            plo     rc
+            dec     r8
+            ldi     scratch1_.1        ; where to copy
+            phi     rf
+            ldi     scratch1_.0
+            plo     rf
+fmtrd_i_1:  lda     rb                 ; copy bytes from input
+            sep     scall              ; check for numeral
+            dw      isnumeral
+            lbdf    fmtrd_i_1a         ; jump if so
+            ldi     '0'                ; otherwise make it zero
+fmtrd_i_1a: str     rf
+            inc     rf
+            dec     rc
+            glo     rc
+            lbnz    fmtrd_i_1
+            ldi     0                  ; terminate
+            str     rf
+            ldi     scratch1_.1        ; back to field data
+            phi     rf
+            ldi     scratch1_.0
+            plo     rf
+fmtrd_i_2:  lda     rf                 ; move past any spaces
+            lbz     fmtrd_i_3          ; jump if terminator hit
+            smi     ' '                ; check for space
+            lbz     fmtrd_i_2          ; loop until no more spaces
+            dec     rf                 ; back to nonspace
+fmtrd_i_3:  ldi     scratch2_.1        ; where to put conversion
+            phi     rd
+            ldi     scratch2_.0
+            plo     rd
+            ghi     r7                 ; save important registers
+            stxd
+            glo     r7
+            stxd
+            ghi     r8
+            stxd
+            glo     r8
+            stxd
+            ghi     r9
+            stxd
+            glo     r9
+            stxd
+            ghi     ra
+            stxd
+            glo     ra
+            stxd
+            ghi     rb
+            stxd
+            glo     rb
+            stxd
+            sep     scall              ; convert ascii to integer
+            dw      atoi32
+            irx                        ; recover important registers
+            ldxa
+            plo     rb
+            ldxa
+            phi     rb
+            ldxa
+            plo     ra
+            ldxa
+            phi     ra
+            ldxa
+            plo     r9
+            ldxa
+            phi     r9
+            ldxa
+            plo     r8
+            ldxa
+            phi     r8
+            ldxa
+            plo     r7
+            ldx
+            phi     r7
+            lda     r9                 ; get next variable type
+            plo     re                 ; set aside
+            lda     r9                 ; get data address
+            phi     rd
+            lda     r9
+            plo     rd
+            ldi     scratch2_.1        ; where to number
+            phi     rf
+            ldi     scratch2_.0
+            plo     rf
+            glo     re                 ; recover variable type
+            smi     'B'                ; is it a byte
+            lbz     fmtrd_i_b          ; jump if so
+            glo     re                 ; recover variable type
+            smi     'L'                ; is it a logical
+            lbz     fmtrd_i_b          ; jump if so
+            glo     re                 ; recover variable type
+            smi     'S'                ; is it a short
+            lbz     fmtrd_i_s          ; jump if so
+            lda     rf                 ; copy converted number
+            str     rd
+            inc     rd
+            lda     rf
+            str     rd
+            inc     rd
+fmtrd_i_c2: lda     rf
+            str     rd
+            inc     rd
+fmtrd_i_c1: lda     rf
+            str     rd
+            lbr     fmtrd_nx           ; process end of entry
+fmtrd_i_s:  inc     rf                 ; skip high 2 bytes
+            inc     rf
+            lbr     fmtrd_i_c2         ; and copy 2 bytes
+fmtrd_i_b:  inc     rf                 ; skip high 3 bytes
+            inc     rf
+            inc     rf
+            lda     rf                 ; and copy final byte
+            str     rd
+
+fmtrd_nx:   dec     ra                 ; see if done with specifier
+            glo     ra
+            lbnz    fmtr_loop          ; jump if not, process next var
+            inc     r8                 ; move to next specifier
+            inc     r8
+            inc     r8
+            lbr     fmtread_lp         ; and process it
+
+fmtrd_dn:   ldi     1                  ; signal not eof
+            adi     0                  ; clear DF, no errors
+            sep     sret               ; return to caller
+#endif
+
 #ifdef FMTWRITE
 #redefine ITOA32
 #redefine FTOA
@@ -1615,6 +1795,42 @@ fwrite:       sep      scall           ; get file record for file
               sep      sret            ; return to caller
 fwrite_gd:    inc      rd              ; back to status field
               glo      rc              ; get bytes written
+              str      rd
+              sep      sret
+#endif
+
+#ifdef FREAD
+#redefine FILDES
+#redefine FSTATUS
+#redefine FCLOSE
+fread:        sep      scall           ; get file record for file
+              dw       fildes
+              lbdf     fclose_rt       ; return if invalid file
+              ldn      rd              ; get file open flag
+              lbz      ferr_no         ; jump if file not open
+              inc      rd              ; point to record size
+              lda      rd
+              plo      rc              ; put into count
+              ldi      0
+              phi      rc
+              inc      rd              ; move to Elf/OS FILDES
+              inc      rd
+              inc      rd
+              inc      rd
+              sep      scall           ; call Elf/OS to read the record
+              dw       0309h
+              dec      rd              ; move back to IOSTATUS field
+              dec      rd
+              dec      rd
+              str      rd              ; store status into record
+              dec      rd              ; point to IORESULT
+              ldi      0               ; get restult flag
+              shlc
+              str      rd              ; and store it
+              lbz      fread_gd        ; jump if good read
+              sep      sret            ; return to caller
+fread_gd:     inc      rd              ; back to status field
+              glo      rc              ; get bytes read
               str      rd
               sep      sret
 #endif
@@ -8376,3 +8592,98 @@ ioresults:  plo    re              ; save return code
 
 #endif
 
+#ifdef ISNUMERAL
+isnumeral:  plo    re              ; keep a copy
+            smi    '0'             ; check for below digits
+            lbnf   isnum_no        ; jump if not a numeral
+            smi    10              ; check high of range
+            lbdf   isnum_no        ; jump if too high
+            smi    0               ; set DF to indicate numeral
+            glo    re              ; recover original
+            sep    sret            ; and return
+isnum_no:   adi    0               ; clear DF to indicate not numeral
+            glo    re              ; recover original character
+            sep    sret            ; and return to caller
+#endif
+
+#ifdef PUSHALL
+pushall:    irx                    ; get top 2 values
+            ldxa
+            phi    rf
+            ldx
+            plo    rf
+            ghi    r7              ; now push everything
+            stxd
+            glo    r7
+            stxd
+            ghi    r8
+            stxd
+            glo    r8
+            stxd
+            ghi    r9
+            stxd
+            glo    r9
+            stxd
+            ghi    ra
+            stxd
+            glo    ra
+            stxd
+            ghi    rb
+            stxd
+            glo    rb
+            stxd
+            ghi    rc
+            stxd
+            glo    rc
+            stxd
+            ghi    rd
+            stxd
+            glo    rd
+            stxd
+            glo    rf               ; put top 2 bytes back
+            stxd
+            ghi    rf
+            stxd
+            sep    sret             ; and return to caller
+#endif
+
+#ifdef POPALL
+popall:     irx                     ; recover top 2 values
+            ldxa
+            phi    rf
+            ldxa
+            plo    rf
+            ldxa                    ; recover everything else
+            plo    rd
+            ldxa
+            phi    rd
+            ldxa
+            plo    rc
+            ldxa
+            phi    rc
+            ldxa
+            plo    rb
+            ldxa
+            phi    rb
+            ldxa
+            plo    ra
+            ldxa
+            phi    ra
+            ldxa
+            plo    r9
+            ldxa
+            phi    r9
+            ldxa
+            plo    r8
+            ldxa
+            phi    r8
+            ldxa
+            plo    r7
+            ldx
+            phi    r7
+            glo    rf                ; put top 2 bytes back
+            stxd
+            ghi    rf
+            stxd
+            sep    sret              ; and return
+#endif

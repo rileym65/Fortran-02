@@ -77,9 +77,9 @@ void cread(char* line) {
         }
       }
 
-    else if (strncasecmp(line, "eof=",4) == 0) {
+    else if (strncasecmp(line, "end=",4) == 0) {
       if (eof >= 0) {
-        showError("Duplicate EOF=");
+        showError("Duplicate END=");
         return;
         }
       line += 4;
@@ -120,152 +120,94 @@ void cread(char* line) {
 
     }
 
-
   if (*line != ',' && *line != ')') {
     showError("Syntax error");
     return;
     }
   line++;
-  if (*line >= '0' && *line <= '9') {
-    /* *************************** */
-    /* ***** Formatted write ***** */
-    /* *************************** */
-    pos = 0;
-    while (*line >= '0' && *line <= '9') token[pos++] = *line++;
-    token[pos] = 0;
-    sprintf(buffer,"           ldi     (%s_%s+3).1                 ; point to format data",
-      module, token);
-    Asm(buffer);
-    Asm("           phi     r8");
-    sprintf(buffer,"           ldi     (%s_%s+3).0", module, token);
-    Asm(buffer);
-    Asm("           plo     r8");
-    varLabel = nextLabel++;
-    eolLabel = nextLabel++;
-    sprintf(buffer,"           ldi     lbl_%d.1                 ; point variable data",
-      varLabel);
-    Asm(buffer);
-    Asm("           phi     r9");
-    sprintf(buffer,"           ldi     lbl_%d.0", varLabel);
-    Asm(buffer);
-    Asm("           plo     r9");
-    Asm("           inc     r7                  ; Retrieve LUN");
-    Asm("           lda     r7");
-    Asm("           phi     ra");
-    Asm("           inc     r7");
-    Asm("           inc     r7");
-    Asm("           sep     scall               ; Process write list");
-    Asm("           dw      fmtwrite");
-    sprintf(buffer,"           lbr     lbl_%d",eolLabel);
-    Asm(buffer);
 
-/* ***** Need processing for ERR=, et ***** */
-
-    sprintf(buffer,"lbl_%d:",varLabel);
+  varLabel = nextLabel++;
+  eolLabel = nextLabel++;
+  size = 0;
+  sprintf(buffer,"           lbr     lbl_%d",eolLabel);
+  Asm(buffer);
+  sprintf(buffer,"lbl_%d:",varLabel);
+  Asm(buffer);
+  while (*line != 0) {
+    line = getVarName(line, token);
+    if (strlen(token) == 0) {
+      showError("Invalid variable name");
+      return;
+      }
+    v = getVariable(token, module);
+    if (v < 0) {
+      showError("Invalid variable name");
+      return;
+      }
+    switch (varType(v)) {
+      case 'B':
+      case 'L': size += 1; break;
+      case 'S': size += 2; break;
+      case 'I':
+      case 'R': size += 4;  break;
+      }
+    sprintf(buffer,"           db      %d",varType(v));
     Asm(buffer);
-    if (*line != ')') {
+    sprintf(buffer,"           dw      %s_%s",variables[v].module, variables[v].name);
+    Asm(buffer);
+    if (*line != ',' && *line != 0) {
       showError("Syntax error");
       return;
       }
-    line++;
-    while (*line != 0) {
-      line = getVarName(line, token);
-      if (strlen(token) == 0) {
-        showError("Invalid variable name");
-        return;
-        }
-      v = getVariable(token, module);
-      if (v < 0) {
-        showError("Invalid variable name");
-        return;
-        }
-      sprintf(buffer,"           db      %d",varType(v)); 
-      Asm(buffer);
-      sprintf(buffer,"           dw      %s_%s",
-        variables[v].module, variables[v].name);
-      Asm(buffer);
-      if (*line != ',' && *line != 0) {
-        showError("Syntax error");
-        return;
-        }
-      if (*line == ',') line++;
-      }
-    Asm("           db      0");
-    sprintf(buffer,"lbl_%d:",eolLabel);
+    if (*line == ',') line++;
+    }
+  Asm("           db      0");
+  sprintf(buffer,"lbl_%d:",eolLabel);
+  Asm(buffer);
+  if (fline > 0) {
+    sprintf(buffer,"           ldi     (%s_%d+3).1                 ; point to format data",
+      module, fline);
     Asm(buffer);
-    addDefine("FMTWRITE",1,1);
+    Asm("           phi     r8");
+    sprintf(buffer,"           ldi     (%s_%d+3).0", module, fline);
+    Asm(buffer);
+    Asm("           plo     r8");
     }
   else {
-    /* ***************************** */
-    /* ***** Unformatted read ***** */
-    /* ***************************** */
-    varLabel = nextLabel++;
-    eolLabel = nextLabel++;
-    size = 0;
-    sprintf(buffer,"           lbr     lbl_%d",eolLabel);
-    Asm(buffer);
-    sprintf(buffer,"lbl_%d:",varLabel);
-    Asm(buffer);
-    while (*line != 0) {
-      line = getVarName(line, token);
-      if (strlen(token) == 0) {
-        showError("Invalid variable name");
-        return;
-        }
-      v = getVariable(token, module);
-      if (v < 0) {
-        showError("Invalid variable name");
-        return;
-        }
-      switch (varType(v)) {
-        case 'B':
-        case 'L': size += 1; break;
-        case 'S': size += 2; break;
-        case 'I':
-        case 'R': size += 4;  break;
-        }
-      sprintf(buffer,"           db      %d",varType(v));
-      Asm(buffer);
-      sprintf(buffer,"           dw      %s_%s",variables[v].module, variables[v].name);
-      Asm(buffer);
-      if (*line != ',' && *line != 0) {
-        showError("Syntax error");
-        return;
-        }
-      if (*line == ',') line++;
-      }
-    Asm("           db      0");
-    sprintf(buffer,"lbl_%d:",eolLabel);
-    Asm(buffer);
     sprintf(buffer,"           ldi     %d                       ; Number of bytes to read",size/256);
     Asm(buffer);
     Asm("           phi     rc");
     sprintf(buffer,"           ldi     %d",size%256);
     Asm(buffer);
     Asm("           plo     rc");
-    sprintf(buffer,"           ldi     lbl_%d.1                 ; point variable data",
-      varLabel);
-    Asm(buffer);
-    Asm("           phi     r9");
-    sprintf(buffer,"           ldi     lbl_%d.0", varLabel);
-    Asm(buffer);
-    Asm("           plo     r9");
-    Asm("           inc     r7                  ; Retrieve LUN");
-    Asm("           lda     r7");
-    Asm("           phi     ra");
-    Asm("           inc     r7");
-    Asm("           inc     r7");
-    Asm("           sep     scall               ; Process write list");
+    }
+  sprintf(buffer,"           ldi     lbl_%d.1                 ; point variable data", varLabel);
+  Asm(buffer);
+  Asm("           phi     r9");
+  sprintf(buffer,"           ldi     lbl_%d.0", varLabel);
+  Asm(buffer);
+  Asm("           plo     r9");
+  Asm("           inc     r7                  ; Retrieve LUN");
+  Asm("           lda     r7");
+  Asm("           phi     ra");
+  Asm("           inc     r7");
+  Asm("           inc     r7");
+  Asm("           sep     scall               ; Process write list");
+  if (fline > 0) {
+    Asm("           dw      fmtread");
+    addDefine("FMTREAD",1,1);
+    }
+  else {
     Asm("           dw      uread");
-    if (err > 0) {
-      sprintf(buffer,"           lbdf    %s_%d                 ; Jump on error",module, err);
-      Asm(buffer);
-      }
-    if (eof > 0) {
-      sprintf(buffer,"           lbz     %s_%d                 ; Jump on eof",module, eof);
-      Asm(buffer);
-      }
     addDefine("UREAD",1,1);
+    }
+  if (err > 0) {
+    sprintf(buffer,"           lbdf    %s_%d                 ; Jump on error",module, err);
+    Asm(buffer);
+    }
+  if (eof > 0) {
+    sprintf(buffer,"           lbz     %s_%d                 ; Jump on eof",module, eof);
+    Asm(buffer);
     }
   }
 

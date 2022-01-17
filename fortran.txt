@@ -28,8 +28,8 @@ if the -d command line switch is specified
       GO TO line
       GO TO (line,line,line,...),var
       GO TO var
-      WRITE(lun[,fline][,ERR=line][,EOF=line])var,var,...
-      READ(lun[,ERR=line][,EOF=line])var,var,...
+      WRITE(lun[,fline][,ERR=line][,END=line])var,var,...
+      READ(lun[,fline][,ERR=line][,END=line])var,var,...
       CONTINUE
       PAUSE [c]
       STOP [c]
@@ -82,13 +82,17 @@ Expression operators:
       IOFLAG(lun)    (expression)
       IOSTATUS(lun)  (expression)
 
-Format specifiers:
+Format specifiers for output:
       [n]A[width]
       [n]F[width][.decimal]
       [n]I[width]
       [n]L[width]
       [n]X
       'string'
+
+Format specifiers for input:
+      [n]I[width]
+      [n]X
 
 
 
@@ -98,7 +102,7 @@ Still to implement:
 
 
       GO TO var,(line,line,...)
-      CALL subr(arg,arg,...)
+      CALL subr[(arg,arg,...)]
       CALL APPEND(lun,filename,reclen)
       RETURN
       READ(lun[,REC=index],fline,ERR=line,END=line)var,var,...
@@ -109,10 +113,7 @@ Still to implement:
       PROGRAM name
       fnmame(arg,arg,...) = expr
       [type] FUNCTION name(arg,arg,...)
-      SUBROUTINE name(arg,arg,...)
-      SUBROUTINE name
-      CALL sname(arg,arg,...)
-      CALL sname
+      SUBROUTINE name[(arg,arg,...)]
       BLOCK DATA
 
 Compiler Directives:
@@ -177,3 +178,7 @@ Switches:
 -mchi           - -ram=8000-ffff -rom=0000-7fff -nq -ef3
 -mchip          - -ram=8000-ffff -rom=0000-7fff -rq -ref3
 
+runtime errors:
+  0x20 - File not open
+  0x21 - File already open
+  0x22 - Invalid format encountered

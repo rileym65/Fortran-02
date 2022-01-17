@@ -325,6 +325,7 @@ int main(int argc, char** argv, char** envp) {
     if (getDefine("HEAP") != 0)       printf("  dealloc    %04xh\n",getLabel("dealloc"));
     if (getDefine("HEAP") != 0)       printf("  hfree      %04xh\n",getLabel("hfree"));
     if (getDefine("FMTWRITE") != 0)   printf("  fmtwrite   %04xh\n",getLabel("fmtwrite"));
+    if (getDefine("FMTREAD") != 0)    printf("  fmtread    %04xh\n",getLabel("fmtread"));
     if (getDefine("AND16") != 0)      printf("  and16      %04xh\n",getLabel("and16"));
     if (getDefine("ATOI16") != 0)     printf("  atoi16     %04xh\n",getLabel("atoi"));
     if (getDefine("DIV16") != 0)      printf("  div16      %04xh\n",getLabel("div16"));
@@ -350,7 +351,9 @@ int main(int argc, char** argv, char** envp) {
     if (getDefine("LFSR") != 0)       printf("  lfsr       %04xh\n",getLabel("lfsr_lp"));
     if (getDefine("FOPEN") != 0)      printf("  fopen      %04xh\n",getLabel("fopen"));
     if (getDefine("UWRITE") != 0)     printf("  uwrite     %04xh\n",getLabel("uwrite"));
+    if (getDefine("FWRITE") != 0)     printf("  fwrite     %04xh\n",getLabel("fwrite"));
     if (getDefine("UREAD") != 0)      printf("  uread      %04xh\n",getLabel("uread"));
+    if (getDefine("FREAD") != 0)      printf("  fread      %04xh\n",getLabel("fread"));
     if (getDefine("FCLOSE") != 0)     printf("  fclose     %04xh\n",getLabel("fclose"));
     if (getDefine("FREWIND") != 0)    printf("  frewind    %04xh\n",getLabel("frewind"));
     if (getDefine("IOFLAG") != 0)     printf("  ioflag     %04xh\n",getLabel("ioflag"));
