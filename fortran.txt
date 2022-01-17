@@ -93,6 +93,7 @@ Format specifiers for output:
 Format specifiers for input:
       [n]I[width]
       [n]X
+      [n]L[width]
 
 
 
