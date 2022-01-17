@@ -663,6 +663,7 @@ uread_rt:   smi     0                  ; indicate error
 #redefine FREAD
 #redefine ATOI32
 #redefine ISNUMERAL
+#redefine ATOF
 fmtread:    ghi     ra                 ; get lun
             lbz     fmtread_0          ; jump if from terminal
             sep     scall              ; othereise read from disk
@@ -692,12 +693,38 @@ fmtread_lp: lda     r8                 ; get count for next format item
             ldn     r8                 ; get format type
             smi     'X'                ; check for X
             lbz     fmtrd_x            ; jump if so
-fmtr_loop:  ldn     r8                 ; recover type
+fmtr_loop:  inc     r8                 ; get size of field
+            ldn     r8
+            plo     rc                 ; place into count
+            phi     rc                 ; keep a copy
+            dec     r8
+            ldi     scratch1_.1        ; where to copy
+            phi     rf
+            ldi     scratch1_.0
+            plo     rf
+fmtrd_c_1:  lda     rb                 ; copy bytes from input
+            str     rf
+            inc     rf
+            dec     rc
+            glo     rc
+            lbnz    fmtrd_c_1
+            ldi     0                  ; terminate
+            str     rf
+            ghi     rc                 ; reset size
+            plo     rc
+            ldi     scratch1_.1        ; Point RF back to here
+            phi     rf
+            ldi     scratch1_.0
+            plo     rf
+            ldn     r8                 ; recover type
             smi     'I'                ; check for integer
             lbz     fmtrd_i            ; jump if so
             ldn     r8                 ; recover type
             smi     'L'                ; check for logical
             lbz     fmtrd_l            ; jump if so
+            ldn     r8                 ; recover type
+            smi     'F'                ; check for real
+            lbz     fmtrd_r            ; jump if so
             ldi     0x22               ; error code
             smi     0                  ; invalid type, so error
             sep     sret               ; return to caller
@@ -714,14 +741,9 @@ fmtrd_x:    glo     ra                 ; get item count
             inc     r8
             lbr     fmtread_lp         ; loop for next item
 
-fmtrd_l:    inc     r8                 ; get size
-            ldn     r8
-            plo     rc
-            dec     r8
-            ldi     0                  ; set field initially to false
-            phi     rf
-fmtrd_l_1:  lda     rb                 ; get byte from input
-            plo     re                 ; keep a copy
+fmtrd_l:    ldi     0                  ; set field initially to false
+            phi     rc
+fmtrd_l_1:  lda     rf                 ; get byte from input
             smi     'T'                ; check for true
             lbz     fmtrd_l_t          ; jump if so
             smi     32                 ; lowercase t
@@ -751,7 +773,7 @@ fmtrd_l_s:  ldi     2
             lskp
 fmtrd_l_b:  ldi     1
             plo     rf                 ; set counter
-fmtrd_l_3:  ghi     rf                 ; get read value
+fmtrd_l_3:  ghi     rc                 ; get read value
             str     rd                 ; write into variable
             inc     rd
             dec     rf                 ; decrement count
@@ -759,29 +781,20 @@ fmtrd_l_3:  ghi     rf                 ; get read value
             lbnz    fmtrd_l_3          ; loop back if not
             lbr     fmtrd_nx           ; otherwise on to the next
 fmtrd_l_t:  ldi     0ffh               ; mark as true
-            phi     rf
+            phi     rc
             lbr     fmtrd_l_2          ; finish checking field
 
-fmtrd_i:    inc     r8                 ; get size
-            ldn     r8
-            plo     rc
-            dec     r8
-            ldi     scratch1_.1        ; where to copy
-            phi     rf
-            ldi     scratch1_.0
-            plo     rf
-fmtrd_i_1:  lda     rb                 ; copy bytes from input
-            sep     scall              ; check for numeral
+fmtrd_i:    lda     rf                 ; get byte from input
+            sep     scall              ; is it a numeral
             dw      isnumeral
-            lbdf    fmtrd_i_1a         ; jump if so
-            ldi     '0'                ; otherwise make it zero
-fmtrd_i_1a: str     rf
-            inc     rf
-            dec     rc
-            glo     rc
-            lbnz    fmtrd_i_1
-            ldi     0                  ; terminate
+            lbdf    fmtrd_i_1          ; jump if so
+            dec     rf                 ; replace with '0'
+            ldi     '0'
             str     rf
+            inc     rf
+fmtrd_i_1:  dec     rc                 ; decrement width
+            glo     rc                 ; see if done
+            lbnz    fmtrd_i            ; loop back if not
             ldi     scratch1_.1        ; back to field data
             phi     rf
             ldi     scratch1_.0
@@ -877,6 +890,118 @@ fmtrd_i_b:  inc     rf                 ; skip high 3 bytes
             inc     rf
             lda     rf                 ; and copy final byte
             str     rd
+
+
+
+fmtrd_r:    lda     rf                 ; get byte from input
+            sep     scall              ; is it a numeral
+            dw      isnumeral
+            lbdf    fmtrd_r_1          ; jump if so
+;            dec     rf                 ; replace with '0'
+;            ldi     '0'
+;            str     rf
+;            inc     rf
+fmtrd_r_1:  dec     rc                 ; decrement width
+            glo     rc                 ; see if done
+            lbnz    fmtrd_r            ; loop back if not
+            ldi     scratch1_.1        ; back to field data
+            phi     rf
+            ldi     scratch1_.0
+            plo     rf
+fmtrd_r_2:  lda     rf                 ; move past any spaces
+            lbz     fmtrd_r_3          ; jump if terminator hit
+            smi     ' '                ; check for space
+            lbz     fmtrd_r_2          ; loop until no more spaces
+            dec     rf                 ; back to nonspace
+fmtrd_r_3:  ldi     scratch2_.1        ; where to put conversion
+            phi     rd
+            ldi     scratch2_.0
+            plo     rd
+            ghi     r7                 ; save important registers
+            stxd
+            glo     r7
+            stxd
+            ghi     r8
+            stxd
+            glo     r8
+            stxd
+            ghi     r9
+            stxd
+            glo     r9
+            stxd
+            ghi     ra
+            stxd
+            glo     ra
+            stxd
+            ghi     rb
+            stxd
+            glo     rb
+            stxd
+            sep     scall              ; convert ascii to integer
+            dw      atof
+            irx                        ; recover important registers
+            ldxa
+            plo     rb
+            ldxa
+            phi     rb
+            ldxa
+            plo     ra
+            ldxa
+            phi     ra
+            ldxa
+            plo     r9
+            ldxa
+            phi     r9
+            ldxa
+            plo     r8
+            ldxa
+            phi     r8
+            ldxa
+            plo     r7
+            ldx
+            phi     r7
+            lda     r9                 ; get next variable type
+            plo     re                 ; set aside
+            lda     r9                 ; get data address
+            phi     rd
+            lda     r9
+            plo     rd
+            ldi     scratch2_.1        ; where to number
+            phi     rf
+            ldi     scratch2_.0
+            plo     rf
+            glo     re                 ; recover variable type
+            smi     'B'                ; is it a byte
+            lbz     fmtrd_r_b          ; jump if so
+            glo     re                 ; recover variable type
+            smi     'L'                ; is it a logical
+            lbz     fmtrd_r_b          ; jump if so
+            glo     re                 ; recover variable type
+            smi     'S'                ; is it a short
+            lbz     fmtrd_r_s          ; jump if so
+            lda     rf                 ; copy converted number
+            str     rd
+            inc     rd
+            lda     rf
+            str     rd
+            inc     rd
+fmtrd_r_c2: lda     rf
+            str     rd
+            inc     rd
+fmtrd_r_c1: lda     rf
+            str     rd
+            lbr     fmtrd_nx           ; process end of entry
+fmtrd_r_s:  inc     rf                 ; skip high 2 bytes
+            inc     rf
+            lbr     fmtrd_r_c2         ; and copy 2 bytes
+fmtrd_r_b:  inc     rf                 ; skip high 3 bytes
+            inc     rf
+            inc     rf
+            lda     rf                 ; and copy final byte
+            str     rd
+
+
+
 
 fmtrd_nx:   dec     ra                 ; see if done with specifier
             glo     ra
