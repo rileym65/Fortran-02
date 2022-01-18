@@ -91,6 +91,7 @@ Format specifiers for output:
       'string'
 
 Format specifiers for input:
+      [n]F[width][.decimal]
       [n]I[width]
       [n]X
       [n]L[width]

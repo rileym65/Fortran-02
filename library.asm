@@ -666,6 +666,10 @@ uread_rt:   smi     0                  ; indicate error
 #redefine ATOF
 fmtread:    ghi     ra                 ; get lun
             lbz     fmtread_0          ; jump if from terminal
+            ldi     iobuffer.1
+            phi     rf
+            ldi     iobuffer.0
+            plo     rf
             sep     scall              ; othereise read from disk
             dw      fread
             lbdf    fmtread_er         ; jump on file error
@@ -961,6 +965,7 @@ fmtrd_r_3:  ldi     scratch2_.1        ; where to put conversion
             ldx
             phi     r7
             lda     r9                 ; get next variable type
+            lbz     fmtrd_dn
             plo     re                 ; set aside
             lda     r9                 ; get data address
             phi     rd
@@ -1980,7 +1985,8 @@ fwrite_gd:    inc      rd              ; back to status field
 #redefine FILDES
 #redefine FSTATUS
 #redefine FCLOSE
-fread:        sep      scall           ; get file record for file
+fread:        ghi      ra
+              sep      scall           ; get file record for file
               dw       fildes
               lbdf     fclose_rt       ; return if invalid file
               ldn      rd              ; get file open flag
