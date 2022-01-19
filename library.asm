@@ -896,18 +896,62 @@ fmtrd_i_b:  inc     rf                 ; skip high 3 bytes
             str     rd
 
 
-
-fmtrd_r:    lda     rf                 ; get byte from input
+fmtrd_r:    ldi     0                  ; indicate no period found
+            phi     rc
+fmtrd_ra:   lda     rf                 ; get byte from input
+            lbz     fmtrd_r0           ; jump if terminator found
             sep     scall              ; is it a numeral
             dw      isnumeral
+            plo     re                 ; save character
             lbdf    fmtrd_r_1          ; jump if so
-;            dec     rf                 ; replace with '0'
-;            ldi     '0'
-;            str     rf
-;            inc     rf
+            smi     '-'                ; check for minus sign
+            lbz     fmtrd_r_1          ; jump if minus
+            glo     re                 ; test for +
+            smi     '+'
+            lbz     fmtrd_r_1
+            glo     re                 ; test for E
+            smi     'E'
+            lbz     fmtrd_r_1
+            smi     32                 ; test for e
+            lbz     fmtrd_r_1
+            smi     '.'                ; check for period
+            lbnz    fmtrd_r_1          ; jump if not
+            ldi     0xff               ; indicate period found
+            phi     rc
+            dec     rf                 ; replace with '0'
+            ldi     '0'
+            skp
+            str     rf
+            inc     rf
 fmtrd_r_1:  dec     rc                 ; decrement width
             glo     rc                 ; see if done
-            lbnz    fmtrd_r            ; loop back if not
+            lbnz    fmtrd_ra           ; loop back if not
+fmtrd_r_0b: ldi     scratch1_.1        ; back to field data
+            phi     rf
+            ldi     scratch1_.0
+            plo     rf
+            ghi     rc                 ; was a decimal encountered
+            lbnz    fmtrd_r_2          ; jump if so
+fmtrd_r_x1: lda     rf                 ; find terminator
+            lbnz    fmtrd_r_x1
+            inc     r8                 ; get decimal size
+            inc     r8
+            ldn     r8
+            plo     rc
+            dec     r8
+            dec     r8
+            ldi     0                  ; write new terminator
+            str     rf
+fmtrd_r_x2: dec     rf                 ; move to prior character
+            glo     rc                 ; done moving characters?
+            lbz     fmtrd_r_x3         ; jump if so
+            dec     rf                 ; move prior character
+            lda     rf
+            str     rf
+            dec     rc                 ; decrement count
+            lbr     fmtrd_r_x2         ; loop until done
+fmtrd_r_x3: ldi     '.'                ; put in decimal point
+            str     rf
             ldi     scratch1_.1        ; back to field data
             phi     rf
             ldi     scratch1_.0
@@ -1004,7 +1048,17 @@ fmtrd_r_b:  inc     rf                 ; skip high 3 bytes
             inc     rf
             lda     rf                 ; and copy final byte
             str     rd
-
+fmtrd_r0:   dec     rf                 ; move back to terminator
+fmtrd_r0c:  glo     rc                 ; see if done with field
+            lbz     fmtrd_r_0a         ; jump if so
+            ldi     '0'                ; write a zero
+            str     rf
+            inc     rf
+            dec     rc
+            lbr     fmtrd_r0c          ; loop until full field set
+fmtrd_r_0a: ldi     0                  ; write terminator
+            str     rf
+            lbr     fmtrd_r_0b
 
 
 
