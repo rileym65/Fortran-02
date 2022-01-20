@@ -228,6 +228,10 @@ int pass(char* filename) {
     Asm("SCRATCH1_: ds    64");
     Asm("SCRATCH2_: ds    32");
     }
+  else if (getDefine("FFWRITE")) {
+    Asm("SCRATCH1_: ds    64");
+    Asm("SCRATCH2_: ds    32");
+    }
   if (getDefine("LFSR")) {
     Asm("LFSR_:     dw    0");
     Asm("LFSR__:    dw    0");

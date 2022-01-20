@@ -503,6 +503,9 @@ nobs:       inc     ra
 #ifdef FFWRITE
 #redefine ITOA32
 #redefine FTOA
+#redefine USEFP
+#redefine DIVFP
+#redefine MULFP
 ffwrite:    ldi     iobuffer.1         ; setup output buffer
             phi     rd
             ldi     iobuffer.0
