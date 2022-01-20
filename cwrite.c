@@ -30,8 +30,20 @@ void cwrite(char* line) {
     return;
     }
   line++;
-  line = cexpr(line,0);
-  if (exprErrors > 0) return;
+  if (*line == '*') {
+    Asm("           ldi     0                   ; Push LUN 0 to expr stack");
+    Asm("           sex     r7");
+    Asm("           stxd");
+    Asm("           stxd");
+    Asm("           stxd");
+    Asm("           stxd");
+    Asm("           sex     r2");
+    line++;
+    }
+  else {
+    line = cexpr(line,0);
+    if (exprErrors > 0) return;
+    }
 
   while (*line != 0 && *line != ')') {
     if (*line != ',') {
@@ -99,8 +111,17 @@ void cwrite(char* line) {
         }
       }
 
+    else if (*line == '*') {
+      if (fline != -1) {
+        showError("Duplicate FORMAT line");
+        return;
+        }
+      fline = -999;
+      line++;
+      }
+
     else if (*line >= '0' && *line <= '9') {
-      if (fline >= 0) {
+      if (fline != -1) {
         showError("Duplicate FORMAT line");
         return;
         }
@@ -156,6 +177,10 @@ void cwrite(char* line) {
     Asm("           dw      fmtwrite");
     addDefine("FMTWRITE",1,1);
     }
+  else if (fline == -999) {
+    Asm("           dw      ffwrite");
+    addDefine("FFWRITE",1,1);
+    }
   else {
     Asm("           dw      uwrite");
     addDefine("UWRITE",1,1);
@@ -174,21 +199,39 @@ void cwrite(char* line) {
   sprintf(buffer,"lbl_%d:",varLabel);
   Asm(buffer);
   while (*line != 0) {
-    line = getVarName(line, token);
-    if (strlen(token) == 0) {
-      showError("Invalid variable name");
-      return;
+    if (*line == '\'') {
+      line++;
+      strcpy(buffer,"           db      34,'");
+      pos = strlen(buffer);
+      while (*line != '\'' && *line != 0) {
+        buffer[pos++] = *line++;
+        }
+      buffer[pos] = 0;
+      strcat(buffer,"',0");
+      if (*line != '\'') {
+        showError("Unmatched quote");
+        return;
+        }
+      Asm(buffer);
+      line++;
       }
-    v = getVariable(token, module);
-    if (v < 0) {
-      showError("Invalid variable name");
-      return;
+    else {
+      line = getVarName(line, token);
+      if (strlen(token) == 0) {
+        showError("Invalid variable name");
+        return;
+        }
+      v = getVariable(token, module);
+      if (v < 0) {
+        showError("Invalid variable name");
+        return;
+        }
+      sprintf(buffer,"           db      %d",varType(v)); 
+      Asm(buffer);
+      sprintf(buffer,"           dw      %s_%s",
+        variables[v].module, variables[v].name);
+      Asm(buffer);
       }
-    sprintf(buffer,"           db      %d",varType(v)); 
-    Asm(buffer);
-    sprintf(buffer,"           dw      %s_%s",
-      variables[v].module, variables[v].name);
-    Asm(buffer);
     if (*line != ',' && *line != 0) {
       showError("Syntax error");
       return;
