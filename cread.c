@@ -30,8 +30,20 @@ void cread(char* line) {
     return;
     }
   line++;
-  line = cexpr(line,0);
-  if (exprErrors > 0) return;
+  if (*line == '*') {
+    Asm("           ldi     0                   ; Push LUN 0 to expr stack");
+    Asm("           sex     r7");
+    Asm("           stxd");
+    Asm("           stxd");
+    Asm("           stxd");
+    Asm("           stxd");
+    Asm("           sex     r2");
+    line++;
+    }
+  else {
+    line = cexpr(line,0);
+    if (exprErrors > 0) return;
+    }
   while (*line != 0 && *line != ')') {
     if (*line != ',') {
       showError("Syntax error");
@@ -98,8 +110,17 @@ void cread(char* line) {
         }
       }
 
+    else if (*line == '*') {
+      if (fline != -1) {
+        showError("Duplicate FORMAT line");
+        return;
+        }
+      fline = -999;
+      line++;
+      }
+
     else if (*line >= '0' && *line <= '9') {
-      if (fline >= 0) {
+      if (fline != -1) {
         showError("Duplicate FORMAT line");
         return;
         }
@@ -196,6 +217,10 @@ void cread(char* line) {
   if (fline > 0) {
     Asm("           dw      fmtread");
     addDefine("FMTREAD",1,1);
+    }
+  else if (fline = -999) {
+    Asm("           dw      ffread");
+    addDefine("FFREAD",1,1);
     }
   else {
     Asm("           dw      uread");

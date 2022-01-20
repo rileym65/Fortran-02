@@ -356,6 +356,7 @@ int main(int argc, char** argv, char** envp) {
     if (getDefine("FREAD") != 0)      printf("  fread      %04xh\n",getLabel("fread"));
     if (getDefine("FCLOSE") != 0)     printf("  fclose     %04xh\n",getLabel("fclose"));
     if (getDefine("FREWIND") != 0)    printf("  frewind    %04xh\n",getLabel("frewind"));
+    if (getDefine("FFREAD") != 0)     printf("  ffread     %04xh\n",getLabel("ffread"));
     if (getDefine("IOFLAG") != 0)     printf("  ioflag     %04xh\n",getLabel("ioflag"));
     if (getDefine("IOSTATUS") != 0)   printf("  iostatus   %04xh\n",getLabel("iostatus"));
   
