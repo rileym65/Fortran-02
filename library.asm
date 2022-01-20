@@ -514,7 +514,10 @@ ffread_lp:  ldn     r9                 ; get next variable type
             sep     sret               ; otherwise return to caller
 ffread_1:   ldn     rb                 ; need to see if we have some input
             lbnz    ffread_2           ; jump if we do
-ffread_1a:  ldi     iobuffer.1         ; setup buffer
+ffread_1a:  ldi     '?'                ; show input prompt
+            sep     scall
+            dw      f_type
+            ldi     iobuffer.1         ; setup buffer
             phi     rf
             ldi     iobuffer.0
             plo     rf
