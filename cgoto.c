@@ -18,7 +18,10 @@ void cgoto(char* line) {
   int  pos;
   int  i;
   int  v;
+  int  value;
   int  finalLabel;
+  int  goLabel;
+  int  noLabel;
 
   /* ************************************** */
   /* ***** Handle jump to line number ***** */
@@ -109,6 +112,74 @@ void cgoto(char* line) {
     /* ***** Assigned GO TO witht qualification ***** */
     /* ********************************************** */
     if (*line == ',') {
+      line++;
+      if (*line != '(') {
+        showError("Syntax error");
+        return;
+        }
+      line++;
+      sprintf(buffer,"          ldi   %s_%s.1                ; Point to variable",
+              variables[v].module, variables[v].name);
+      Asm(buffer);
+      Asm("            phi  ra");
+      sprintf(buffer,"          ldi   %s_%s.0",
+              variables[v].module, variables[v].name);
+      Asm(buffer);
+      Asm("            plo  ra");
+      Asm("            inc  ra");
+      Asm("            inc  ra");
+      Asm("            lda  ra");
+      Asm("            phi  rf");
+      Asm("            ldn  ra");
+      Asm("            plo  rf");
+      finalLabel = nextLabel++;
+      goLabel = nextLabel++;
+      while (*line != 0 && *line != ')') {
+        if (*line >= '0' && *line <= '9') {
+          value = 0;
+          while (*line >= '0' && *line <= '9') {
+            value = (value * 10) + (*line - '0');
+            line++;
+            }
+          if (value == 0) {
+            showError("Invalid line number");
+            return;
+            }
+          noLabel = (*line == ',') ? nextLabel++ : finalLabel;
+          Asm("          ghi   rf                      ; Check line number");
+          sprintf(buffer,"          smi   %s_%d.1", module, value); Asm(buffer);
+          sprintf(buffer,"          lbnz  lbl_%d", noLabel); Asm(buffer);
+          Asm("          glo   rf");
+          sprintf(buffer,"          smi   %s_%d.0", module, value); Asm(buffer);
+          sprintf(buffer,"          lbz   lbl_%d", goLabel); Asm(buffer);
+          if (*line == ',') {
+            line++;
+            sprintf(buffer,"lbl_%d:",noLabel); Asm(buffer);
+            }
+          else {
+            sprintf(buffer,"          lbr   lbl_%d", finalLabel); Asm(buffer);
+            }
+          }
+        }
+      if (*line != ')') {
+        showError("Syntax error");
+        return;
+        }
+      sprintf(buffer,"lbl_%d:",goLabel); Asm(buffer);
+      sprintf(buffer,"          ldi   lbl_%d.1", nextLabel); Asm(buffer);
+      Asm("            phi  ra");
+      sprintf(buffer,"          ldi   lbl_%d.0", nextLabel); Asm(buffer);
+      Asm("            plo  ra");
+      Asm("            sep  ra");
+      sprintf(buffer,"lbl_%d:     ghi  rf", nextLabel++); Asm(buffer);
+      Asm("            phi  r3");
+      Asm("            glo  rf");
+      Asm("            plo  r3");
+      Asm("            sep  r3");
+
+
+      sprintf(buffer,"lbl_%d:",finalLabel); Asm(buffer);
+      return;
       }
     showError("Syntax error");
     return;
