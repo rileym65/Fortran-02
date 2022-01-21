@@ -540,7 +540,7 @@ ffwrite_qt: lda     r9                 ; get byte from list
             str     rd                 ; store into output
             inc     rd
             lbr     ffwrite_qt
-ffwrite_l:  ldn     r9                 ; get variable vlue
+ffwrite_l:  ldn     rf                 ; get variable vlue
             lbnz    ffwrite_lt         ; jump if true
             ldi     'F'                ; need to output false
             lskp
@@ -729,6 +729,9 @@ ffread_4:   ldi     scratch1_.1        ; setup buffers for conversion
             phi     rd
             ldi     scratch2_.0
             plo     rd
+            ldn     r9                 ; get variable type
+            smi     'L'                ; check for logical
+            lbz     ffread_l           ; jump if so
             ghi     r7                 ; save important registers
             stxd
             glo     r7
@@ -776,9 +779,6 @@ ffread_5:   irx                        ; recover consumed registers
             smi     'B'                ; is it a byte
             lbz     ffread_b           ; jump if so
             glo     re                 ; recover type
-            smi     'L'                ; is it a logical
-            lbz     ffread_b           ; jump if so
-            glo     re                 ; recover type
             smi     'S'                ; is it a short
             lbz     ffread_s           ; jump if so
             ldi     4                  ; need to copy 4 bytes
@@ -804,6 +804,22 @@ ffread_b:   inc     rf                 ; move to LSB
             ldn     rf                 ; retrieve it
             str     rd                 ; and store to variable
             lbr     ffread_lp          ; loop back for next variable
+ffread_l:   inc     r9                 ; get variable address
+            lda     r9
+            phi     rd
+            lda     r9
+            plo     rd
+            ldi     0                  ; set it initially to false
+            str     rd
+ffread_la:  lda     rf                 ; read byte from input
+            lbz     ffread_lp          ; loop to next variable if done
+            smi     'T'                ; check for T
+            lbz     ffread_t           ; jump if so
+            smi     32                 ; check for t
+            lbnz    ffread_la          ; jump if not
+ffread_t:   ldi     0ffh               ; set variable to true
+            str     rd
+            lbr     ffread_lp          ; then to next variable
 #endif
 
 #ifdef UWRITE
