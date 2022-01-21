@@ -1743,13 +1743,13 @@ fmtwrt_a2:  ldi     2                  ; 2 characters
 fmtwrt_a4:  ldi     4                  ; 4 characters
 fmtwrt_aa:  phi     rc                 ; store count
 fmtwrt_ab:  lda     rf                 ; get byte from variable
-            lbz     fmtwrt_ac          ; jump if no more ascii data
+            lbz     fmtwrt_an          ; jump if not ascii data
             str     rb                 ; write to output buffer
             inc     rb
             dec     rc                 ; decrement field width
             glo     rc                 ; see if field width reached
             lbz     fmtwrt_e1          ; end of entry if so
-            ghi     rc                 ; get source count
+fmtwrt_an:  ghi     rc                 ; get source count
             smi     1                  ; subtract 1
             phi     rc                 ; and put it back
             lbnz    fmtwrt_ab          ; continue copying if not done
