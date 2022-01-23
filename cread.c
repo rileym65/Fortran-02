@@ -218,7 +218,7 @@ void cread(char* line) {
     Asm("           dw      fmtread");
     addDefine("FMTREAD",1,1);
     }
-  else if (fline = -999) {
+  else if (fline == -999) {
     Asm("           dw      ffread");
     addDefine("FFREAD",1,1);
     }
