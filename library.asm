@@ -657,8 +657,7 @@ ffwrite_r:  ldi     (scratch2_+3).1    ; need to reverse the bytes
             sep     scall              ; convert real value
             dw      ftoa
             lbr     ffwrite_r2         ; and finish up 
-ffwrite_dn: dec     rd                 ; move back to last space
-            ldi     0                  ; and write a terminator
+ffwrite_dn: ldi     0                  ; write a terminator
             str     rd
             ldi     iobuffer.1         ; setup buffer for output
             phi     rf
