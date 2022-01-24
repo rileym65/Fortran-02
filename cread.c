@@ -31,11 +31,12 @@ void cread(char* line) {
     }
   line++;
   if (*line == '*') {
-    Asm("           ldi     0                   ; Push LUN 0 to expr stack");
+    Asm("           ldi     0                   ; Push LUN 5 to expr stack");
     Asm("           sex     r7");
     Asm("           stxd");
     Asm("           stxd");
     Asm("           stxd");
+    Asm("           ldi     5");
     Asm("           stxd");
     Asm("           sex     r2");
     line++;

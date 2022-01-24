@@ -989,7 +989,9 @@ uread_rt:   smi     0                  ; indicate error
 #redefine ISNUMERAL
 #redefine ATOF
 fmtread:    ghi     ra                 ; get lun
+            xri     5                  ; terminal is LUN 5
             lbz     fmtread_0          ; jump if from terminal
+            xri     5                  ; restore LUN
             ldi     iobuffer.1
             phi     rf
             ldi     iobuffer.0
@@ -2031,6 +2033,7 @@ fmtwrt_dn:  ldi     0                  ; terminate record
             ldi     iobuffer.0
             plo     rf
             ghi     ra                 ; need to get LUN
+            xri     5                  ; check for LUN 5
             lbnz    fmtwrt_dsk         ; jump if a disk file
             sep     scall              ; display it
             dw      f_msg
@@ -2038,7 +2041,8 @@ fmtwrt_dn:  ldi     0                  ; terminate record
             dw      f_inmsg
             db      10,13,0
             sep     sret               ; then return to caller
-fmtwrt_dsk: sep     scall              ; call disk write
+fmtwrt_dsk: xri     5                  ; resture LUN number
+            sep     scall              ; call disk write
             dw      fwrite
             sep     sret               ; and then return
 #endif
