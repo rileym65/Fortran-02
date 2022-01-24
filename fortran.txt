@@ -9,6 +9,8 @@ by the compiler
   A line beginning with 'd' or 'D' is a debug line and will only be compiled
 if the -d command line switch is specified
 
+      PROGRAM name
+
       INTEGER var,var,...
       LOGICAL var,var,...
       REAL var,var,...
@@ -43,6 +45,9 @@ if the -d command line switch is specified
       CALL OPEN(lun,filename,reclen)
       REWIND lun
       ENDFILE lun
+      CALL subr
+      RETURN                (For no-arg subroutines)
+      
 
 Expression operators:
       +
@@ -110,16 +115,15 @@ Still to implement:
 
       CALL subr[(arg,arg,...)]
       CALL APPEND(lun,filename,reclen)
-      RETURN
       READ(lun[,REC=index],fline,ERR=line,END=line)var,var,...
       WRITE(lun[,REC=index],fline,ERR=line,END=line)var,var,...
       READ(lun[,REC=index],ERR=line,END=line)var,var,...
       WRITE(lun[,REC=index],ERR=line,END=line)var,var,...
 
-      PROGRAM name
       fnmame(arg,arg,...) = expr
       [type] FUNCTION name(arg,arg,...)
       SUBROUTINE name[(arg,arg,...)]
+      EXTERNAL
       BLOCK DATA
 
 Compiler Directives:

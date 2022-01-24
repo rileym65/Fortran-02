@@ -15,6 +15,7 @@ void crewind(char* line) {
   int  pos;
   int  lun;
   int  v;
+  checkMain();
   lun = 0;
   if (*line >= '0' && *line <= '9') {
     while (*line >= '0' && *line <= '9') {

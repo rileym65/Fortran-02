@@ -17,6 +17,7 @@ void cformat(char* line) {
   char string[256];
   int pos;
   char ftype;
+  checkMain();
   if (*line != '(') {
     showError("Syntax error");
     return;

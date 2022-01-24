@@ -10,11 +10,9 @@
 
 #include "header.h"
 
-void ccontinue(char* line) {
-  checkMain();
-  if (*line != 0) {
-    showError("Invalid character encountered in CONTINUE statement");
-    return;
-    }
+void checkMain() {
+  if (inUnit) return;
+  inUnit = -1;
+  Asm("START___:");
   }
 

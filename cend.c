@@ -11,6 +11,8 @@
 #include "header.h"
 
 void cend(char* line) {
+  inUnit = 0;
+  inSub = 0;
   if (*line != 0) {
     showError("Invalid character encountered in END statement");
     return;

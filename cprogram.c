@@ -10,11 +10,29 @@
 
 #include "header.h"
 
-void ccontinue(char* line) {
-  checkMain();
-  if (*line != 0) {
-    showError("Invalid character encountered in CONTINUE statement");
+void cprogram(char* line) {
+  char token[32];
+  int  pos;
+  if (inUnit) {
+    showError("Not allowed inside program unit");
     return;
     }
+  inUnit = -1;
+  pos = 0;
+  while ((*line >= 'a' && *line <= 'z') ||
+         (*line >= 'A' && *line <= 'Z') ||
+         (*line >= '0' && *line <= '9') ||
+          *line == '_') token[pos++] = *line++;
+  if (*line != 0) {
+    showError("Syntax error");
+    return;
+    }
+  if (pos == 0) {
+    showError("NULL name not allowed");
+    return;
+    }
+  token[pos] = 0;
+  strcpy(module, token);
+  Asm("START___:");
   }
 

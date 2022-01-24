@@ -23,6 +23,7 @@ void cdata(char* line) {
   int  flag;
   int  shift;
   INTREAL ir;
+  checkMain();
   while (*line != 0) {
     numVars = 0;
     pos = 0;
@@ -112,10 +113,7 @@ void cdata(char* line) {
           ir.integer = 0;
           shift = 24;
           for (j=1; j<strlen(token); j++) {
-            if (shift >= 0) {
-              ir.integer |= (token[j] << shift);
-              shift -= 8;
-              }
+            ir.integer = (ir.integer << 8) | token[j];
             }
           }
         else if (token[0] == 'X') {

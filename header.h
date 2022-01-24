@@ -179,6 +179,7 @@ typedef struct {
 LINK DOREC   doLoops[32];
 LINK int     numDoLoops;
 LINK int     inUnit;
+LINK int     inSub;
 LINK char    module[32];
 LINK int     nextLabel;
 LINK char    nextLine[1024];
@@ -193,6 +194,8 @@ LINK COMMON *common;
 LINK int     numCommon;
 LINK COMMONBLOCK *commonBlocks;
 LINK int          numCommonBlocks;
+LINK char       **externals;
+LINK int          numExternals;
 
 
 
@@ -309,15 +312,20 @@ extern void cdo(char* line);
 extern void cDoEnd();
 extern void cend(char* line);
 extern void cendfile(char* line);
+extern void cexternal(char* line);
 extern void cformat(char* line);
 extern void cgoto(char* line);
+extern void checkMain();
 extern void cif(char* line);
 extern void clet(char* line);
 extern void copen(char* line);
 extern void cpause(char* line);
+extern void cprogram(char* line);
 extern void cread(char* line);
+extern void creturn(char* line);
 extern void crewind(char* line);
 extern void cstop(char* line);
+extern void csubroutine(char* line);
 extern void cwrite(char* line);
 extern void ctype(char* line,int vtype);
 extern char* getArg(char*line, char dest, char* rem);

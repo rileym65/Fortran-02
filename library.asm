@@ -663,11 +663,17 @@ ffwrite_dn: ldi     0                  ; write a terminator
             phi     rf
             ldi     iobuffer.0
             plo     rf
-            sep     scall              ; display it
-            dw      f_msg
-            sep     scall              ; display cr/lf
+            ghi     ra                 ; get LUN
+            smi     6                  ; check for LUN6
+            lbnz    ffwrite_d1         ; jump if not
+            lda     rf                 ; get first byte
+            smi     '+'                ; check for no advance
+            lbz     ffwrite_d2         ; jump if no advance
+ffwrite_d1: sep     scall              ; display cr/lf
             dw      f_inmsg
             db      10,13,0
+ffwrite_d2: sep     scall              ; display it
+            dw      f_msg
             sep     sret               ; then return to caller
 #endif
 

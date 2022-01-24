@@ -14,8 +14,8 @@ void casm(char* line) {
   char flag;
   char aline[2048];
   char *pline;
+  checkMain();
   line = trim(line);
-printf("inline assembly\n");
   if (*line != 0) {
     showError("Nothing can follow ASM on a line");
     return;

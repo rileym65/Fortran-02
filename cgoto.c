@@ -22,6 +22,7 @@ void cgoto(char* line) {
   int  finalLabel;
   int  goLabel;
   int  noLabel;
+  checkMain();
 
   /* ************************************** */
   /* ***** Handle jump to line number ***** */

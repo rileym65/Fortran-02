@@ -21,7 +21,7 @@ void ccommon(char* line) {
   int  flag;
   flag = -1;
   pos = 0;
-  inUnit = -1;
+  checkMain();
   if (passNumber != 1) return;
   strcpy(area," ");
   while (flag) {

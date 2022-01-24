@@ -21,6 +21,7 @@ void cread(char* line) {
   int  rec;
   int  eof;
   int  err;
+  checkMain();
   rec = -1;
   eof = -1;
   err = -1;

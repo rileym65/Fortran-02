@@ -10,11 +10,7 @@
 
 #include "header.h"
 
-void ccontinue(char* line) {
+void cexternal(char* line) {
   checkMain();
-  if (*line != 0) {
-    showError("Invalid character encountered in CONTINUE statement");
-    return;
-    }
   }
 

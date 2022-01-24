@@ -11,12 +11,9 @@
 #include "header.h"
 
 void copen(char* line) {
-  int  i;
-  int  v;
   int  reclen;
   int  labelFName;
   int  labelJump;
-  char token[32];
   int  pos;
   if (!useElfos) {
     showError("Elf/OS mode not enabled");

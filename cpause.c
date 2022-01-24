@@ -14,6 +14,7 @@ void cpause(char* line) {
   char msg[256];
   char buffer[512];
   int  pos;
+  checkMain();
   if (*line != 0) {
     pos = 0;
     while (*line != 0) msg[pos++] = *line++;

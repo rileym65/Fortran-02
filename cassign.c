@@ -15,6 +15,7 @@ void cassign(char* line) {
   int  pos;
   int  lnum;
   int  v;
+  checkMain();
   if (*line < '0' || *line > '9') {
     showError("Syntax error");
     return;

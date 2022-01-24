@@ -19,7 +19,7 @@ void cdimension(char* line) {
   int  flag;
   flag = -1;
   pos = 0;
-  inUnit = -1;
+  checkMain();
   if (passNumber != 1) return;
   while (flag) {
     if (*line >= 'a' && *line <= 'z') token[pos++] = *line++;

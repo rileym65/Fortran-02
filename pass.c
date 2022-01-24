@@ -30,6 +30,8 @@ int pass(char* filename) {
   startup();
   Asm("PROGRAM__:  equ  $");
   inUnit = 0;
+  inSub = 0;
+  numExternals = 0;
   strcpy(module,"main");
   while (nextStatement() != 0) {
     if (currentLine[0] == '.') strcpy(currentLine,"");

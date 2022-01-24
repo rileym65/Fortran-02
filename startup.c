@@ -204,4 +204,5 @@ void startup() {
 //    }
   showCompiler = ctmp;
   if (passNumber == 1) runtime = address;
+  Asm("          lbr  START___");
   }

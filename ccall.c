@@ -11,6 +11,9 @@
 #include "header.h"
 
 void ccall(char* line) {
+  char token[32];
+  int  pos;
+  checkMain();
   if (strncasecmp(line, "open(", 5) == 0) {
     copen(line+5);
     return;
@@ -98,5 +101,23 @@ void ccall(char* line) {
     Asm("          dec   r2                      ; Put stack pointer back where it belongs");
     return;
     }
+  
+  if ((*line >= 'a' && *line <= 'z') ||
+      (*line >= 'A' && *line <= 'Z')) {
+    pos = 0;
+    while ((*line >= 'a' && *line <= 'z') ||
+           (*line >= 'A' && *line <= 'Z') ||
+           (*line >= '0' && *line <= '9') ||
+            *line == '_') token[pos++] = *line++;
+    token[pos] = 0;
+    if (pos == 0) {
+      showError("NULL name not allowed");
+      return;
+      }
+    Asm("          sep   scall                   ; Call subroutine");
+    sprintf(buffer, "          dw    %s",token); Asm(buffer);
+    return;
+    }
+
   }
 

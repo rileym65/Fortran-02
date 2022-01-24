@@ -10,11 +10,15 @@
 
 #include "header.h"
 
-void ccontinue(char* line) {
-  checkMain();
-  if (*line != 0) {
-    showError("Invalid character encountered in CONTINUE statement");
+void creturn(char* line) {
+  if (inSub == 0) {
+    showError("Invalid use of RETURN");
     return;
     }
+  if (*line != 0) {
+    showError("Syntax error");
+    return;
+    }
+  Asm("              sep   sret               ; Return to caller");
   }
 

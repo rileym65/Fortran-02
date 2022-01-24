@@ -20,15 +20,20 @@ OBJS = \
 	cend.o \
 	cendfile.o \
 	cexpr.o \
+	cexternal.o \
 	cformat.o \
+	checkmain.o \
 	cif.o \
 	clet.o \
 	cgoto.o \
 	copen.o \
 	cpause.o \
+	cprogram.o \
 	cread.o \
+	creturn.o \
 	crewind.o \
 	cstop.o \
+	csubroutine.o \
 	ctype.o \
 	cwrite.o \
 	compileline.o \
@@ -80,8 +85,10 @@ cdo.o:           header.h cdo.c
 cend.o:          header.h cend.c
 cendfile.o:      header.h cendfile.c
 cexpr.o:         header.h cexpr.c
+cexternal.o:     header.h cexternal.c
 cformat.o:       header.h cformat.c
 cgoto.o:         header.h cgoto.c
+checkmain.o:     header.h checkmain.c
 cif.o:           header.h cif.c
 ctype.o:         header.h ctype.c
 clet.o:          header.h clet.c
@@ -89,9 +96,12 @@ ccommon.o:       header.h ccommon.c
 compileline.o:   header.h compileline.c
 copen.o:         header.h copen.c
 cpause.o:        header.h cpause.c
+cprogram.o:      header.h cprogram.c
 cread.o:         header.h cread.c
+creturn.o:       header.h creturn.c
 crewind.o:       header.h crewind.c
 cstop.o:         header.h cstop.c
+csubroutine.o:   header.h csubroutine.c
 cwrite.o:        header.h cwrite.c
 findline.o:      header.h findline.c
 findvariable.o:  header.h findvariable.c

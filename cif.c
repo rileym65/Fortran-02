@@ -14,6 +14,7 @@ void cif(char* line) {
   int falseLabel;
   word l[3];
   int  c;
+  checkMain();
   if (*line != '(') {
     showError("Syntax error");
     return;

@@ -21,6 +21,7 @@ void cdo(char* line) {
   int  lnum;
   char *argret;
   dword value;
+  checkMain();
   lnum = 0;
   if (*line < '0' || *line > '9') {
     showError("Line number expected");
@@ -193,7 +194,6 @@ void cdo(char* line) {
       }
     else {
       doLoops[numDoLoops].varStep = 'V';
-printf("<<%s>>\n",step);
       vstep = getVariable(step, module);
       if (vstep < 0) return;
       doLoops[numDoLoops].step = vstep;
