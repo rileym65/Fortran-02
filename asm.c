@@ -718,7 +718,10 @@ void processDb(char* args,char typ) {
   }
 
 void processDs(word arg) {
+  if (outCount > 0) writeOutput();
+  outCount = 0;
   address += arg;
+  outAddress = address;
   }
 
 void processOrg(word arg) {
