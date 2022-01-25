@@ -182,6 +182,10 @@ int pass(char* filename) {
         }
       }
     }
+  for (i=0; i<numCommon; i++) {
+    sprintf(buffer, "c_%s:    ds    %d", common[i].name, common[i].maxSize);
+    Asm(buffer);
+    }
 
 /* ************************************* */
 /* ***** File record               ***** */

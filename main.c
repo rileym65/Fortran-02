@@ -300,7 +300,7 @@ int main(int argc, char** argv, char** envp) {
                                 getLabel("ENDRUNTIME__")-getLabel("RUNTIME__"));
   printf("program size  : %d\n",getLabel("RUNTIME__")-getLabel("PROGRAM__"));
   printf("Data    size  : %d\n",getLabel("end__")-getLabel("DATA__"));
-  printf("Total size    : %d\n",getLabel("ENDRUNTIME__")-getLabel("BEGIN__"));
+  printf("Total size    : %d\n",getLabel("end__")-getLabel("BEGIN__"));
   printf("Variable RAM  : %04xh\n",variableRAM);
   printf("Ram           : %04xh-%04xh\n",ramStart,ramEnd);
   printf("Rom           : %04xh-%04xh\n",romStart,romEnd);

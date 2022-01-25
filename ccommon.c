@@ -19,6 +19,7 @@ void ccommon(char* line) {
   int  i;
   int  c;
   int  flag;
+  int  vsize;
   flag = -1;
   pos = 0;
   checkMain();
@@ -51,6 +52,12 @@ void ccommon(char* line) {
       if (i < 0) i = addVariable(token, module);
       strcpy(variables[i].common, area);
       c = getCommon(area, module);
+      switch (varType(i)) {
+        case 'B': vsize=1; break;
+        case 'L': vsize=1; break;
+        case 'S': vsize=2; break;
+        default : vsize=4; break;
+        }
       if (*line == '(') {
         line++;
         dimCount = 0;
@@ -81,7 +88,13 @@ void ccommon(char* line) {
         variables[i].sizes[0] = dims[0];
         variables[i].sizes[1] = dims[1];
         variables[i].sizes[2] = dims[2];
+        if (dimCount == 0) vsize = vsize * dims[0];
+        if (dimCount == 1) vsize = vsize * dims[0] * dims[1];
+        if (dimCount == 2) vsize = vsize * dims[0] * dims[1] * dims[2];
         }
+      variables[i].offset = common[c].size;
+      common[c].size += vsize;
+      if (common[c].size > common[c].maxSize) common[c].maxSize = common[c].size;
       if (*line == ')') line++;
       if (*line == ',') line++;
       else if (*line == 0) flag = 0;

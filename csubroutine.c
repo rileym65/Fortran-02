@@ -11,6 +11,7 @@
 #include "header.h"
 
 void csubroutine(char* line) {
+  int  i;
   char token[32];
   int  pos;
   if (inUnit) {
@@ -24,7 +25,7 @@ void csubroutine(char* line) {
          (*line >= 'A' && *line <= 'Z') ||
          (*line >= '0' && *line <= '9') ||
           *line == '_') token[pos++] = *line++;
-  if (*line != 0) {
+  if (*line != 0 && *line != '(') {
     showError("Syntax error");
     return;
     }
@@ -35,5 +36,29 @@ void csubroutine(char* line) {
   token[pos] = 0;
   strcpy(module, token);
   sprintf(buffer,"%s:", token); Asm(buffer);
+  if (*line == 0) return;
+  line++;
+  while (*line != 0 && *line != ')') {
+    if ((*line >= 'a' && *line <= 'z') ||
+        (*line >= 'A' && *line <= 'Z')) {
+      pos = 0;
+      while ((*line >= 'a' && *line <= 'z') ||
+             (*line >= 'A' && *line <= 'Z') ||
+             (*line >= '0' && *line <= '9') ||
+              *line == '_') token[pos++] = *line++;
+      token[pos] = 0;
+      i = addVariable(token, module);
+      if (i < 0) return;
+      if (*line != ',' && *line != 0) {
+        showError("Syntax error");
+        return;
+        }
+      if (*line == ',') line++;
+      }
+    else {
+      showError("Syntax error");
+      return;
+      }
+    }
   }
 

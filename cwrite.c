@@ -230,8 +230,14 @@ void cwrite(char* line) {
         }
       sprintf(buffer,"           db      %d",varType(v)); 
       Asm(buffer);
-      sprintf(buffer,"           dw      %s_%s",
-        variables[v].module, variables[v].name);
+      if (strlen(variables[v].common) > 0) {
+        sprintf(buffer,"           dw      c_%s+%d",
+          variables[v].common, variables[v].offset);
+        }
+      else {
+        sprintf(buffer,"           dw      %s_%s",
+          variables[v].module, variables[v].name);
+        }
       Asm(buffer);
       }
     if (*line != ',' && *line != 0) {

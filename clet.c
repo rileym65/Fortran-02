@@ -101,24 +101,48 @@ void clet(char* line) {
       showError("Syntax error");
       *line = 0;
       }
-    if (varType(v) == 'I' || varType(v) == 'R') {
-      sprintf(buffer,"          ldi   (%s_%s+3).1              ; Get destination variable address", module,varname); Asm(buffer);
-      Asm("          phi   rf");
-      sprintf(buffer,"          ldi   (%s_%s+3).0", module,varname); Asm(buffer);
-      Asm("          plo   rf");
+
+    if (strlen(variables[v].common) > 0) {
+      if (varType(v) == 'I' || varType(v) == 'R') {
+        sprintf(buffer,"          ldi   (c_%s+%d+3).1              ; Get destination variable address", variables[v].common,variables[v].offset); Asm(buffer);
+        Asm("          phi   rf");
+        sprintf(buffer,"          ldi   (c_%s+%d+3).0              ; Get destination variable address", variables[v].common,variables[v].offset); Asm(buffer);
+        Asm("          plo   rf");
+        }
+      if (varType(v) == 'S') {
+        sprintf(buffer,"          ldi   (c_%s+%d+1).1              ; Get destination variable address", variables[v].common,variables[v].offset); Asm(buffer);
+        Asm("          phi   rf");
+        sprintf(buffer,"          ldi   (c_%s+%d+1).0              ; Get destination variable address", variables[v].common,variables[v].offset); Asm(buffer);
+        Asm("          plo   rf");
+        }
+      if (varType(v) == 'B' || varType(v) == 'L') {
+        sprintf(buffer,"          ldi   (c_%s+%d).1              ; Get destination variable address", variables[v].common,variables[v].offset); Asm(buffer);
+        Asm("          phi   rf");
+        sprintf(buffer,"          ldi   (c_%s+%d).0              ; Get destination variable address", variables[v].common,variables[v].offset); Asm(buffer);
+        Asm("          plo   rf");
+        }
       }
-    if (varType(v) == 'S') {
-      sprintf(buffer,"          ldi   (%s_%s+1).1              ; Get destination variable address", module,varname); Asm(buffer);
-      Asm("          phi   rf");
-      sprintf(buffer,"          ldi   (%s_%s+1).0", module,varname); Asm(buffer);
-      Asm("          plo   rf");
+    else {
+      if (varType(v) == 'I' || varType(v) == 'R') {
+        sprintf(buffer,"          ldi   (%s_%s+3).1              ; Get destination variable address", module,varname); Asm(buffer);
+        Asm("          phi   rf");
+        sprintf(buffer,"          ldi   (%s_%s+3).0", module,varname); Asm(buffer);
+        Asm("          plo   rf");
+        }
+      if (varType(v) == 'S') {
+        sprintf(buffer,"          ldi   (%s_%s+1).1              ; Get destination variable address", module,varname); Asm(buffer);
+        Asm("          phi   rf");
+        sprintf(buffer,"          ldi   (%s_%s+1).0", module,varname); Asm(buffer);
+        Asm("          plo   rf");
+        }
+      if (varType(v) == 'B' || varType(v) == 'L') {
+        sprintf(buffer,"          ldi   (%s_%s).1              ; Get destination variable address", module,varname); Asm(buffer);
+        Asm("          phi   rf");
+        sprintf(buffer,"          ldi   (%s_%s).0", module,varname); Asm(buffer);
+        Asm("          plo   rf");
+        }
       }
-    if (varType(v) == 'B' || varType(v) == 'L') {
-      sprintf(buffer,"          ldi   (%s_%s).1              ; Get destination variable address", module,varname); Asm(buffer);
-      Asm("          phi   rf");
-      sprintf(buffer,"          ldi   (%s_%s).0", module,varname); Asm(buffer);
-      Asm("          plo   rf");
-      }
+
     if (isArray) {
       Asm("          irx                             ; Add offset");
       Asm("          glo   rf");

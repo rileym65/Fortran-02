@@ -11,6 +11,7 @@
 #include "header.h"
 
 void cend(char* line) {
+  int i;
   inUnit = 0;
   inSub = 0;
   if (*line != 0) {
@@ -43,6 +44,10 @@ void cend(char* line) {
   else {
     Asm("          idl                           ; Idle the CPU");
     Asm("          lbr   $-1");
+    }
+  for (i=0; i<numCommon; i++) {
+    common[i].numVariables = 0;
+    common[i].size = 0;
     }
   }
 

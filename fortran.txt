@@ -17,6 +17,7 @@ if the -d command line switch is specified
       BYTE var,var,...
       SHORT var,var,...
       DIMENSION var(size,size,...),...
+      COMMON /name/var,var,.../name/var,var,var...
       DATA var,var,var/data,data,data/var,var,.../data,data,...
 
       var = expr
@@ -106,10 +107,16 @@ Format specifiers for input:
       [n]X
       [n]L[width]
 
+LUN assignments:
+  1 - First disk file
+  2 - Second disk file
+  3 - Third disk file
+  4 - Fourth disk file
+  5 - Terminal without carriage control
+  6 - Terminal with carriage control
 
 
 Still to implement:
-      COMMON /name/var,var,.../name/var,var,var...
       EQUIVALENCE (var,var,...),(var,var,...),...
 
 

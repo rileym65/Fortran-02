@@ -14,8 +14,7 @@
 word getCommon(char* name, char* module) {
   int i;
   for (i=0; i<numCommon; i++) {
-    if (strcasecmp(name, common[i].name) == 0 &&
-        strcasecmp(module, common[i].module) == 0) return i;
+    if (strcasecmp(name, common[i].name) == 0) return i;
     }
   numCommon++;
   if (numCommon == 1)
@@ -23,16 +22,9 @@ word getCommon(char* name, char* module) {
   else
     common = (COMMON*)realloc(common, sizeof(COMMON) * numCommon);
   strcpy(common[numCommon-1].name, name);
-  strcpy(common[numCommon-1].module, module);
   common[numCommon-1].numVariables = 0;
-  for (i=0; i<numCommonBlocks; i++)
-    if (strcasecmp(name, commonBlocks[i].name) == 0) return numCommon-1;
-  numCommonBlocks++;
-  if (numCommonBlocks == 1)
-    commonBlocks = (COMMONBLOCK*)malloc(sizeof(COMMONBLOCK));
-  else
-    commonBlocks = (COMMONBLOCK*)realloc(commonBlocks, sizeof(COMMONBLOCK) * numCommonBlocks);
-  strcpy(commonBlocks[numCommonBlocks-1].name, name);
+  common[numCommon-1].size = 0;
+  common[numCommon-1].maxSize = 0;
   return numCommon-1;
   }
 

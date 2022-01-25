@@ -51,9 +51,10 @@ typedef struct {
 
 typedef struct {
   char   name[32];
-  char   module[32];
   char **variables;
   int    numVariables;
+  int    size;
+  int    maxSize;
   } COMMON;
 
 typedef struct {
