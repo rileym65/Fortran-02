@@ -24,7 +24,7 @@ void ccommon(char* line) {
   pos = 0;
   checkMain();
   if (passNumber != 1) return;
-  strcpy(area," ");
+  strcpy(area,"_");
   while (flag) {
     if (*line == '/' && pos == 0) {
       line++;

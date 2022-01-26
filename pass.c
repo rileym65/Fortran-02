@@ -196,10 +196,12 @@ int pass(char* filename) {
       if (cnt == 16) {
         Asm(buffer);
         cnt = 0;
-        strcat(buffer, "         db    ");
+        strcpy(buffer, "         db    ");
         }
       }
-    if (cnt != 0) Asm(buffer);
+    if (cnt != 0) {
+      Asm(buffer);
+      }
     }
 
 /* ************************************* */
