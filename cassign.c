@@ -15,6 +15,10 @@ void cassign(char* line) {
   int  pos;
   int  lnum;
   int  v;
+  if (inBlockData) {
+    showError("Not allowed in BLOCK DATA");
+    return;
+    }
   checkMain();
   if (*line < '0' || *line > '9') {
     showError("Syntax error");

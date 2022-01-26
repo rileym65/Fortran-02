@@ -25,6 +25,7 @@ word getCommon(char* name, char* module) {
   common[numCommon-1].numVariables = 0;
   common[numCommon-1].size = 0;
   common[numCommon-1].maxSize = 0;
+  common[numCommon-1].data = NULL;
   return numCommon-1;
   }
 

@@ -11,6 +11,7 @@ OBJS = \
 	asm.o \
 	casm.o \
 	cassign.o \
+	cblockdata.o \
 	ccall.o \
 	ccommon.o \
 	ccontinue.o \
@@ -77,6 +78,7 @@ arrayref.o:      header.h arrayref.c
 asm.o:           header.h asm.c
 casm.o:          header.h casm.c
 cassign.o:       header.h cassign.c
+cblockdata.o:    header.h cblockdata.c
 ccall.o:         header.h ccall.c
 ccontinue.o:     header.h ccontinue.c
 cdata.o:         header.h cdata.c

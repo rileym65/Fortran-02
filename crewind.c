@@ -15,6 +15,10 @@ void crewind(char* line) {
   int  pos;
   int  lun;
   int  v;
+  if (inBlockData) {
+    showError("Not allowed in BLOCK DATA");
+    return;
+    }
   checkMain();
   lun = 0;
   if (*line >= '0' && *line <= '9') {

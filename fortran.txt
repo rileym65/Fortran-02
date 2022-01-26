@@ -10,6 +10,8 @@ Dlabl statement
 if the -d command line switch is specified
 
       PROGRAM name
+      SUBROUTINE name
+      BLOCK DATA [name]
 
       INTEGER var,var,...
       LOGICAL var,var,...
@@ -131,7 +133,6 @@ Still to implement:
       [type] FUNCTION name(arg,arg,...)
       SUBROUTINE name[(arg,arg,...)]
       EXTERNAL
-      BLOCK DATA
 
 Compiler Directives:
 .1805           - Enable 1804/5/6 assembler mode

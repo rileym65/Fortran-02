@@ -22,6 +22,10 @@ void cgoto(char* line) {
   int  finalLabel;
   int  goLabel;
   int  noLabel;
+  if (inBlockData) {
+    showError("Not allowed in BLOCK DATA");
+    return;
+    }
   checkMain();
 
   /* ************************************** */

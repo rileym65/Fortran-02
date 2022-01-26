@@ -202,7 +202,7 @@ void startup() {
 //    Asm("          sep  scall");
 //    Asm("          dw   f_setbd");
 //    }
+  Asm("          lbr  START___");
   showCompiler = ctmp;
   if (passNumber == 1) runtime = address;
-  Asm("          lbr  START___");
   }

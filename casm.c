@@ -14,6 +14,10 @@ void casm(char* line) {
   char flag;
   char aline[2048];
   char *pline;
+  if (inBlockData) {
+    showError("Not allowed in BLOCK DATA");
+    return;
+    }
   checkMain();
   line = trim(line);
   if (*line != 0) {

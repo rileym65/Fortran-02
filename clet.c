@@ -17,6 +17,10 @@ void clet(char* line) {
   int  v;
   int  isArray;
   char varname[256];
+  if (inBlockData) {
+    showError("Not allowed in BLOCK DATA");
+    return;
+    }
   checkMain();
   line = trim(line);
   if (!(*line >= 'a' && *line <= 'z') && !(*line >= 'A' && *line <= 'Z')) {

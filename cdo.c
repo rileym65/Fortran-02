@@ -21,6 +21,10 @@ void cdo(char* line) {
   int  lnum;
   char *argret;
   dword value;
+  if (inBlockData) {
+    showError("Not allowed in BLOCK DATA");
+    return;
+    }
   checkMain();
   lnum = 0;
   if (*line < '0' || *line > '9') {

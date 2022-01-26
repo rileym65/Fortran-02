@@ -13,6 +13,10 @@
 void ccall(char* line) {
   char token[32];
   int  pos;
+  if (inBlockData) {
+    showError("Not allowed in BLOCK DATA");
+    return;
+    }
   checkMain();
   if (strncasecmp(line, "open(", 5) == 0) {
     copen(line+5);

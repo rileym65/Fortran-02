@@ -20,6 +20,10 @@ void cwrite(char* line) {
   int  rec;
   int  eof;
   int  err;
+  if (inBlockData) {
+    showError("Not allowed in BLOCK DATA");
+    return;
+    }
   checkMain();
   rec = -1;
   eof = -1;

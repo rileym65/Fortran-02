@@ -10,15 +10,25 @@
 
 #include "header.h"
 
-void ccontinue(char* line) {
-  if (inBlockData) {
-    showError("Not allowed in BLOCK DATA");
+void cblockdata(char* line) {
+  char token[32];
+  int  pos;
+  if (inUnit) {
+    showError("Not allowed inside program unit");
     return;
     }
-  checkMain();
+  inUnit = -1;
+  inBlockData = -1;
+  pos = 0;
+  while ((*line >= 'a' && *line <= 'z') ||
+         (*line >= 'A' && *line <= 'Z') ||
+         (*line >= '0' && *line <= '9') ||
+          *line == '_') token[pos++] = *line++;
   if (*line != 0) {
-    showError("Invalid character encountered in CONTINUE statement");
+    showError("Syntax error");
     return;
     }
+  token[pos] = 0;
+  strcpy(module, token);
   }
 

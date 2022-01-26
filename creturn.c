@@ -11,6 +11,10 @@
 #include "header.h"
 
 void creturn(char* line) {
+  if (inBlockData) {
+    showError("Not allowed in BLOCK DATA");
+    return;
+    }
   if (inSub == 0) {
     showError("Invalid use of RETURN");
     return;

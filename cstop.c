@@ -14,6 +14,10 @@ void cstop(char* line) {
   char msg[256];
   char buffer[512];
   int  pos;
+  if (inBlockData) {
+    showError("Not allowed in BLOCK DATA");
+    return;
+    }
   checkMain();
   if (*line != 0) {
     pos = 0;

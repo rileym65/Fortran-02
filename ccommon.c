@@ -94,7 +94,15 @@ void ccommon(char* line) {
         }
       variables[i].offset = common[c].size;
       common[c].size += vsize;
-      if (common[c].size > common[c].maxSize) common[c].maxSize = common[c].size;
+      if (common[c].size > common[c].maxSize) {
+        common[c].maxSize = common[c].size;
+        if (common[c].data == NULL) {
+          common[c].data = (byte*)malloc(common[c].maxSize);
+          }
+        else {
+          common[c].data = (byte*)realloc(common[c].data, common[c].maxSize);
+          }
+        }
       if (*line == ')') line++;
       if (*line == ',') line++;
       else if (*line == 0) flag = 0;

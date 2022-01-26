@@ -11,6 +11,10 @@
 #include "header.h"
 
 void cexternal(char* line) {
+  if (inBlockData) {
+    showError("Not allowed in BLOCK DATA");
+    return;
+    }
   checkMain();
   }
 

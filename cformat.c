@@ -17,6 +17,10 @@ void cformat(char* line) {
   char string[256];
   int pos;
   char ftype;
+  if (inBlockData) {
+    showError("Not allowed in BLOCK DATA");
+    return;
+    }
   checkMain();
   if (*line != '(') {
     showError("Syntax error");

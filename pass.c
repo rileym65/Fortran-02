@@ -12,7 +12,9 @@
 
 int pass(char* filename) {
   int   i;
+  int   j;
   int   size;
+  int   cnt;
   char  tmp[16];
   source = fopen(filename,"r");
   if (source == NULL) {
@@ -31,6 +33,7 @@ int pass(char* filename) {
   Asm("PROGRAM__:  equ  $");
   inUnit = 0;
   inSub = 0;
+  inBlockData = 0;
   numExternals = 0;
   strcpy(module,"main");
   while (nextStatement() != 0) {
@@ -183,8 +186,20 @@ int pass(char* filename) {
       }
     }
   for (i=0; i<numCommon; i++) {
-    sprintf(buffer, "c_%s:    ds    %d", common[i].name, common[i].maxSize);
-    Asm(buffer);
+    sprintf(buffer, "c_%s:    db    ", common[i].name);
+    cnt = 0;
+    for (j=0; j<common[i].maxSize; j++) {
+      sprintf(tmp,"%d",common[i].data[j]);
+      if (cnt != 0) strcat(buffer,",");
+      strcat(buffer,tmp);
+      cnt++;
+      if (cnt == 16) {
+        Asm(buffer);
+        cnt = 0;
+        strcat(buffer, "         db    ");
+        }
+      }
+    if (cnt != 0) Asm(buffer);
     }
 
 /* ************************************* */

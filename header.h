@@ -51,10 +51,10 @@ typedef struct {
 
 typedef struct {
   char   name[32];
-  char **variables;
   int    numVariables;
   int    size;
   int    maxSize;
+  byte  *data;
   } COMMON;
 
 typedef struct {
@@ -181,6 +181,7 @@ LINK DOREC   doLoops[32];
 LINK int     numDoLoops;
 LINK int     inUnit;
 LINK int     inSub;
+LINK int     inBlockData;
 LINK char    module[32];
 LINK int     nextLabel;
 LINK char    nextLine[1024];
@@ -304,6 +305,7 @@ LINK int    numNests;
 
 extern char* arrayRef(char* line, int v);
 extern void cassign(char* line);
+extern void cblockdata(char* line);
 extern void ccall(char* line);
 extern void ccommon(char* line);
 extern void ccontinue(char* line);

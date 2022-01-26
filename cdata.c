@@ -17,13 +17,17 @@ void cdata(char* line) {
   int  i,j;
   int  pos;
   int  v;
+  int  c;
   int  var;
+  int  ofs;
   int  count;
   int  isFloat;
   int  flag;
   int  shift;
   INTREAL ir;
   checkMain();
+//  Asm("          sep   scall                    ; Call data initializer");
+//  Asm("          dw    fdata");
   while (*line != 0) {
     numVars = 0;
     pos = 0;
@@ -134,7 +138,62 @@ void cdata(char* line) {
             showError("Too many values specified");
             return;
             }
-          variables[vars[var++]].value = ir.integer;
+          variables[vars[var]].value = ir.integer;
+          if (strlen(variables[vars[var]].common) > 0) {
+            ofs = variables[vars[var]].offset;
+            c = getCommon(variables[vars[var]].common,module);
+            if (c < 0) {
+              showError("COMMON block not found");
+              return;
+              }
+            switch (varType(vars[var])) {
+              case 'B':
+              case 'L':
+                   common[c].data[ofs] = ir.integer & 0xff;
+                   break;
+              case 'S':
+                   common[c].data[ofs++] = (ir.integer >> 8) & 0xff;
+                   common[c].data[ofs]   = ir.integer & 0xff;
+                   break;
+              case 'I':
+              case 'R':
+                   common[c].data[ofs++] = (ir.integer >> 24) & 0xff;
+                   common[c].data[ofs++] = (ir.integer >> 16) & 0xff;
+                   common[c].data[ofs++] = (ir.integer >> 8) & 0xff;
+                   common[c].data[ofs]   = ir.integer & 0xff;
+                   break;
+              }
+            }
+//          switch (varType(vars[var])) {
+//            case 'B': Asm("          dw    1"); break;
+//            case 'L': Asm("          dw    1"); break;
+//            case 'S': Asm("          dw    2"); break;
+//            case 'I': Asm("          dw    4"); break;
+//            case 'R': Asm("          dw    4"); break;
+//            }
+//          if (strlen(variables[vars[var]].common) > 0) {
+//            sprintf(buffer,"          dw    c_%s+%d",variables[vars[var]].common, variables[vars[var]].offset);
+//            Asm(buffer);
+//            }
+//          else {
+//            sprintf(buffer,"          dw    %s_%s",variables[vars[var]].module, variables[vars[var]].name);
+//            Asm(buffer);
+//            }
+//          switch (varType(vars[var])) {
+//            case 'B':
+//            case 'L':
+//                 sprintf(buffer,"          db    %d",ir.integer & 0xff);
+//                 break;
+//            case 'S':
+//                 sprintf(buffer,"          dw    %d",ir.integer & 0xffff);
+//                 break;
+//            case 'I':
+//            case 'R':
+//                 sprintf(buffer,"          dw    %d,%d",(ir.integer >> 16) & 0xffff, ir.integer & 0xffff);
+//                 break;
+//            }
+//          Asm(buffer);
+          var++;
           }
         pos = 0;
         count = 1;
@@ -154,5 +213,7 @@ void cdata(char* line) {
       }
     if (*line == '/') line++;
     }
+//  Asm("          dw    0                        ; End the list");
+//  addDefine("FDATA",1,1);
   }
 

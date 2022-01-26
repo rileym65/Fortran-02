@@ -24,6 +24,7 @@ int compileLine(char* line) {
   line = trim(line);
   if (strncasecmp(line,"asm",3) == 0) casm(line+3);
   else if (strncasecmp(line, "assign", 6) == 0)     cassign(line+6);
+  else if (strncasecmp(line, "blockdata", 9) ==0)   cblockdata(line+9);
   else if (strncasecmp(line, "byte", 4) == 0)       ctype(line+4,V_BYTE);
   else if (strncasecmp(line, "call", 4) == 0)       ccall(line+4);
   else if (strncasecmp(line, "common", 6) == 0)     ccommon(line+6);

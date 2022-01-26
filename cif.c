@@ -14,6 +14,10 @@ void cif(char* line) {
   int falseLabel;
   word l[3];
   int  c;
+  if (inBlockData) {
+    showError("Not allowed in BLOCK DATA");
+    return;
+    }
   checkMain();
   if (*line != '(') {
     showError("Syntax error");
