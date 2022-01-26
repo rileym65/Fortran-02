@@ -574,7 +574,7 @@ ffwrite_lt: ldi     'T'                ; need to output true
             inc     rd
 ffwrite_sp: ldi     ' '                ; followed by a space
             str     rd
-            inc     rd
+;            inc     rd
             lbr     ffwrite_lp         ; loop back for next variable
 ffwrite_i:  ldi     (scratch2_+3).1    ; need to reverse the bytes
             phi     rb
@@ -603,9 +603,17 @@ ffwrite_i:  ldi     (scratch2_+3).1    ; need to reverse the bytes
             stxd
             glo     r9
             stxd
+            ghi     ra
+            stxd
+            glo     ra
+            stxd
             sep     scall              ; convert integer value
             dw      itoa32
 ffwrite_r2: irx                        ; recover consumed registers
+            ldxa
+            plo     ra
+            ldxa
+            phi     ra
             ldxa
             plo     r9
             ldxa
@@ -2069,8 +2077,11 @@ fmtwrt_dn:  ldi     0                  ; terminate record
             phi     rf
             ldi     iobuffer.0
             plo     rf
+            ghi     ra                 ; get LUN
+            smi     6                  ; check for LUN 6
+            lbz     fmtwrt_d6          ; jump if so
             ghi     ra                 ; need to get LUN
-            xri     5                  ; check for LUN 5
+            smi     5                  ; check for LUN 5
             lbnz    fmtwrt_dsk         ; jump if a disk file
             sep     scall              ; display it
             dw      f_msg
@@ -2078,10 +2089,20 @@ fmtwrt_dn:  ldi     0                  ; terminate record
             dw      f_inmsg
             db      10,13,0
             sep     sret               ; then return to caller
-fmtwrt_dsk: xri     5                  ; resture LUN number
+fmtwrt_dsk: ghi     ra                 ; recover LUN number
             sep     scall              ; call disk write
             dw      fwrite
             sep     sret               ; and then return
+fmtwrt_d6:  lda     rf                 ; get carriage control character
+            plo     re                 ; keep a copy
+            smi     '+'                ; check for no skip
+            lbz     fmtwrt_dg          ; jump if so
+            sep     scall              ; otherwise move to next line
+            dw      f_inmsg
+            db      10,13,0
+fmtwrt_dg:  sep     scall              ; display output
+            dw      f_msg
+            sep     sret               ; then return to caller
 #endif
 
 #ifdef FROMSCI
