@@ -26,7 +26,7 @@ void ccommon(char* line) {
   if (passNumber != 1) return;
   strcpy(area," ");
   while (flag) {
-    if (*line == '/') {
+    if (*line == '/' && pos == 0) {
       line++;
       pos = 0;
       while (*line != '/' && *line != 0) {
@@ -41,7 +41,7 @@ void ccommon(char* line) {
     else if (*line >= 'A' && *line <= 'Z') token[pos++] = *line++;
     else if (*line >= '0' && *line <= '9') token[pos++] = *line++;
     else if (*line == '_') token[pos++] = *line++;
-    else if (*line == ',' || *line == 0 || *line == '(') {
+    else if (*line == ',' || *line == 0 || *line == '(' || *line == '/') {
       token[pos] = 0;
       if (pos == 0) {
         showError("Expected variable name not given");
