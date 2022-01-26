@@ -137,17 +137,33 @@ Still to implement:
 Compiler Directives:
 .1805           - Enable 1804/5/6 assembler mode
 .32             - Enable 32-bit mode (on by default)
+.arch=micro     - Set architecture to Micro/Elf
+.arch=pev       - Set architecture to Pico/Elf
+.arch=pev2      - Set architecture to Pico/Elf V2
+.arch=elf2k     - Set architecture to Elf 2k
+.arch=mchip     - Set architecture to MemberCHIP
 .binary         - Output file as binary
 .fp             - Enable floating-point mode (on by default)
 .elfos          - Produce Elf/OS executable
+.estack=addr    - Set address for expr stack
+.exit=addr      - Set exit address
+.iosize=size    - Size of I/O buffer
 .list           - Show source list
 .nolist         - Turn off source list
 .noruntime      - Do not show runtime modules
 .nosymbols      - Do not show assembler symbols
 .novars         - Do not show variables
 .options        - Show options in effect
+.ram=start-end  - Set RAM address range
+.rom=start-end  - Set ROM address range
 .runtime        - Show runtime modules
+.stack=addr     - Set address for stack
+.start=addr     - Set starting compilation address
 .symbols        - Show assembler symbols
+.term=none      - Set no terminal code
+.term=elfos     - Set terminal to use Elf/OS
+.term=bios      - Set terminal to use BIOS
+.term=self      - Set to use internal terminal
 .vars           - Show variables
 
 Switches:

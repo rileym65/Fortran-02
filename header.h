@@ -339,6 +339,8 @@ extern int  nextStatement();
 extern void startup();
 extern int  validVar(char *line);
 extern char varType(int varNum);
+extern void processRAM(char* buffer);
+extern void processROM(char* buffer);
 
 extern void  addLabel(char* label, word value);
 int addVariable(char* name,char* module);

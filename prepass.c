@@ -45,10 +45,110 @@ int prepass(char* filename) {
       if (strcasecmp(currentLine,".runtime") == 0) { showRuntime = -1; }
       if (strcasecmp(currentLine,".noruntime") == 0) { showRuntime = 0; }
       if (strcasecmp(currentLine,".options") == 0) { showOptions = -1; }
+      if (strncasecmp(currentLine,".ram=",5) == 0) { processRAM(currentLine+5); }
+      if (strncasecmp(currentLine,".rom=",5) == 0) { processROM(currentLine+5); }
+      if (strncasecmp(currentLine,".vars=",6) == 0) { variableStart=getHex(currentLine+6); }
+      if (strncasecmp(currentLine,".stack=",7) == 0) { stack=getHex(currentLine+7); }
+      if (strncasecmp(currentLine,".estack=",8) == 0) { estack=getHex(currentLine+8); }
+      if (strncasecmp(currentLine,".iosize=",8) == 0) { iBufferSize=getHex(currentLine+8); }
+      if (strncasecmp(currentLine,".exit=",6) == 0) { exitAddress=getHex(currentLine+6); }
+      if (strncasecmp(currentLine,".start=",7) == 0) { programStart=getHex(currentLine+7); }
       if (strcasecmp(currentLine,".binary") == 0) {
         outMode = 'B';
         strcpy(outName,baseName);
         strcat(outName, ".bin");
+        }
+      if (strcasecmp(currentLine,".term=bios") == 0) {
+        useSelfTerm = 0;
+        lblF_inmsg = 0xff66;
+        lblF_type = 0xff03;
+        lblF_read = 0xff06;
+        lblF_input = 0xff0f;
+        lblF_msg = 0xff09;
+        lblF_setbd = 0xff2d;
+        }
+      if (strcasecmp(currentLine,".term=elfos") == 0) {
+        useSelfTerm = 0;
+        lblF_inmsg = 0x034b;
+        lblF_type = 0x0330;
+        lblF_read = 0x0309;
+        lblF_input = 0x0339;
+        lblF_msg = 0x0333;
+        lblF_setbd = 0x0360;
+        }
+      if (strcasecmp(currentLine,".term=self") == 0) {
+        useSelfTerm = 0xff;
+        lblF_inmsg = 0x0000;
+        lblF_type = 0x0000;
+        lblF_read = 0x0000;
+        lblF_input = 0x0000;
+        lblF_msg = 0x0000;
+        lblF_setbd = 0x0000;
+        }
+      if (strcasecmp(currentLine,".term=none") == 0) {
+        useSelfTerm = 0;
+        lblF_inmsg = 0xffff;
+        lblF_type = 0xffff;
+        lblF_read = 0xffff;
+        lblF_input = 0xffff;
+        lblF_msg = 0xffff;
+        lblF_setbd = 0xffff;
+        }
+      if (strcasecmp(currentLine,".arch=pev") == 0) {
+        ramStart = 0x0000;
+        ramEnd = 0x7fff;
+        romStart = 0x8000;
+        romEnd = 0xffff;
+        SERN = BN2;
+        SERP = B2;
+        SERSEQ = SEQ;
+        SERREQ = REQ;
+        }
+      if (strcasecmp(currentLine,".arch=pev2") == 0) {
+        ramStart = 0x0000;
+        ramEnd = 0x7fff;
+        romStart = 0x8000;
+        romEnd = 0xffff;
+        SERN = B2;
+        SERP = BN2;
+        SERSEQ = REQ;
+        SERREQ = SEQ;
+        }
+      if (strcasecmp(currentLine,".arch=micro") == 0) {
+        ramStart = 0x0000;
+        ramEnd = 0x7fff;
+        romStart = 0x8000;
+        romEnd = 0xffff;
+        SERN = BN2;
+        SERP = B2;
+        SERSEQ = SEQ;
+        SERREQ = REQ;
+        }
+      if (strcasecmp(currentLine,".arch=elf2k") == 0) {
+        ramStart = 0x0000;
+        ramEnd = 0x7fff;
+        romStart = 0x8000;
+        romEnd = 0xffff;
+        SERN = BN3;
+        SERP = B3;
+        SERSEQ = SEQ;
+        SERREQ = REQ;
+        }
+      if (strcasecmp(currentLine,".arch=mchip") == 0) {
+        ramStart = 0x8000;
+        ramEnd = 0xffff;
+        romStart = 0x0000;
+        romEnd = 0x7fff;
+        SERN = B3;
+        SERP = BN3;
+        SERSEQ = REQ;
+        SERREQ = SEQ;
+        lblF_inmsg = 0x0f66;
+        lblF_type = 0x0f03;
+        lblF_read = 0x0f06;
+        lblF_input = 0x0f0f;
+        lblF_msg = 0x0f09;
+        lblF_setbd = 0x0f2d;
         }
       strcpy(currentLine,"");
       }
