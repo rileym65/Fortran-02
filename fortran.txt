@@ -159,6 +159,7 @@ Compiler Directives:
 .runtime        - Show runtime modules
 .stack=addr     - Set address for stack
 .start=addr     - Set starting compilation address
+.stg            - Produce STG compatible image
 .symbols        - Show assembler symbols
 .term=none      - Set no terminal code
 .term=elfos     - Set terminal to use Elf/OS

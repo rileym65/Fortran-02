@@ -58,6 +58,11 @@ int prepass(char* filename) {
         strcpy(outName,baseName);
         strcat(outName, ".bin");
         }
+      if (strcasecmp(currentLine,".stg") == 0) {
+        useStg = -1;
+        exitAddress = 0x8003;
+        ramEnd = 0x7eff;
+        }
       if (strcasecmp(currentLine,".term=bios") == 0) {
         useSelfTerm = 0;
         lblF_inmsg = 0xff66;
