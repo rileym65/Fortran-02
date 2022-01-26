@@ -33,7 +33,6 @@ void ccall(char* line) {
     Asm("           lda     r7");
     Asm("           stxd                        ; save for now");
     Asm("           inc     r7                  ; remove high word");
-    Asm("           inc     r7");
     line = cexpr(line, 0);
     if (*line != ')') {
       showError("Syntax error");
@@ -53,7 +52,6 @@ void ccall(char* line) {
     Asm("           lda     r7");
     Asm("           str     rf                  ; write to memory");
     Asm("           inc     r7                  ; clear rest of data from expr stack");
-    Asm("           inc     r7");
     Asm("           inc     r7");
     return;
     }
