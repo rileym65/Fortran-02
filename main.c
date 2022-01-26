@@ -360,6 +360,7 @@ int main(int argc, char** argv, char** envp) {
     if (getDefine("FFWRITE") != 0)    printf("  ffwrite    %04xh\n",getLabel("ffwrite"));
     if (getDefine("IOFLAG") != 0)     printf("  ioflag     %04xh\n",getLabel("ioflag"));
     if (getDefine("IOSTATUS") != 0)   printf("  iostatus   %04xh\n",getLabel("iostatus"));
+    if (getDefine("FDATA") != 0)      printf("  fdata      %04xh\n",getLabel("fdata"));
   
     if (getDefine("ABS32") != 0)      printf("  abs32      %04xh\n",getLabel("abs32"));
     if (getDefine("ADD32") != 0)      printf("  add32      %04xh\n",getLabel("add32"));

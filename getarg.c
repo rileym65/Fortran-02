@@ -66,14 +66,26 @@ char* getArg(char*line, char dest, char* rem) {
       default : ofs = 3; break;
       }
     if (dest == 'e') ofs = 0;
-    sprintf(buffer,"              ldi   (%s_%s+%d).1        ; Point to variable",
-      variables[v].module, variables[v].name, ofs);
-    Asm(buffer);
-    Asm("              phi   rf");
-    sprintf(buffer,"              ldi   (%s_%s+%d).0",
-      variables[v].module, variables[v].name, ofs);
-    Asm(buffer);
-    Asm("              plo   rf");
+    if (strlen(variables[v].common) > 0) {
+      sprintf(buffer,"              ldi   (c_%s+%d+%d).1        ; Point to variable",
+        variables[v].common, variables[v].offset, ofs);
+      Asm(buffer);
+      Asm("              phi   rf");
+      sprintf(buffer,"              ldi   (c_%s+%d+%d).0",
+        variables[v].common, variables[v].offset, ofs);
+      Asm(buffer);
+      Asm("              plo   rf");
+      }
+    else {
+      sprintf(buffer,"              ldi   (%s_%s+%d).1        ; Point to variable",
+        variables[v].module, variables[v].name, ofs);
+      Asm(buffer);
+      Asm("              phi   rf");
+      sprintf(buffer,"              ldi   (%s_%s+%d).0",
+        variables[v].module, variables[v].name, ofs);
+      Asm(buffer);
+      Asm("              plo   rf");
+      }
     }
 
   if (dest == 'd') {

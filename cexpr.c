@@ -331,17 +331,33 @@ char* evaluate(char *pos, int *err, char* rtype) {
             if ((varType(v) == 'I' || varType(v) == 'R') && isArray == 0) {
               Asm("           sep     scall                     ; push variable to expr stack");
               Asm("           dw      vpush32");
-              sprintf(abuffer,"           dw      %s_%s",module,token);
+              if (strlen(variables[v].common) > 0) {
+                sprintf(abuffer,"           dw      c_%s+%d",variables[v].common,variables[v].offset);
+                }
+              else {
+                sprintf(abuffer,"           dw      %s_%s",module,token);
+                }
               Asm(abuffer);
               if (varType(v) == 'I') numbers[nstack++] = 'I';
               if (varType(v) == 'R') numbers[nstack++] = 'R';
               }
             else {
-              sprintf(abuffer,"           ldi     %s_%s.1             ; Point to variable",module,token);
-              Asm(abuffer);
-              Asm("           phi     rf");
-              sprintf(abuffer,"           ldi     %s_%s.0             ; Point to variable",module,token);
-              Asm(abuffer);
+              if (strlen(variables[v].common) > 0) {
+                sprintf(abuffer,"           ldi     (c_%s+%d).1             ; Point to variable",
+                        variables[v].common, variables[v].offset);
+                Asm(abuffer);
+                Asm("           phi     rf");
+                sprintf(abuffer,"           ldi     (c_%s+%d).0             ; Point to variable",
+                        variables[v].common, variables[v].offset);
+                Asm(abuffer);
+                }
+              else {
+                sprintf(abuffer,"           ldi     %s_%s.1             ; Point to variable",module,token);
+                Asm(abuffer);
+                Asm("           phi     rf");
+                sprintf(abuffer,"           ldi     %s_%s.0             ; Point to variable",module,token);
+                Asm(abuffer);
+                }
               Asm("           plo     rf");
               if (isArray) {
                 Asm("           irx                               ; Add array cell offset");

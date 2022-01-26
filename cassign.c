@@ -65,16 +65,30 @@ void cassign(char* line) {
       return;
       }
     }
-  sprintf(buffer,"            ldi  %s_%s.1          ; Point to variable",
-          variables[v].module,
-          variables[v].name);
-  Asm(buffer);
-  Asm("            phi  rf");
-  sprintf(buffer,"            ldi  %s_%s.0",
-          variables[v].module,
-          variables[v].name);
-  Asm(buffer);
-  Asm("            plo  rf");
+  if (strlen(variables[v].common) > 0) {
+    sprintf(buffer,"            ldi  (c_%s+%d).1          ; Point to variable",
+            variables[v].common,
+            variables[v].offset);
+    Asm(buffer);
+    Asm("            phi  rf");
+    sprintf(buffer,"            ldi  (c_%s+%d).0",
+            variables[v].common,
+            variables[v].offset);
+    Asm(buffer);
+    Asm("            plo  rf");
+    }
+  else {
+    sprintf(buffer,"            ldi  %s_%s.1          ; Point to variable",
+            variables[v].module,
+            variables[v].name);
+    Asm(buffer);
+    Asm("            phi  rf");
+    sprintf(buffer,"            ldi  %s_%s.0",
+            variables[v].module,
+            variables[v].name);
+    Asm(buffer);
+    Asm("            plo  rf");
+    }
   if (variables[v].type == V_INTEGER ||
       variables[v].type == V_DEFAULT) {
     Asm("            ldi  0          ; clear high word");

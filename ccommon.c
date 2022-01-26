@@ -33,7 +33,7 @@ void ccommon(char* line) {
         area[pos++] = *line++;
         }
       area[pos] = 0;
-      if (pos == 0) strcpy(area, " ");
+      if (pos == 0) strcpy(area, "_");
       if (*line == '/') line++;
       pos = 0;
       }

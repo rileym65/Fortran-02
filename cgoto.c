@@ -88,14 +88,26 @@ void cgoto(char* line) {
       Asm(buffer);
       Asm("            plo  ra");
       Asm("            sep  ra");
-      sprintf(buffer,"lbl_%d:   ldi   %s_%s.1                ; Point to variable",
-              nextLabel++, variables[v].module, variables[v].name);
-      Asm(buffer);
-      Asm("            phi  rf");
-      sprintf(buffer,"          ldi   %s_%s.0",
-              variables[v].module, variables[v].name);
-      Asm(buffer);
-      Asm("            plo  rf");
+      if (strlen(variables[v].common) > 0) {
+        sprintf(buffer,"lbl_%d:   ldi   (c_%s+%d).1                ; Point to variable",
+                nextLabel++, variables[v].common, variables[v].offset);
+        Asm(buffer);
+        Asm("            phi  rf");
+        sprintf(buffer,"          ldi   (c_%s+%d).0",
+                variables[v].common, variables[v].offset);
+        Asm(buffer);
+        Asm("            plo  rf");
+        }
+      else {
+        sprintf(buffer,"lbl_%d:   ldi   %s_%s.1                ; Point to variable",
+                nextLabel++, variables[v].module, variables[v].name);
+        Asm(buffer);
+        Asm("            phi  rf");
+        sprintf(buffer,"          ldi   %s_%s.0",
+                variables[v].module, variables[v].name);
+        Asm(buffer);
+        Asm("            plo  rf");
+        }
       if (variables[v].type == V_INTEGER ||
           variables[v].type == V_DEFAULT) {
         Asm("            inc  rf");
@@ -119,14 +131,26 @@ void cgoto(char* line) {
         return;
         }
       line++;
-      sprintf(buffer,"          ldi   %s_%s.1                ; Point to variable",
-              variables[v].module, variables[v].name);
-      Asm(buffer);
-      Asm("            phi  ra");
-      sprintf(buffer,"          ldi   %s_%s.0",
-              variables[v].module, variables[v].name);
-      Asm(buffer);
-      Asm("            plo  ra");
+      if (strlen(variables[v].common) > 0) {
+        sprintf(buffer,"          ldi   (c_%s+%d).1                ; Point to variable",
+                variables[v].common, variables[v].offset);
+        Asm(buffer);
+        Asm("            phi  ra");
+        sprintf(buffer,"          ldi   (c_%s+%d).0",
+                variables[v].common, variables[v].offset);
+        Asm(buffer);
+        Asm("            plo  ra");
+        }
+      else {
+        sprintf(buffer,"          ldi   %s_%s.1                ; Point to variable",
+                variables[v].module, variables[v].name);
+        Asm(buffer);
+        Asm("            phi  ra");
+        sprintf(buffer,"          ldi   %s_%s.0",
+                variables[v].module, variables[v].name);
+        Asm(buffer);
+        Asm("            plo  ra");
+        }
       Asm("            inc  ra");
       Asm("            inc  ra");
       Asm("            lda  ra");
@@ -247,14 +271,26 @@ void cgoto(char* line) {
         return;
         }
       }
-    sprintf(buffer,"          ldi   %s_%s.1                ; Point to variable",
-            variables[v].module, variables[v].name);
-    Asm(buffer);
-    Asm("            phi  rf");
-    sprintf(buffer,"          ldi   %s_%s.0",
-            variables[v].module, variables[v].name);
-    Asm(buffer);
-    Asm("            plo  rf");
+    if (strlen(variables[v].common) > 0) {
+      sprintf(buffer,"          ldi   (c_%s+%d).1                ; Point to variable",
+              variables[v].common, variables[v].offset);
+      Asm(buffer);
+      Asm("            phi  rf");
+      sprintf(buffer,"          ldi   (c_%s+%d).0",
+              variables[v].common, variables[v].offset);
+      Asm(buffer);
+      Asm("            plo  rf");
+      }
+    else {
+      sprintf(buffer,"          ldi   %s_%s.1                ; Point to variable",
+              variables[v].module, variables[v].name);
+      Asm(buffer);
+      Asm("            phi  rf");
+      sprintf(buffer,"          ldi   %s_%s.0",
+              variables[v].module, variables[v].name);
+      Asm(buffer);
+      Asm("            plo  rf");
+      }
     finalLabel = nextLabel++;
     if (variables[v].type == V_BYTE || variables[v].type == V_LOGICAL) {
       Asm("            lda  rf");

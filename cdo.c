@@ -142,12 +142,22 @@ void cdo(char* line) {
     doLoops[numDoLoops].loops = ((atoi(end) - atoi(start)) / atoi(step)) + 1;
     doLoops[numDoLoops].step = atoi(step);
     value = atoi(start);
-    sprintf(buffer,"          ldi   (%s_%s).1                 ; point to variable",variables[v].module, variables[v].name);
-    Asm(buffer);
-    Asm("          phi   rf");
-    sprintf(buffer,"          ldi   (%s_%s).0",variables[v].module, variables[v].name);
-    Asm(buffer);
-    Asm("          plo   rf");
+    if (strlen(variables[v].common) > 0) {
+      sprintf(buffer,"          ldi   (c_%s+%d).1                 ; point to variable",variables[v].common, variables[v].offset);
+      Asm(buffer);
+      Asm("          phi   rf");
+      sprintf(buffer,"          ldi   (c_%s+%d).0",variables[v].common, variables[v].offset);
+      Asm(buffer);
+      Asm("          plo   rf");
+      }
+    else {
+      sprintf(buffer,"          ldi   (%s_%s).1                 ; point to variable",variables[v].module, variables[v].name);
+      Asm(buffer);
+      Asm("          phi   rf");
+      sprintf(buffer,"          ldi   (%s_%s).0",variables[v].module, variables[v].name);
+      Asm(buffer);
+      Asm("          plo   rf");
+      }
     if (varType(v) == 'I') {
       sprintf(buffer,"          ldi   %d                 ; Write start value", (value >> 24) & 0xff);
       Asm(buffer);
@@ -202,12 +212,22 @@ void cdo(char* line) {
     if (argret == NULL) return;
     argret = getArg(start, 'e', "Push start to expr stack");
     if (argret == NULL) return;
-    sprintf(buffer,"          ldi   (%s_%s).1                 ; point to variable",variables[v].module, variables[v].name);
-    Asm(buffer);
-    Asm("          phi   rf");
-    sprintf(buffer,"          ldi   (%s_%s).0",variables[v].module, variables[v].name);
-    Asm(buffer);
-    Asm("          plo   rf");
+    if (strlen(variables[v].common) > 0) {
+      sprintf(buffer,"          ldi   (c_%s+%d).1                 ; point to variable",variables[v].common, variables[v].offset);
+      Asm(buffer);
+      Asm("          phi   rf");
+      sprintf(buffer,"          ldi   (c_%s+%d).0",variables[v].common, variables[v].offset);
+      Asm(buffer);
+      Asm("          plo   rf");
+      }
+    else {
+      sprintf(buffer,"          ldi   (%s_%s).1                 ; point to variable",variables[v].module, variables[v].name);
+      Asm(buffer);
+      Asm("          phi   rf");
+      sprintf(buffer,"          ldi   (%s_%s).0",variables[v].module, variables[v].name);
+      Asm(buffer);
+      Asm("          plo   rf");
+      }
     switch (varType(v)) {
       case 'B':
       case 'L':
@@ -311,14 +331,27 @@ void cDoEnd() {
     case 'S': i = 1; s1 = 2; break;
     default : i = 3; s1 = 4; break;
     }
-  sprintf(buffer,"          ldi   (%s_%s+%d).1                 ; point to variable",
-          variables[v].module, variables[v].name, i);
-  Asm(buffer);
-  Asm("          phi   rf");
-  sprintf(buffer,"          ldi   (%s_%s+%d).0                 ; point to variable",
-          variables[v].module, variables[v].name, i);
-  Asm(buffer);
-  Asm("          plo   rf");
+  if (strlen(variables[v].common) > 0) {
+    sprintf(buffer,"          ldi   (c_%s+%d+%d).1                 ; point to variable",
+            variables[v].common, variables[v].offset, i);
+    Asm(buffer);
+    Asm("          phi   rf");
+    sprintf(buffer,"          ldi   (c_%s+%d+%d).0                 ; point to variable",
+            variables[v].common, variables[v].offset, i);
+    Asm(buffer);
+    Asm("          plo   rf");
+    }
+  else {
+    sprintf(buffer,"          ldi   (%s_%s+%d).1                 ; point to variable",
+            variables[v].module, variables[v].name, i);
+    Asm(buffer);
+    Asm("          phi   rf");
+    sprintf(buffer,"          ldi   (%s_%s+%d).0                 ; point to variable",
+            variables[v].module, variables[v].name, i);
+    Asm(buffer);
+    Asm("          plo   rf");
+    }
+
   if (doLoops[numDoLoops-1].varStep == 'N') {
     Asm("          ldn   rf                       ; get byte from variable");
     sprintf(buffer,"          adi   %d                 ; add step",doLoops[numDoLoops-1].step & 0xff);
@@ -353,14 +386,26 @@ void cDoEnd() {
       case 'S': i = 1; s2 = 2; break;
       default : i = 3; s2 = 4; break;
       }
-    sprintf(buffer,"          ldi   (%s_%s+%d).1                 ; point to variable",
-            variables[v2].module, variables[v2].name, i);
-    Asm(buffer);
-    Asm("          phi   rd");
-    sprintf(buffer,"          ldi   (%s_%s+%d).0                 ; point to variable",
-            variables[v2].module, variables[v2].name, i);
-    Asm(buffer);
-    Asm("          plo   rd");
+    if (strlen(variables[v2].common) > 0) {
+      sprintf(buffer,"          ldi   (c_%s+%d+%d).1                 ; point to variable",
+              variables[v2].common, variables[v2].offset, i);
+      Asm(buffer);
+      Asm("          phi   rd");
+      sprintf(buffer,"          ldi   (c_%s+%d+%d).0                 ; point to variable",
+              variables[v2].common, variables[v2].offset, i);
+      Asm(buffer);
+      Asm("          plo   rd");
+      }
+    else {
+      sprintf(buffer,"          ldi   (%s_%s+%d).1                 ; point to variable",
+              variables[v2].module, variables[v2].name, i);
+      Asm(buffer);
+      Asm("          phi   rd");
+      sprintf(buffer,"          ldi   (%s_%s+%d).0                 ; point to variable",
+              variables[v2].module, variables[v2].name, i);
+      Asm(buffer);
+      Asm("          plo   rd");
+      }
     for (i=0; i<s1; i++) {
       if (s2 > 0) {
         Asm("          ldn   rd");
