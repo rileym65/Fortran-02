@@ -146,7 +146,22 @@ void cdo(char* line) {
     doLoops[numDoLoops].loops = ((atoi(end) - atoi(start)) / atoi(step)) + 1;
     doLoops[numDoLoops].step = atoi(step);
     value = atoi(start);
-    if (strlen(variables[v].common) > 0) {
+    if (variables[v].isArg) {
+      sprintf(buffer,"          ldi   %s_%s.1                 ; point to variable",
+              variables[v].module, variables[v].name);
+      Asm(buffer);
+      Asm("          phi   rf");
+      sprintf(buffer,"          ldi   %s_%s.0",variables[v].module, variables[v].name);
+      Asm(buffer);
+      Asm("          plo   rf");
+      Asm("           lda     rf                        ; Retrieve pointed to address");
+      Asm("           plo     re");
+      Asm("           lda     rf");
+      Asm("           plo     rf");
+      Asm("           glo     re");
+      Asm("           phi     rf");
+      }
+    else if (strlen(variables[v].common) > 0) {
       sprintf(buffer,"          ldi   (c_%s+%d).1                 ; point to variable",variables[v].common, variables[v].offset);
       Asm(buffer);
       Asm("          phi   rf");
@@ -216,7 +231,22 @@ void cdo(char* line) {
     if (argret == NULL) return;
     argret = getArg(start, 'e', "Push start to expr stack");
     if (argret == NULL) return;
-    if (strlen(variables[v].common) > 0) {
+    if (variables[v].isArg) {
+      sprintf(buffer,"          ldi   %s_%s.1                 ; point to variable",
+              variables[v].module, variables[v].name);
+      Asm(buffer);
+      Asm("          phi   rf");
+      sprintf(buffer,"          ldi   %s_%s.0",variables[v].module, variables[v].name);
+      Asm(buffer);
+      Asm("          plo   rf");
+      Asm("           lda     rf                        ; Retrieve pointed to address");
+      Asm("           plo     re");
+      Asm("           lda     rf");
+      Asm("           plo     rf");
+      Asm("           glo     re");
+      Asm("           phi     rf");
+      }
+    else if (strlen(variables[v].common) > 0) {
       sprintf(buffer,"          ldi   (c_%s+%d).1                 ; point to variable",variables[v].common, variables[v].offset);
       Asm(buffer);
       Asm("          phi   rf");
@@ -335,7 +365,31 @@ void cDoEnd() {
     case 'S': i = 1; s1 = 2; break;
     default : i = 3; s1 = 4; break;
     }
-  if (strlen(variables[v].common) > 0) {
+  if (variables[v].isArg) {
+    sprintf(buffer,"          ldi   %s_%s.1                 ; point to variable",
+            variables[v].module, variables[v].name);
+    Asm(buffer);
+    Asm("          phi   rf");
+    sprintf(buffer,"          ldi   %s_%s.0                 ; point to variable",
+            variables[v].module, variables[v].name);
+    Asm(buffer);
+    Asm("          plo   rf");
+    Asm("           lda     rf                        ; Retrieve pointed to address");
+    Asm("           plo     re");
+    Asm("           lda     rf");
+    Asm("           plo     rf");
+    Asm("           glo     re");
+    Asm("           phi     rf");
+    if (i == 1) {
+      Asm("           inc     rf");
+      }
+    if (i == 3) {
+      Asm("           inc     rf");
+      Asm("           inc     rf");
+      Asm("           inc     rf");
+      }
+    }
+  else if (strlen(variables[v].common) > 0) {
     sprintf(buffer,"          ldi   (c_%s+%d+%d).1                 ; point to variable",
             variables[v].common, variables[v].offset, i);
     Asm(buffer);
@@ -390,7 +444,31 @@ void cDoEnd() {
       case 'S': i = 1; s2 = 2; break;
       default : i = 3; s2 = 4; break;
       }
-    if (strlen(variables[v2].common) > 0) {
+    if (variables[v2].isArg) {
+      sprintf(buffer,"          ldi   %s_%s.1                 ; point to variable",
+              variables[v2].module, variables[v2].name);
+      Asm(buffer);
+      Asm("          phi   rd");
+      sprintf(buffer,"          ldi   %s_%s.0                 ; point to variable",
+              variables[v2].module, variables[v2].name);
+      Asm(buffer);
+      Asm("          plo   rd");
+      Asm("           lda     rd                        ; Retrieve pointed to address");
+      Asm("           plo     re");
+      Asm("           lda     rd");
+      Asm("           plo     rd");
+      Asm("           glo     re");
+      Asm("           phi     rd");
+      if (i == 1) {
+        Asm("           inc     rd");
+        }
+      if (i == 3) {
+        Asm("           inc     rd");
+        Asm("           inc     rd");
+        Asm("           inc     rd");
+        }
+      }
+    else if (strlen(variables[v2].common) > 0) {
       sprintf(buffer,"          ldi   (c_%s+%d+%d).1                 ; point to variable",
               variables[v2].common, variables[v2].offset, i);
       Asm(buffer);
