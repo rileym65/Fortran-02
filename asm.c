@@ -211,9 +211,9 @@ void writeOutput() {
     strcat(outLine,temp);
     write(outFile, outLine, strlen(outLine));
     }
-  if (outMode == 'B') {
-    write(outFile, outBuffer, outCount);
-    }
+//  if (outMode == 'B') {
+//    write(outFile, outBuffer, outCount);
+//    }
   }
 
 void output(byte value) {
@@ -227,6 +227,11 @@ void output(byte value) {
     }
   if (passNumber == 1) {
     if (address > highest) highest = address;
+    }
+  if (outMode == 'B') {
+    image[address] = value;
+    if (address < lowestAddress) lowestAddress = address;
+    if (address > highestAddress) highestAddress = address;
     }
   if (passNumber == 2) {
     if (showCompiler) {

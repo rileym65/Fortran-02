@@ -47,6 +47,7 @@ typedef struct {
   byte  dimensions;
   word  sizes[3];
   dword value;
+  byte  isArg;
   } VARREC;
 
 typedef struct {
@@ -284,6 +285,9 @@ LINK byte   useFp;
 LINK byte   useStep32;
 LINK byte   useStrings;
 LINK byte   debug;
+LINK byte   image[65536];
+LINK int    highestAddress;
+LINK int    lowestAddress;
 
 LINK char **variableNames;
 LINK word  *variableAddresses;

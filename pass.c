@@ -28,6 +28,8 @@ int pass(char* filename) {
   lineCount = -1;
   nextLabel = 1;
   numDoLoops = 0;
+  highestAddress = 0;
+  lowestAddress = 0xffff;
   Asm("BEGIN__:  equ  $");
   startup();
   Asm("PROGRAM__:  equ  $");

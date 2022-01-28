@@ -83,6 +83,11 @@ void output(byte value) {
   if (passNumber == 1) {
     if (address > highest) highest = address;
     }
+  if (outMode == 'B') {
+    image[address] = value;
+    if (address < lowestAddress) lowestAddress = address;
+    if (address > highestAddress) highestAddress = address;
+    }
   if (passNumber == 2) {
     if (showCompiler) {
       printf(" %02x",value);
@@ -280,6 +285,9 @@ int main(int argc, char** argv, char** envp) {
   if (createLst) lstFile = fopen(lstName,"w");
   pass(sourceFile);
   if (outCount > 0) writeOutput();
+  if (outMode == 'B') {
+    write(outFile, image+lowestAddress, highestAddress-lowestAddress+1);
+    }
   close(outFile);
   if (useAsm) {
 //    for (i=0; i<numberOfVariables; i++) {
@@ -306,6 +314,10 @@ int main(int argc, char** argv, char** envp) {
   printf("Rom           : %04xh-%04xh\n",romStart,romEnd);
   printf("Stack         : %04xh\n",stack);
   printf("Expr. Stack   : %04xh\n",estack);
+  if (outMode == 'B') {
+    printf("Lowest Addr   : %04xh\n",lowestAddress);
+    printf("Highest Addr  : %04xh\n",highestAddress);
+    }
   if (getDefine("HEAP"))
     printf("Heap          : %04xh\n",heap);
   printf("Program start : %04xh\n",getLabel("start"));
@@ -361,6 +373,7 @@ int main(int argc, char** argv, char** envp) {
     if (getDefine("IOFLAG") != 0)     printf("  ioflag     %04xh\n",getLabel("ioflag"));
     if (getDefine("IOSTATUS") != 0)   printf("  iostatus   %04xh\n",getLabel("iostatus"));
     if (getDefine("FDATA") != 0)      printf("  fdata      %04xh\n",getLabel("fdata"));
+    if (getDefine("FENTER") != 0)     printf("  fenter     %04xh\n",getLabel("fenter"));
   
     if (getDefine("ABS32") != 0)      printf("  abs32      %04xh\n",getLabel("abs32"));
     if (getDefine("ADD32") != 0)      printf("  add32      %04xh\n",getLabel("add32"));
