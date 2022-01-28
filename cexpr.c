@@ -328,7 +328,24 @@ char* evaluate(char *pos, int *err, char* rtype) {
               Asm("           glo     rf");
               Asm("           stxd");
               }
-            if ((varType(v) == 'I' || varType(v) == 'R') && isArray == 0) {
+
+            if (variables[v].isArg) {
+              if ((varType(v) == 'I' || varType(v) == 'R') && isArray == 0) {
+                Asm("           sep     scall                     ; push variable to expr stack");
+                Asm("           dw      vpush32p");
+                if (strlen(variables[v].common) > 0) {
+                  sprintf(abuffer,"           dw      c_%s+%d",variables[v].common,variables[v].offset);
+                  }
+                else {
+                  sprintf(abuffer,"           dw      %s_%s",module,token);
+                  }
+                Asm(abuffer);
+                if (varType(v) == 'I') numbers[nstack++] = 'I';
+                if (varType(v) == 'R') numbers[nstack++] = 'R';
+                }
+              }
+
+            else if ((varType(v) == 'I' || varType(v) == 'R') && isArray == 0) {
               Asm("           sep     scall                     ; push variable to expr stack");
               Asm("           dw      vpush32");
               if (strlen(variables[v].common) > 0) {

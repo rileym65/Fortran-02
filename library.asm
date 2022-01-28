@@ -33,6 +33,28 @@ vpush32:    lda     r6
             stxd
             sex     r2
             sep     sret
+
+vpush32p:   lda     r6
+            phi     rf
+            lda     r6
+            plo     rf
+            lda     rf
+            plo     re
+            lda     rf
+            plo     rf
+            glo     re
+            phi     rf
+            sex     r7
+            lda     rf
+            stxd
+            lda     rf
+            stxd
+            lda     rf
+            stxd
+            lda     rf
+            stxd
+            sex     r2
+            sep     sret
             
 #ifdef USEEF
 sampleef:   ldi     0
@@ -497,6 +519,63 @@ nobs:       inc     ra
             lbr     inplp
 #endif
 
+
+; *******************************
+; ***** Fortran/02 routines *****
+; *******************************
+
+#ifdef FENTER
+fenter:     irx                        ; recover return addresses
+            ldxa                       ; and set them aside
+            phi     r8
+            ldxa
+            plo     r8
+            ldxa
+            phi     r9
+            ldxa
+            plo     r9
+            ldx                        ; retrieve passed argument count
+            plo     ra                 ; and put it here
+fenter_lp:  glo     ra                 ; get passedcount
+            lbz     fenter_tf          ; jump if too few arguments
+            lda     r6                 ; retrieve next address
+            phi     rf
+            str     r2
+            lda     r6
+            plo     rf
+            or                         ; see if end of list
+            lbz     fenter_tm          ; jump if too many arguments passed
+            irx
+            ldxa                       ; get next address
+            str     rf                 ; and write to local var
+            inc     rf
+            ldx
+            str     rf
+            dec     ra                 ; decrement passed argument count
+            lbr     fenter_lp          ; loop for next argument
+fenter_tf:  lda     r6                 ; need to read rest of local table
+            str     r2
+            lda     r6
+            or
+            lbnz    fenter_tf          ; loop until done
+            lbr     fenter_dn
+fenter_tm:  glo     ra                 ; see if done
+            lbz     fenter_dn          ; jump if so
+            irx                        ; take two bytes off stack
+            irx
+            dec     ra                 ; decrement argument count
+            lbr     fenter_tm          ; loop until done
+fenter_dn:  glo     r9                 ; restore stack entries
+            stxd
+            ghi     r9
+            stxd
+            glo     r8
+            stxd
+            ghi     r8
+            stxd
+            sep     sret               ; and return to caller
+#endif
+
 #ifdef FDATA
 fdata:      lda     r6                 ; get size of next item
             phi     rc
@@ -544,7 +623,19 @@ ffwrite_lp: lda     r9                 ; get next variable type
             phi     rf
             lda     r9
             plo     rf
-            glo     re                 ; recover variable type
+            glo     re                 ; check for pointer type
+            shl
+            lbnf    ffwrite_x          ; jump if not
+            lda     rf                 ; retrieve pointed to address
+            str     r2
+            lda     rf
+            plo     rf
+            ldn     r2
+            phi     rf
+            glo     re                 ; clear pointer bit
+            ani     07fh
+            plo     re
+ffwrite_x:  glo     re                 ; recover variable type
             smi     'B'                ; check for byte
             lbz     ffwrite_b          ; jump if so
             glo     re                 ; recover variable type
@@ -686,6 +777,10 @@ ffwrite_r:  ldi     (scratch2_+3).1    ; need to reverse the bytes
             ghi     r9
             stxd
             glo     r9
+            stxd
+            ghi     ra
+            stxd
+            glo     ra
             stxd
             sep     scall              ; convert real value
             dw      ftoa
@@ -1532,7 +1627,19 @@ fmtwrt_f:   lda     r9                 ; get next variable type
             phi     rf
             lda     r9
             plo     rf
-            glo     re                 ; now check variable type
+            glo     re                 ; recover type
+            shl                        ; check for pointer
+            lbnf    fmtwrt_fn
+            lda     rf                 ; retrieve pointed to address
+            str     r2
+            lda     rf
+            plo     rf
+            ldn     r2
+            phi     rf
+            glo     re                 ; clear pointer bit
+            ani     07fh
+            plo     re
+fmtwrt_fn:  glo     re                 ; now check variable type
             smi     'B'                ; check for byte
             lbz     fmtwrt_f1          ; jump if so
             glo     re
@@ -1762,7 +1869,19 @@ fmtwrt_a:   lda     r9                 ; get next variable type
             phi     rf
             lda     r9
             plo     rf
-            inc     r8                 ; get field width
+            glo     re                 ; check for pointer type
+            shl
+            lbnf    fmtwrt_ap          ; jump if not
+            lda     rf                 ; retrieve pointed to address
+            str     r2
+            lda     rf
+            plo     rf
+            ldn     r2
+            phi     rf
+            glo     re                 ; clear pointer bit
+            ani     07fh
+            plo     re
+fmtwrt_ap:  inc     r8                 ; get field width
             ldn     r8
             plo     rc
             dec     r8
@@ -1817,7 +1936,19 @@ fmtwrt_l:   lda     r9                 ; get next variable type
             phi     rf
             lda     r9
             plo     rf
-            inc     r8                 ; get field width
+            glo     re                 ; see if pointer
+            shl
+            lbnf    fmtwrt_lx          ; jump if not
+            lda     rf                 ; retrieve pointed to address
+            str     r2
+            lda     rf
+            plo     rf
+            ldn     r2
+            phi     rf
+            glo     re                 ; clear pointer bit
+            ani     07fh
+            plo     re
+fmtwrt_lx:  inc     r8                 ; get field width
             ldn     r8
             plo     rc
             dec     r8
@@ -1879,7 +2010,19 @@ fmtwrt_i:   lda     r9                 ; get next variable type
             phi     rf
             lda     r9
             plo     rf
-            glo     re                 ; get conversion
+            glo     re                 ; check for pointer
+            shl
+            lbnf    fmtwrt_ix          ; jump if not
+            lda     rf                 ; retrieve pointed to address
+            str     r2
+            lda     rf
+            plo     rf
+            ldn     r2
+            phi     rf
+            glo     re                 ; clear pointer bit
+            ani     07fh
+            plo     re
+fmtwrt_ix:  glo     re                 ; get conversion
             sex     r7                 ; point to expr stack
             smi     'I'                ; is it an integer
             lbz     fmtwrt_i4          ; jump if so

@@ -11,8 +11,14 @@
 #include "header.h"
 
 void ccall(char* line) {
+  int  i;
   char token[32];
+  char subName[32];
   int  pos;
+  int  v;
+  char *temp;
+  char argType;
+  numCallArgs = 0;
   if (inBlockData) {
     showError("Not allowed in BLOCK DATA");
     return;
@@ -110,14 +116,83 @@ void ccall(char* line) {
     while ((*line >= 'a' && *line <= 'z') ||
            (*line >= 'A' && *line <= 'Z') ||
            (*line >= '0' && *line <= '9') ||
-            *line == '_') token[pos++] = *line++;
-    token[pos] = 0;
+            *line == '_') subName[pos++] = *line++;
+    subName[pos] = 0;
     if (pos == 0) {
       showError("NULL name not allowed");
       return;
       }
+
+    if (*line == '(') {
+      line++;
+      argType = ' ';
+      while (*line != 0 && *line != ')') {
+        if ((*line >= 'a' && *line <= 'z') ||
+            (*line >= 'A' && *line <= 'Z')) {
+          pos = 0;
+          temp = line;
+          while ((*temp >= 'a' && *temp <= 'z') ||
+                 (*temp >= 'A' && *temp <= 'Z') ||
+                 (*temp >= '0' && *temp <= '9') ||
+                 *temp == '_') token[pos++] = *temp++;
+          token[pos] = 0;
+          if (*temp == ')' || *temp == ',') {
+printf("Variable arg: %s\n",token);
+            argType = 'V';
+            v = getVariable(token,module);
+            if (v < 0) return;
+            callArgs[numCallArgs] = v;
+            callArgTypes[numCallArgs++] = 'V';
+            argType = '*';
+            line = temp;
+            }
+          }
+        if (argType == ' ') {
+printf("Expression arg: %s\n",token);
+          line = cexpr(line, 2);
+          if (exprErrors > 0) return;
+          callArgs[numCallArgs] = 0;
+          callArgTypes[numCallArgs++] = 'E';
+          }
+        if (*line == ',') line++;
+        }
+      if (*line != ')') {
+        showError("Syntax error");
+        return;
+        }
+      line++;
+      if (*line != 0) {
+        showError("Syntax error");
+        return;
+        }
+      }
+
+    if (numCallArgs > 0) {
+      i = numCallArgs-1;
+      while (i >= 0) {
+        if (callArgTypes[i] == 'V') {
+          sprintf(buffer,"          ldi   (%s_%s).0               ; Push variable address",
+                  variables[callArgs[i]].module, variables[callArgs[i]].name);
+          Asm(buffer);
+          Asm("          stxd");
+          sprintf(buffer,"          ldi   (%s_%s).1",
+                  variables[callArgs[i]].module, variables[callArgs[i]].name);
+          Asm(buffer);
+          Asm("          stxd");
+          }
+        i--;
+        }
+      }
+
+    if (*line != 0) {
+      showError("Syntax error");
+      return;
+      }
+    sprintf(buffer,"          ldi   %d                      ; Set no of arguments",numCallArgs);
+    Asm(buffer);
+    Asm("          stxd                          ; Place on stack");
     Asm("          sep   scall                   ; Call subroutine");
-    sprintf(buffer, "          dw    %s",token); Asm(buffer);
+    sprintf(buffer, "          dw    %s",subName); Asm(buffer);
     return;
     }
 

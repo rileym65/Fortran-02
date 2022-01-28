@@ -14,6 +14,7 @@ int addVariable(char* name,char* module) {
   int i;
   i = findVariable(name, module);
   if (i >= 0) {
+    if (inSub && variables[i].type == V_DEFAULT) return i;
     showError("Variable already defined");
     return -1;
     }
@@ -30,6 +31,7 @@ int addVariable(char* name,char* module) {
   variables[numVariables-1].type = V_DEFAULT;
   variables[numVariables-1].dimensions = 0;
   variables[numVariables-1].value = 0;
+  variables[numVariables-1].isArg = 0;
   return numVariables-1;
   }
 

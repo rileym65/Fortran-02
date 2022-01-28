@@ -36,7 +36,13 @@ void csubroutine(char* line) {
   token[pos] = 0;
   strcpy(module, token);
   sprintf(buffer,"%s:", token); Asm(buffer);
-  if (*line == 0) return;
+  Asm("              sep   scall              ; Bind parameters");
+  Asm("              dw    fenter");
+  addDefine("FENTER",1,1);
+  if (*line == 0) {
+    Asm("              dw    0");
+    return;
+    }
   line++;
   while (*line != 0 && *line != ')') {
     if ((*line >= 'a' && *line <= 'z') ||
@@ -47,9 +53,16 @@ void csubroutine(char* line) {
              (*line >= '0' && *line <= '9') ||
               *line == '_') token[pos++] = *line++;
       token[pos] = 0;
-      i = addVariable(token, module);
+      if (passNumber == 1)
+        i = addVariable(token, module);
+      else
+        i = getVariable(token, module);
       if (i < 0) return;
-      if (*line != ',' && *line != 0) {
+      variables[i].isArg = 0xff;
+      sprintf(buffer,"              dw    %s_%s",
+        variables[i].module, variables[i].name);
+      Asm(buffer);
+      if (*line != ',' && *line != 0 && *line != ')') {
         showError("Syntax error");
         return;
         }
@@ -60,5 +73,7 @@ void csubroutine(char* line) {
       return;
       }
     }
+  Asm("              dw    0");
+  addDefine("FENTER",1,1);
   }
 

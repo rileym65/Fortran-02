@@ -106,7 +106,28 @@ void clet(char* line) {
       *line = 0;
       }
 
-    if (strlen(variables[v].common) > 0) {
+    if (variables[v].isArg) {
+      sprintf(buffer,"          ldi   (%s_%s).1              ; Get destination variable address",
+              module,varname); Asm(buffer);
+      Asm("          phi   rf");
+      sprintf(buffer,"          ldi   (%s_%s).0", module,varname); Asm(buffer);
+      Asm("          plo   rf");
+      Asm("          lda   rf                        ; retrieve pointed to address");
+      Asm("          plo   re");
+      Asm("          lda   rf");
+      Asm("          plo   rf");
+      Asm("          glo   re");
+      Asm("          phi   rf");
+      if (varType(v) == 'I' || varType(v) == 'R') {
+        Asm("          inc   rf                        ; point to LSB");
+        Asm("          inc   rf");
+        Asm("          inc   rf");
+        }
+      if (varType(v) == 'S') {
+        Asm("          inc   rf                        ; point to LSB");
+        }
+      }
+    else if (strlen(variables[v].common) > 0) {
       if (varType(v) == 'I' || varType(v) == 'R') {
         sprintf(buffer,"          ldi   (c_%s+%d+3).1              ; Get destination variable address", variables[v].common,variables[v].offset); Asm(buffer);
         Asm("          phi   rf");

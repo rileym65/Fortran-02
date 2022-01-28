@@ -232,7 +232,12 @@ void cwrite(char* line) {
         showError("Invalid variable name");
         return;
         }
-      sprintf(buffer,"           db      %d",varType(v)); 
+      if (variables[v].isArg) {
+        sprintf(buffer,"           db      %d+080h",varType(v)); 
+        }
+      else {
+        sprintf(buffer,"           db      %d",varType(v)); 
+        }
       Asm(buffer);
       if (strlen(variables[v].common) > 0) {
         sprintf(buffer,"           dw      c_%s+%d",
