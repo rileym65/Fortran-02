@@ -92,7 +92,23 @@ void cgoto(char* line) {
       Asm(buffer);
       Asm("            plo  ra");
       Asm("            sep  ra");
-      if (strlen(variables[v].common) > 0) {
+      if (variables[v].isArg) {
+        sprintf(buffer,"lbl_%d:   ldi   %s_%s.1                ; Point to variable",
+                nextLabel++, variables[v].module, variables[v].name);
+        Asm(buffer);
+        Asm("            phi  rf");
+        sprintf(buffer,"          ldi   %s_%s.0",
+                variables[v].module, variables[v].name);
+        Asm(buffer);
+        Asm("            plo  rf");
+        Asm("           lda     rf                        ; Retrieve pointed to address");
+        Asm("           plo     re");
+        Asm("           lda     rf");
+        Asm("           plo     rf");
+        Asm("           glo     re");
+        Asm("           phi     rf");
+        }
+      else if (strlen(variables[v].common) > 0) {
         sprintf(buffer,"lbl_%d:   ldi   (c_%s+%d).1                ; Point to variable",
                 nextLabel++, variables[v].common, variables[v].offset);
         Asm(buffer);
@@ -135,7 +151,23 @@ void cgoto(char* line) {
         return;
         }
       line++;
-      if (strlen(variables[v].common) > 0) {
+      if (variables[v].isArg) {
+        sprintf(buffer,"lbl_%d:   ldi   %s_%s.1                ; Point to variable",
+                nextLabel++, variables[v].module, variables[v].name);
+        Asm(buffer);
+        Asm("            phi  rf");
+        sprintf(buffer,"          ldi   %s_%s.0",
+                variables[v].module, variables[v].name);
+        Asm(buffer);
+        Asm("            plo  rf");
+        Asm("           lda     rf                        ; Retrieve pointed to address");
+        Asm("           plo     re");
+        Asm("           lda     rf");
+        Asm("           plo     rf");
+        Asm("           glo     re");
+        Asm("           phi     rf");
+        }
+      else if (strlen(variables[v].common) > 0) {
         sprintf(buffer,"          ldi   (c_%s+%d).1                ; Point to variable",
                 variables[v].common, variables[v].offset);
         Asm(buffer);
