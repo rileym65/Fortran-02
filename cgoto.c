@@ -275,7 +275,23 @@ void cgoto(char* line) {
         return;
         }
       }
-    if (strlen(variables[v].common) > 0) {
+    if (variables[v].isArg) {
+      sprintf(buffer,"          ldi   %s_%s.1                ; Point to variable",
+              variables[v].module, variables[v].name);
+      Asm(buffer);
+      Asm("            phi  rf");
+      sprintf(buffer,"          ldi   %s_%s.0",
+              variables[v].module, variables[v].name);
+      Asm(buffer);
+      Asm("            plo  rf");
+      Asm("           lda     rf                        ; Retrieve pointed to address");
+      Asm("           plo     re");
+      Asm("           lda     rf");
+      Asm("           plo     rf");
+      Asm("           glo     re");
+      Asm("           phi     rf");
+      }
+    else if (strlen(variables[v].common) > 0) {
       sprintf(buffer,"          ldi   (c_%s+%d).1                ; Point to variable",
               variables[v].common, variables[v].offset);
       Asm(buffer);
