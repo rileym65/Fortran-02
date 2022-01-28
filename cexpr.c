@@ -330,19 +330,21 @@ char* evaluate(char *pos, int *err, char* rtype) {
               }
 
             if (variables[v].isArg) {
+              Asm("           sep     scall                     ; push variable to expr stack");
               if ((varType(v) == 'I' || varType(v) == 'R') && isArray == 0) {
-                Asm("           sep     scall                     ; push variable to expr stack");
                 Asm("           dw      vpush32p");
-                if (strlen(variables[v].common) > 0) {
-                  sprintf(abuffer,"           dw      c_%s+%d",variables[v].common,variables[v].offset);
-                  }
-                else {
-                  sprintf(abuffer,"           dw      %s_%s",module,token);
-                  }
-                Asm(abuffer);
-                if (varType(v) == 'I') numbers[nstack++] = 'I';
-                if (varType(v) == 'R') numbers[nstack++] = 'R';
                 }
+              if (varType(v) == 'S') {
+                Asm("           dw      vpush16p");
+                addDefine("VPUSH16P",1,1);
+                }
+              if ((varType(v) == 'B' || varType(v) == 'L') && isArray == 0) {
+                addDefine("VPUSH8P",1,1);
+                Asm("           dw      vpush8p");
+                }
+              sprintf(abuffer,"           dw      %s_%s",module,token);
+              Asm(abuffer);
+              numbers[nstack++] = (varType(v) == 'R') ? 'R' : 'I';
               }
 
             else if ((varType(v) == 'I' || varType(v) == 'R') && isArray == 0) {

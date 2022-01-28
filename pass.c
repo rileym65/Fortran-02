@@ -125,6 +125,12 @@ int pass(char* filename) {
                 size);
         Asm(buffer);
         }
+      else if (variables[i].isArg) {
+        sprintf(buffer, "%s_%s:    dw    0", 
+                       variables[i].module,
+                       variables[i].name);
+        Asm(buffer);
+        }
       else {
         switch (variables[i].type) {
           case V_BYTE:
