@@ -124,11 +124,10 @@ void ccall(char* line) {
       showError("NULL name not allowed");
       return;
       }
-
     if (*line == '(') {
       line++;
-      argType = ' ';
       while (*line != 0 && *line != ')') {
+        argType = ' ';
         if ((*line >= 'a' && *line <= 'z') ||
             (*line >= 'A' && *line <= 'Z')) {
           pos = 0;
@@ -163,6 +162,8 @@ void ccall(char* line) {
           Asm("           ldn   r7");
           Asm("           stxd");
           usedExpr = 0xff;
+          }
+        else {
           }
         if (*line == ',') line++;
         }

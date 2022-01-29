@@ -329,7 +329,7 @@ char* evaluate(char *pos, int *err, char* rtype) {
               Asm("           stxd");
               }
 
-            if (variables[v].isArg) {
+            if (variables[v].isArg && isArray == 0) {
               Asm("           sep     scall                     ; push variable to expr stack");
               if ((varType(v) == 'I' || varType(v) == 'R') && isArray == 0) {
                 Asm("           dw      vpush32p");
@@ -378,6 +378,14 @@ char* evaluate(char *pos, int *err, char* rtype) {
                 Asm(abuffer);
                 }
               Asm("           plo     rf");
+              if (variables[v].isArg) {
+                Asm("           lda     rf                        ; Retrieve pointed to address");
+                Asm("           plo     re");
+                Asm("           lda     rf");
+                Asm("           plo     rf");
+                Asm("           glo     re");
+                Asm("           phi     rf");
+                }
               if (isArray) {
                 Asm("           irx                               ; Add array cell offset");
                 Asm("           glo     rf");
