@@ -23,6 +23,45 @@ void creturn(char* line) {
     showError("Syntax error");
     return;
     }
+  if (functionVar >= 0) {
+    sprintf(buffer,"              ldi   %s_%s.1            ; Point to result variable",
+            variables[functionVar].module, variables[functionVar].name);
+    Asm(buffer);
+    Asm("              phi   rf");
+    sprintf(buffer,"              ldi   %s_%s.0",
+            variables[functionVar].module, variables[functionVar].name);
+    Asm(buffer);
+    Asm("              plo   rf");
+    Asm("              sex   r7");
+    if (varType(functionVar) == 'I' || varType(functionVar) == 'R') {
+      Asm("              lda   rf");
+      Asm("              stxd");
+      Asm("              lda   rf");
+      Asm("              stxd");
+      Asm("              lda   rf");
+      Asm("              stxd");
+      Asm("              lda   rf");
+      Asm("              stxd");
+      }
+    if (varType(functionVar) == 'S') {
+      Asm("              lda   0");
+      Asm("              stxd");
+      Asm("              stxd");
+      Asm("              lda   rf");
+      Asm("              stxd");
+      Asm("              lda   rf");
+      Asm("              stxd");
+      }
+    if (varType(functionVar) == 'B' || varType(functionVar) == 'L') {
+      Asm("              ldi   0");
+      Asm("              stxd");
+      Asm("              stxd");
+      Asm("              stxd");
+      Asm("              lda   rf");
+      Asm("              stxd");
+      }
+    Asm("              sex   r2");
+    }
   Asm("              sep   sret               ; Return to caller");
   }
 

@@ -15,6 +15,7 @@ void cend(char* line) {
   inUnit = 0;
   inSub = 0;
   inBlockData = 0;
+  functionVar = -1;
   if (*line != 0) {
     showError("Invalid character encountered in END statement");
     return;

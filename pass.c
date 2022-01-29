@@ -36,6 +36,7 @@ int pass(char* filename) {
   inUnit = 0;
   inSub = 0;
   inBlockData = 0;
+  functionVar = -1;
   numExternals = 0;
   strcpy(module,"main");
   while (nextStatement() != 0) {

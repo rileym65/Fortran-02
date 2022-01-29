@@ -78,6 +78,11 @@ typedef struct {
   dword loops;
   } DOREC;
 
+typedef struct {
+  char name[32];
+  byte  type;
+  } EXTERNAL;
+  
 #define IDL      0x00
 #define LDN      0x00
 #define INC      0x10
@@ -178,27 +183,28 @@ typedef struct {
 #define OP_NUMFP  0x01
 #define OP_NUM    0x00
 
-LINK DOREC   doLoops[32];
-LINK int     numDoLoops;
-LINK int     inUnit;
-LINK int     inSub;
-LINK int     inBlockData;
-LINK char    module[32];
-LINK int     nextLabel;
-LINK char    nextLine[1024];
-LINK int     numVariables;
-LINK int     passNumber;
-LINK FILE   *source;
-LINK char    sourceFile[1024];
-LINK char    statement[4096];
-LINK int     statementLabel;
-LINK VARREC *variables;
-LINK COMMON *common;
-LINK int     numCommon;
+LINK DOREC    doLoops[32];
+LINK EXTERNAL externals[100];
+LINK int      numExternals;
+LINK int      numDoLoops;
+LINK int      inUnit;
+LINK int      inSub;
+LINK int      functionVar;
+LINK int      inBlockData;
+LINK char     module[32];
+LINK int      nextLabel;
+LINK char     nextLine[1024];
+LINK int      numVariables;
+LINK int      passNumber;
+LINK FILE    *source;
+LINK char     sourceFile[1024];
+LINK char     statement[4096];
+LINK int      statementLabel;
+LINK VARREC  *variables;
+LINK COMMON  *common;
+LINK int      numCommon;
 LINK COMMONBLOCK *commonBlocks;
 LINK int          numCommonBlocks;
-LINK char       **externals;
-LINK int          numExternals;
 
 
 
@@ -335,7 +341,7 @@ extern void cread(char* line);
 extern void creturn(char* line);
 extern void crewind(char* line);
 extern void cstop(char* line);
-extern void csubroutine(char* line,char t,char rt);
+extern void csubroutine(char* line,char t,byte rt);
 extern void cwrite(char* line);
 extern void ctype(char* line,int vtype);
 extern char* getArg(char*line, char dest, char* rem);

@@ -34,5 +34,6 @@ void cprogram(char* line) {
   token[pos] = 0;
   strcpy(module, token);
   Asm("START___:");
+  numExternals = 0;
   }
 

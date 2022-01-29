@@ -10,7 +10,7 @@
 
 #include "header.h"
 
-void csubroutine(char* line, char t, char rt) {
+void csubroutine(char* line, char t, byte rt) {
   int  i;
   char token[32];
   int  pos;
@@ -20,6 +20,8 @@ void csubroutine(char* line, char t, char rt) {
     }
   inUnit = -1;
   inSub = -1;
+  functionVar = -1;
+  numExternals = 0;
   pos = 0;
   while ((*line >= 'a' && *line <= 'z') ||
          (*line >= 'A' && *line <= 'Z') ||
@@ -35,6 +37,19 @@ void csubroutine(char* line, char t, char rt) {
     }
   token[pos] = 0;
   strcpy(module, token);
+
+  if (t == 'F') {
+    if (passNumber == 1) {
+      functionVar = addVariable(token,module);
+      if (functionVar < 0) return;
+      variables[functionVar].type = rt;
+      }
+    else {
+      functionVar = getVariable(token,module);
+      if (functionVar < 0) return;
+      }
+    }
+
   sprintf(buffer,"%s:", token); Asm(buffer);
   Asm("              sep   scall              ; Bind parameters");
   Asm("              dw    fenter");

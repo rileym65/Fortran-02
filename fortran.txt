@@ -10,6 +10,7 @@ Dlabl statement
 if the -d command line switch is specified
 
       PROGRAM name
+      [type] FUNCTION name(arg,arg,...)
       SUBROUTINE name[(arg,arg,...)]
       BLOCK DATA [name]
 
@@ -19,6 +20,7 @@ if the -d command line switch is specified
       BYTE var,var,...
       SHORT var,var,...
       DIMENSION var(size,size,...),...
+      EXTERNAL name,name,...
       COMMON /name/var,var,.../name/var,var,var...
       DATA var,var,var/data,data,data/var,var,.../data,data,...
 
@@ -130,8 +132,6 @@ Still to implement:
       WRITE(lun[,REC=index],ERR=line,END=line)var,var,...
 
       fnmame(arg,arg,...) = expr
-      [type] FUNCTION name(arg,arg,...)
-      EXTERNAL
 
 Compiler Directives:
 .1805           - Enable 1804/5/6 assembler mode
