@@ -10,7 +10,7 @@ Dlabl statement
 if the -d command line switch is specified
 
       PROGRAM name
-      SUBROUTINE name
+      SUBROUTINE name[(arg,arg,...)]
       BLOCK DATA [name]
 
       INTEGER var,var,...
@@ -26,6 +26,7 @@ if the -d command line switch is specified
       ASSIGN line TO var
       CALL OUT(port,value)
       CALL POKE(address,value)
+      CALL subr[(arg,arg,...)]
       DO line var=start,end[,step]
       FORMAT(spec,spec,...)
       IF (expr) less,equal,greater
@@ -122,7 +123,6 @@ Still to implement:
       EQUIVALENCE (var,var,...),(var,var,...),...
 
 
-      CALL subr[(arg,arg,...)]
       CALL APPEND(lun,filename,reclen)
       READ(lun[,REC=index],fline,ERR=line,END=line)var,var,...
       WRITE(lun[,REC=index],fline,ERR=line,END=line)var,var,...
@@ -131,7 +131,6 @@ Still to implement:
 
       fnmame(arg,arg,...) = expr
       [type] FUNCTION name(arg,arg,...)
-      SUBROUTINE name[(arg,arg,...)]
       EXTERNAL
 
 Compiler Directives:

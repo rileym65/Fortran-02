@@ -48,7 +48,7 @@ int compileLine(char* line) {
   else if (strncasecmp(line, "rewind", 6) == 0)     crewind(line+6);
   else if (strncasecmp(line, "short", 5) == 0)      ctype(line+5,V_SHORT);
   else if (strncasecmp(line, "stop", 4) == 0)       cstop(line+4);
-  else if (strncasecmp(line, "subroutine",10) == 0) csubroutine(line+10);
+  else if (strncasecmp(line, "subroutine",10) == 0) csubroutine(line+10, 'S', ' ');
   else if (strncasecmp(line, "write", 5) == 0)      cwrite(line+5);
   else clet(line);
   while (numDoLoops > 0 && doLoops[numDoLoops-1].line == statementLabel) {

@@ -335,7 +335,7 @@ extern void cread(char* line);
 extern void creturn(char* line);
 extern void crewind(char* line);
 extern void cstop(char* line);
-extern void csubroutine(char* line);
+extern void csubroutine(char* line,char t,char rt);
 extern void cwrite(char* line);
 extern void ctype(char* line,int vtype);
 extern char* getArg(char*line, char dest, char* rem);

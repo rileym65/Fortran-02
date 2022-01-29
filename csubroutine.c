@@ -10,7 +10,7 @@
 
 #include "header.h"
 
-void csubroutine(char* line) {
+void csubroutine(char* line, char t, char rt) {
   int  i;
   char token[32];
   int  pos;
