@@ -97,6 +97,7 @@ Expression operators:
       TAN(n)
       IOFLAG(lun)    (expression)
       IOSTATUS(lun)  (expression)
+      func(arg,arg,...)
 
 Format specifiers for output:
       [n]A[width]

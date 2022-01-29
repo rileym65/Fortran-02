@@ -306,140 +306,176 @@ char* evaluate(char *pos, int *err, char* rtype) {
               token[p++] = *pos++;
               }
             token[p] = 0;
-            v = getVariable(token, module);
-            if (v < 0) {
-              *err = -1;
-              return pos;
-              }
+
             if (*pos == '(') {
-              if (variables[v].dimensions == 0) {
-                showError("Attempt to subscript a non-array variable");
-                *err = -1;
-                return pos;
-                }
-              pos = arrayRef(pos, v);
-              if (pos == NULL) {
-                *err = -1;
-                return pos;
-                }
-              isArray = -1;
-              Asm("           ghi     rf                        ; Save offset for later");
-              Asm("           stxd");
-              Asm("           glo     rf");
-              Asm("           stxd");
-              }
-
-            if (variables[v].isArg && isArray == 0) {
-              Asm("           sep     scall                     ; push variable to expr stack");
-              if ((varType(v) == 'I' || varType(v) == 'R') && isArray == 0) {
-                Asm("           dw      vpush32p");
-                }
-              if (varType(v) == 'S') {
-                Asm("           dw      vpush16p");
-                addDefine("VPUSH16P",1,1);
-                }
-              if ((varType(v) == 'B' || varType(v) == 'L') && isArray == 0) {
-                addDefine("VPUSH8P",1,1);
-                Asm("           dw      vpush8p");
-                }
-              sprintf(abuffer,"           dw      %s_%s",module,token);
-              Asm(abuffer);
-              numbers[nstack++] = (varType(v) == 'R') ? 'R' : 'I';
-              }
-
-            else if ((varType(v) == 'I' || varType(v) == 'R') && isArray == 0) {
-              Asm("           sep     scall                     ; push variable to expr stack");
-              Asm("           dw      vpush32");
-              if (strlen(variables[v].common) > 0) {
-                sprintf(abuffer,"           dw      c_%s+%d",variables[v].common,variables[v].offset);
-                }
-              else {
-                sprintf(abuffer,"           dw      %s_%s",module,token);
-                }
-              Asm(abuffer);
-              if (varType(v) == 'I') numbers[nstack++] = 'I';
-              if (varType(v) == 'R') numbers[nstack++] = 'R';
-              }
-            else {
-              if (strlen(variables[v].common) > 0) {
-                sprintf(abuffer,"           ldi     (c_%s+%d).1             ; Point to variable",
-                        variables[v].common, variables[v].offset);
-                Asm(abuffer);
-                Asm("           phi     rf");
-                sprintf(abuffer,"           ldi     (c_%s+%d).0             ; Point to variable",
-                        variables[v].common, variables[v].offset);
-                Asm(abuffer);
-                }
-              else {
-                sprintf(abuffer,"           ldi     %s_%s.1             ; Point to variable",module,token);
-                Asm(abuffer);
-                Asm("           phi     rf");
-                sprintf(abuffer,"           ldi     %s_%s.0             ; Point to variable",module,token);
-                Asm(abuffer);
-                }
-              Asm("           plo     rf");
-              if (variables[v].isArg) {
-                Asm("           lda     rf                        ; Retrieve pointed to address");
-                Asm("           plo     re");
-                Asm("           lda     rf");
-                Asm("           plo     rf");
-                Asm("           glo     re");
-                Asm("           phi     rf");
-                }
-              if (isArray) {
-                Asm("           irx                               ; Add array cell offset");
-                Asm("           glo     rf");
-                Asm("           add");
-                Asm("           plo     rf");
-                Asm("           irx");
-                Asm("           ghi     rf");
-                Asm("           adc");
-                Asm("           phi     rf");
-                isArray = 0;
-                }
-              Asm("           sex     r7");
-              if (variables[v].type == V_BYTE || variables[v].type == V_LOGICAL) {
-                Asm("           ldi     0                   ; place value onto expr stack");
-                Asm("           stxd");
-                Asm("           stxd");
-                Asm("           stxd");
-                Asm("           ldn     rf");
-                Asm("           stxd");
-                numbers[nstack++] = 'I';
-                }
-              else if (variables[v].type == V_SHORT) {
-                Asm("           ldi     0                   ; place value onto expr stack");
-                Asm("           stxd");
-                Asm("           stxd");
-                Asm("           lda     rf");
-                Asm("           stxd");
-                Asm("           ldn     rf");
-                Asm("           stxd");
-                numbers[nstack++] = 'I';
-                }
-              else if (variables[v].type == V_INTEGER ||
-                       variables[v].type == V_REAL ||
-                       variables[v].type == V_DEFAULT) {
-                Asm("           lda     rf                  ; place value onto expr stack");
-                Asm("           stxd");
-                Asm("           lda     rf");
-                Asm("           stxd");
-                Asm("           lda     rf");
-                Asm("           stxd");
-                Asm("           ldn     rf");
-                Asm("           stxd");
-                if (variables[v].type == V_INTEGER) numbers[nstack++] = 'I';
-                if (variables[v].type == V_REAL) numbers[nstack++] = 'R';
-                if (variables[v].type == V_DEFAULT) {
-                  if (variables[v].name[0] >= 'i' && variables[v].name[0] <= 'n') numbers[nstack++] = 'I';
-                  else if (variables[v].name[0] >= 'I' && variables[v].name[0] <= 'N') numbers[nstack++] = 'I';
-                  else numbers[nstack++] = 'R';
+              v = findFunction(token);
+              if (v >= 0) {
+                pos = buildCall(token, pos);
+                if (pos == NULL) {
+                  *err = -1;
+                  return pos;
+                  }
+                pos--;
+                term = -1;
+                switch (externals[v].type) {
+                  case V_BYTE:
+                  case V_SHORT:
+                  case V_LOGICAL:
+                  case V_INTEGER:
+                       numbers[nstack++] = 'I';
+                       break;
+                  case V_REAL:
+                       numbers[nstack++] = 'R';
+                       break;
+                  case V_DEFAULT:
+                       if (externals[v].name[0] >= 'i' &&
+                           externals[v].name[0] <= 'n')
+                         numbers[nstack++] = 'I';
+                       else if (externals[v].name[0] >= 'I' &&
+                                externals[v].name[0] <= 'N')
+                         numbers[nstack++] = 'I';
+                       else
+                         numbers[nstack++] = 'R';
+                       break;
                   }
                 }
-              Asm("           sex     r2");
               }
-            term = -1;
-            pos--;
+            if (term == 0) {
+              v = getVariable(token, module);
+              if (v < 0) {
+                *err = -1;
+                return pos;
+                }
+              if (*pos == '(') {
+                if (variables[v].dimensions == 0) {
+                  showError("Attempt to subscript a non-array variable");
+                  *err = -1;
+                  return pos;
+                  }
+                pos = arrayRef(pos, v);
+                if (pos == NULL) {
+                  *err = -1;
+                  return pos;
+                  }
+                isArray = -1;
+                Asm("           ghi     rf                        ; Save offset for later");
+                Asm("           stxd");
+                Asm("           glo     rf");
+                Asm("           stxd");
+                }
+  
+              if (variables[v].isArg && isArray == 0) {
+                Asm("           sep     scall                     ; push variable to expr stack");
+                if ((varType(v) == 'I' || varType(v) == 'R') && isArray == 0) {
+                  Asm("           dw      vpush32p");
+                  }
+                if (varType(v) == 'S') {
+                  Asm("           dw      vpush16p");
+                  addDefine("VPUSH16P",1,1);
+                  }
+                if ((varType(v) == 'B' || varType(v) == 'L') && isArray == 0) {
+                  addDefine("VPUSH8P",1,1);
+                  Asm("           dw      vpush8p");
+                  }
+                sprintf(abuffer,"           dw      %s_%s",module,token);
+                Asm(abuffer);
+                numbers[nstack++] = (varType(v) == 'R') ? 'R' : 'I';
+                }
+  
+              else if ((varType(v) == 'I' || varType(v) == 'R') && isArray == 0) {
+                Asm("           sep     scall                     ; push variable to expr stack");
+                Asm("           dw      vpush32");
+                if (strlen(variables[v].common) > 0) {
+                  sprintf(abuffer,"           dw      c_%s+%d",variables[v].common,variables[v].offset);
+                  }
+                else {
+                  sprintf(abuffer,"           dw      %s_%s",module,token);
+                  }
+                Asm(abuffer);
+                if (varType(v) == 'I') numbers[nstack++] = 'I';
+                if (varType(v) == 'R') numbers[nstack++] = 'R';
+                }
+              else {
+                if (strlen(variables[v].common) > 0) {
+                  sprintf(abuffer,"           ldi     (c_%s+%d).1             ; Point to variable",
+                          variables[v].common, variables[v].offset);
+                  Asm(abuffer);
+                  Asm("           phi     rf");
+                  sprintf(abuffer,"           ldi     (c_%s+%d).0             ; Point to variable",
+                          variables[v].common, variables[v].offset);
+                  Asm(abuffer);
+                  }
+                else {
+                  sprintf(abuffer,"           ldi     %s_%s.1             ; Point to variable",module,token);
+                  Asm(abuffer);
+                  Asm("           phi     rf");
+                  sprintf(abuffer,"           ldi     %s_%s.0             ; Point to variable",module,token);
+                  Asm(abuffer);
+                  }
+                Asm("           plo     rf");
+                if (variables[v].isArg) {
+                  Asm("           lda     rf                        ; Retrieve pointed to address");
+                  Asm("           plo     re");
+                  Asm("           lda     rf");
+                  Asm("           plo     rf");
+                  Asm("           glo     re");
+                  Asm("           phi     rf");
+                  }
+                if (isArray) {
+                  Asm("           irx                               ; Add array cell offset");
+                  Asm("           glo     rf");
+                  Asm("           add");
+                  Asm("           plo     rf");
+                  Asm("           irx");
+                  Asm("           ghi     rf");
+                  Asm("           adc");
+                  Asm("           phi     rf");
+                  isArray = 0;
+                  }
+                Asm("           sex     r7");
+                if (variables[v].type == V_BYTE || variables[v].type == V_LOGICAL) {
+                  Asm("           ldi     0                   ; place value onto expr stack");
+                  Asm("           stxd");
+                  Asm("           stxd");
+                  Asm("           stxd");
+                  Asm("           ldn     rf");
+                  Asm("           stxd");
+                  numbers[nstack++] = 'I';
+                  }
+                else if (variables[v].type == V_SHORT) {
+                  Asm("           ldi     0                   ; place value onto expr stack");
+                  Asm("           stxd");
+                  Asm("           stxd");
+                  Asm("           lda     rf");
+                  Asm("           stxd");
+                  Asm("           ldn     rf");
+                  Asm("           stxd");
+                  numbers[nstack++] = 'I';
+                  }
+                else if (variables[v].type == V_INTEGER ||
+                         variables[v].type == V_REAL ||
+                         variables[v].type == V_DEFAULT) {
+                  Asm("           lda     rf                  ; place value onto expr stack");
+                  Asm("           stxd");
+                  Asm("           lda     rf");
+                  Asm("           stxd");
+                  Asm("           lda     rf");
+                  Asm("           stxd");
+                  Asm("           ldn     rf");
+                  Asm("           stxd");
+                  if (variables[v].type == V_INTEGER) numbers[nstack++] = 'I';
+                  if (variables[v].type == V_REAL) numbers[nstack++] = 'R';
+                  if (variables[v].type == V_DEFAULT) {
+                    if (variables[v].name[0] >= 'i' && variables[v].name[0] <= 'n') numbers[nstack++] = 'I';
+                    else if (variables[v].name[0] >= 'I' && variables[v].name[0] <= 'N') numbers[nstack++] = 'I';
+                    else numbers[nstack++] = 'R';
+                    }
+                  }
+                Asm("           sex     r2");
+                }
+              term = -1;
+              pos--;
+              }
             }
           }
         if (term == 0) { printf("Non-number found\n"); return 0; }

@@ -317,6 +317,7 @@ LINK char   nests[10];
 LINK int    numNests;
 
 extern char* arrayRef(char* line, int v);
+extern char* buildCall(char* subName, char* line);
 extern void cassign(char* line);
 extern void cblockdata(char* line);
 extern void ccall(char* line);
@@ -365,6 +366,7 @@ extern int   findLine(word lineNumber, word* address);
 extern int   findNextLine(word lineNumber, word* address);
 extern int   findNextLineNumber(word lineNumber, word* address);
 extern int   findVariable(char* name,char* module);
+extern int   findFunction(char* name);
 extern word  getHex(char* line);
 extern char* getNumber(char* line, word* number);
 extern void  library();

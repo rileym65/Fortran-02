@@ -9,6 +9,7 @@ OBJS = \
 	addvariable.o \
 	arrayref.o \
 	asm.o \
+	buildcall.o \
 	casm.o \
 	cassign.o \
 	cblockdata.o \
@@ -38,6 +39,7 @@ OBJS = \
 	ctype.o \
 	cwrite.o \
 	compileline.o \
+	findfunction.o \
 	findline.o \
 	findvariable.o \
 	getarg.o \
@@ -76,6 +78,7 @@ clean:
 addvariable.o:   header.h addvariable.c
 arrayref.o:      header.h arrayref.c
 asm.o:           header.h asm.c
+buildcall.o:     header.h buildcall.c
 casm.o:          header.h casm.c
 cassign.o:       header.h cassign.c
 cblockdata.o:    header.h cblockdata.c
@@ -105,6 +108,7 @@ crewind.o:       header.h crewind.c
 cstop.o:         header.h cstop.c
 csubroutine.o:   header.h csubroutine.c
 cwrite.o:        header.h cwrite.c
+findfunction.o:  header.h findfunction.c
 findline.o:      header.h findline.c
 findvariable.o:  header.h findvariable.c
 getarg.o:        header.h getarg.c
