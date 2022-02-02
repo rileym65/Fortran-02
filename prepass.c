@@ -371,7 +371,6 @@ int prepass(char* filename) {
   if (SERP == BN3) addDefine("SEREF3I",1,1);
   if (SERP == BN4) addDefine("SEREF4I",1,1);
 
-  printf("\n");
   return(0);
   }
 

@@ -203,7 +203,6 @@ int main(int argc, char** argv, char** envp) {
   strcat(asmName,".asm");
   strcpy(lstName,baseName);
   strcat(lstName,".lst");
-  printf("out: %s\n",outName);
   if (programStart == 0xffff) programStart = 0x0000;
   if (programStart >= ramStart && programStart <= ramEnd) compMode = 'A';
   if (programStart >= romStart && programStart <= romEnd) compMode = 'O';
@@ -237,6 +236,7 @@ int main(int argc, char** argv, char** envp) {
   numCommon = 0;
   numCommonBlocks = 0;
   prepass(sourceFile);
+  printf("out: %s\n\n",outName);
   if (showOptions) {
     printf("Options in effect:\n");
     if (use32Bits) printf("  32-bits\n");
