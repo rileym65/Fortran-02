@@ -10,7 +10,7 @@
 
 #include "header.h"
 
-void copen(char* line) {
+void copen(char* line, byte flags) {
   int  reclen;
   int  labelFName;
   int  labelJump;
@@ -67,6 +67,9 @@ void copen(char* line) {
   sprintf(buffer,"              ldi   lbl_%d.0",labelFName);
   Asm(buffer);
   Asm("              plo   rf");
+  sprintf(buffer,"              ldi   %d           ; File flags",flags);
+  Asm(buffer);
+  Asm("              plo   r8");
   Asm("              irx                      ; Recover LUN");
   Asm("              ldx");
   Asm("              sep   scall              ; Open the file");

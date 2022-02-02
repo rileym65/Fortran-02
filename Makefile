@@ -34,6 +34,7 @@ OBJS = \
 	cread.o \
 	creturn.o \
 	crewind.o \
+	csfunction.o \
 	cstop.o \
 	csubroutine.o \
 	ctype.o \
@@ -105,6 +106,7 @@ cprogram.o:      header.h cprogram.c
 cread.o:         header.h cread.c
 creturn.o:       header.h creturn.c
 crewind.o:       header.h crewind.c
+csfunction.o:    header.h csfunction.c
 cstop.o:         header.h cstop.c
 csubroutine.o:   header.h csubroutine.c
 cwrite.o:        header.h cwrite.c

@@ -118,7 +118,7 @@ char* getArg(char*line, char dest, char* rem) {
         showError("Value is out of range");
         return NULL;
         }
-      sprintf(buffer,"              ldi   %d'",value & 0xff);
+      sprintf(buffer,"              ldi   %d",value & 0xff);
       if (rem != NULL && strlen(rem) > 0) {
         strcat(buffer,"                 ; ");
         strcat(buffer,rem);

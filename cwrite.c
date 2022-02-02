@@ -47,7 +47,7 @@ void cwrite(char* line) {
     line++;
     }
   else {
-    line = cexpr(line,0);
+    line = cexpr(line,0,module);
     if (exprErrors > 0) return;
     }
 

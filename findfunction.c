@@ -12,8 +12,16 @@
 
 int findFunction(char* name) {
   int i;
+  char local[64];
   for (i=0; i<numExternals; i++) {
     if (strcasecmp(name, externals[i].name) == 0)
+      return i;
+    }
+  strcpy(local,module);
+  strcat(local,"_");
+  strcat(local,name);
+  for (i=0; i<numExternals; i++) {
+    if (strcasecmp(local, externals[i].name) == 0)
       return i;
     }
   return -1;

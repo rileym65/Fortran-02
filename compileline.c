@@ -56,7 +56,9 @@ int compileLine(char* line) {
   else if (strncasecmp(line, "stop", 4) == 0)       cstop(line+4);
   else if (strncasecmp(line, "subroutine",10) == 0) csubroutine(line+10, 'S', V_DEFAULT);
   else if (strncasecmp(line, "write", 5) == 0)      cwrite(line+5);
-  else clet(line);
+  else {
+   if (csfunction(line) == 0) clet(line);
+   }
   while (numDoLoops > 0 && doLoops[numDoLoops-1].line == statementLabel) {
     cDoEnd();
     numDoLoops--;

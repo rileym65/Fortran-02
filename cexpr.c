@@ -112,7 +112,7 @@ char* convertNumber(char* buffer, dword* value, byte* success, int* error, char*
   return buffer;
   }
 
-char* evaluate(char *pos, int *err, char* rtype) {
+char* evaluate(char *pos, int *err, char* rtype, char *module) {
   char numbers[256];
   byte ops[256];
   int  nstack;
@@ -310,6 +310,7 @@ char* evaluate(char *pos, int *err, char* rtype) {
             if (*pos == '(') {
               v = findFunction(token);
               if (v >= 0) {
+                strcpy(token, externals[v].name);
                 pos = buildCall(token, pos);
                 if (pos == NULL) {
                   *err = -1;
@@ -969,10 +970,10 @@ char* evaluate(char *pos, int *err, char* rtype) {
   }
 
 
-char* cexpr(char* line, int etype) {
+char* cexpr(char* line, int etype, char* prefix) {
   int error;
   char rtype;
-  line = evaluate(line, &error, &rtype);
+  line = evaluate(line, &error, &rtype, prefix);
   exprErrors = error;
   if (error != 0) return line;
   if (etype == 0 && rtype == 'R') {

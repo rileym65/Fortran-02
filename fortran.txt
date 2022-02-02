@@ -24,10 +24,14 @@ if the -d command line switch is specified
       COMMON /name/var,var,.../name/var,var,var...
       DATA var,var,var/data,data,data/var,var,.../data,data,...
 
+      fnmame(arg,arg,...) = expr
       var = expr
       ASSIGN line TO var
+      CALL APPEND(lun,filename,reclen)
+      CALL OPEN(lun,filename,reclen)
       CALL OUT(port,value)
       CALL POKE(address,value)
+      CALL TRUNCATE(lun,filename,reclen)
       CALL subr[(arg,arg,...)]
       DO line var=start,end[,step]
       FORMAT(spec,spec,...)
@@ -48,7 +52,6 @@ if the -d command line switch is specified
       STOP [c]
       END
       ASM
-      CALL OPEN(lun,filename,reclen)
       REWIND lun
       ENDFILE lun
       CALL subr
@@ -126,13 +129,11 @@ Still to implement:
       EQUIVALENCE (var,var,...),(var,var,...),...
 
 
-      CALL APPEND(lun,filename,reclen)
       READ(lun[,REC=index],fline,ERR=line,END=line)var,var,...
       WRITE(lun[,REC=index],fline,ERR=line,END=line)var,var,...
       READ(lun[,REC=index],ERR=line,END=line)var,var,...
       WRITE(lun[,REC=index],ERR=line,END=line)var,var,...
 
-      fnmame(arg,arg,...) = expr
 
 Compiler Directives:
 .1805           - Enable 1804/5/6 assembler mode

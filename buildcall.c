@@ -44,7 +44,7 @@ char* buildCall(char* subName, char* line) {
             }
           }
         if (argType == ' ') {
-          line = cexpr(line, 2);
+          line = cexpr(line, 2, module);
           if (exprErrors > 0) return NULL;
           callArgs[numCallArgs] = 0;
           callArgTypes[numCallArgs++] = 'E';

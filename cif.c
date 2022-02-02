@@ -24,7 +24,7 @@ void cif(char* line) {
     return;
     }
   line++;
-  line = cexpr(line, 0);
+  line = cexpr(line, 0, module);
   if (*line != ')') {
     showError("Syntax error");
     return;

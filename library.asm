@@ -2667,7 +2667,7 @@ fopen:        sep      scall           ; get file record for file
               stxd
               glo      r7
               stxd
-              ldi      1               ; create file if it does not exist
+              glo      r8              ; Get file flags
               plo      r7
               ldi      0
               phi      r7

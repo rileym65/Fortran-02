@@ -97,8 +97,8 @@ void clet(char* line) {
       if (variables[v].name[0] >= 'i' && variables[v].name[0] <= 'n') fp = 0;
       if (variables[v].name[0] >= 'I' && variables[v].name[0] <= 'N') fp = 0;
       }
-    if (fp) line = cexpr(line, 1);
-      else line = cexpr(line, 0);
+    if (fp) line = cexpr(line, 1, module);
+      else line = cexpr(line, 0, module);
     if (exprErrors > 0) return;
     line = trim(line);
     if (*line != 0) {

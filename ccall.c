@@ -20,13 +20,23 @@ void ccall(char* line) {
     }
   checkMain();
   if (strncasecmp(line, "open(", 5) == 0) {
-    copen(line+5);
+    copen(line+5,1);
+    return;
+    }
+
+  if (strncasecmp(line, "append(", 7) == 0) {
+    copen(line+7,5);
+    return;
+    }
+
+  if (strncasecmp(line, "truncate(", 9) == 0) {
+    copen(line+9,3);
     return;
     }
 
   if (strncasecmp(line, "poke(", 5) == 0) {
     line += 5;
-    line = cexpr(line, 0);
+    line = cexpr(line, 0, module);
     if (*line != ',') {
       showError("Syntax error");
       return;
@@ -38,7 +48,7 @@ void ccall(char* line) {
     Asm("           lda     r7");
     Asm("           stxd                        ; save for now");
     Asm("           inc     r7                  ; remove high word");
-    line = cexpr(line, 0);
+    line = cexpr(line, 0, module);
     if (*line != ')') {
       showError("Syntax error");
       return;
@@ -63,7 +73,7 @@ void ccall(char* line) {
 
   if (strncasecmp(line, "out(", 4) == 0) {
     line += 4;
-    line = cexpr(line, 0);
+    line = cexpr(line, 0, module);
     if (exprErrors > 0) return;
     if (*line != ',') {
       showError("Syntax error");
@@ -79,7 +89,7 @@ void ccall(char* line) {
     Asm("          stxd                          ; Place on stack");
     Asm("          inc   r7                      ; Remove high word");
     Asm("          inc   r7");
-    line = cexpr(line, 0);
+    line = cexpr(line, 0, module);
     if (exprErrors > 0) return;
     if (*line != ')') {
       showError("Syntax error");

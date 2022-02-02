@@ -24,7 +24,7 @@ char* arrayRef(char* line, int v) {
   dims = 1;
   line++;
   while (*line != ')' && *line != 0) {
-    line = cexpr(line, 0);
+    line = cexpr(line, 0, module);
     if (exprErrors > 0) return NULL;
     Asm("           sep     scall                     ; subtract 1");
     Asm("           dw      dec32");
