@@ -14,9 +14,9 @@ int compileLine(char* line) {
   listCount = 0;
   if (showCompiler && passNumber == 2) printf("%04x:",address);
   if (passNumber == 2 && createLst)
-    fprintf(lstFile,"                  ; %s\n",line);
+    fprintf(lstFile,"                  ; %s\n",initialLine);
   if (passNumber == 2 && useAsm) {
-    sprintf(buffer,"; %s",line); writeAsm(buffer,"");
+    sprintf(buffer,"; %s",initialLine); writeAsm(buffer,"");
     }
   if (statementLabel > 0) {
     sprintf(buffer,"%s_%d:", module, statementLabel); Asm(buffer);
