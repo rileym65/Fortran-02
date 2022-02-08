@@ -124,6 +124,12 @@ LUN assignments:
   5 - Terminal without carriage control
   6 - Terminal with carriage control
 
+Terminal carrieage control codes (LUN 6 only)
+  + - No advance
+  0 - Double space
+  - - Triple space
+  1 - Clear screen
+    - All others cause single space
 
 Still to implement:
       EQUIVALENCE (var,var,...),(var,var,...),...
@@ -150,6 +156,7 @@ Compiler Directives:
 .exit=addr      - Set exit address
 .iosize=size    - Size of I/O buffer
 .list           - Show source list
+.noelfos        - Disable Elf/OS mode
 .nolist         - Turn off source list
 .noruntime      - Do not show runtime modules
 .nosymbols      - Do not show assembler symbols
@@ -205,6 +212,7 @@ Switches:
      =self      - use internal serial i/o
      =none      - no terminal
 -elfos          - produce an Elf/OS executable
+-noelfos        - disable Elf/OS mode
 -stg            - produce STG compatible image (sets -exit=8003)
 -melf           - -ram=0000-7fff -rom=8000-ffff -nq -ef2
 -pev            - -ram=0000-7fff -rom=8000-ffff -nq -ef2
