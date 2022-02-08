@@ -1884,6 +1884,7 @@ fmtwrt_cf_z3: ldi     '0'              ; otherwise add ascii zero
               lbr     fmtwrt_cf_z1     ; loop until enough decimal places
 fmtwrt_cf_z2: ldi     0                ; terminate output
               str     rf
+              inc     rc
               lbr     fmtwrt_cp        ; and copy result
 fmtwrt_cf_d:  ghi     rc               ; get decimal count
               lbz     fmtwrt_cf_z2     ; done if enough decimal places
@@ -1944,6 +1945,7 @@ fmtwrt_cp_n:  ldi     '*'              ; flag data to wide
               str     rb
               inc     rb
               dec     rc               ; remove 1 element
+              inc     rf
               inc     rf
               ldn     r2               ; recover field width
               smi     1                ; now 1 smaller
@@ -6815,6 +6817,9 @@ ftoa_8:     irx                   ; recover destination
             lbnz     ftoa_9
             glo      rb
             lbnz     ftoa_9
+            ldi      '.'          ; need decimal point
+            str      rd           ; store into destination
+            inc      rd
             lbr      ftoa_e       ; no fractional digits, jump to E processing
 ftoa_9:     ghi      r9           ; check if need E
             lbz      ftoa_9c2     ; jump if not
