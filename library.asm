@@ -1595,6 +1595,7 @@ fmtrd_dn:   ldi     1                  ; signal not eof
 #redefine MULFP
 #redefine FROMSCI
 #redefine FWRITE
+#redefine WRTREC
 ; ****************************************
 ; ***** Formatted write              *****
 ; ***** R8 - Pointer to format list  *****
@@ -1613,684 +1614,499 @@ fmtrd_dn:   ldi     1                  ; signal not eof
 ; ***** Uses: RA.0 - remaining items *****
 ; *****       RB   - output buffer   *****
 ; ****************************************
-fmtwrite:   ldi     iobuffer.1         ; setup output buffer
-            phi     rb
-            ldi     iobuffer.0
-            plo     rb
+fmtwrite:     ldi     iobuffer.1       ; setup output buffer
+              phi     rb
+              ldi     iobuffer.0
+              plo     rb
+              ghi     r8               ; save position of format list
+              stxd
+              glo     r8
+              stxd
+              lbr     checkfmt         ; check format
+fmtwrite_lp:  lda     r9               ; get next variable type
+              lbz     fmtwrite_dn2     ; jump if no more variables
+              plo     re               ; save type
+              lda     r9               ; retrieve data address
+              phi     rf
+              lda     r9
+              plo     rf
+              ldn     r8               ; get conversion type
+              smi     'A'              ; check for A conversion
+              lbz     fmtwrt_ca        ; jump if so
+              glo     re               ; recover variable type
+              smi     'I'              ; is it an integer
+              lbz     fmtwrt_i         ; jump if so
+              glo     re
+              smi     'R'              ; is it a real
+              lbz     fmtwrt_r         ; jump if so
+              glo     re
+              smi     'S'              ; is it a short
+              lbz     fmtwrt_i2        ; jump if so
+              glo     re
+              smi     'B'              ; is it a byte
+              lbz     fmtwrt_i1        ; jump if so
+              glo     re
+              smi     'L'              ; is it a logical
+              lbz     fmtwrt_i1        ; jump if so
+              lbr     fmtwrite_dn2     ; consider done if unknown type
+fmtwrt_i1:    ldi     0                ; high order 3 bytes are zero
+              sex     r7               ; point x to expr stack
+              stxd
+              stxd
+              stxd
+              lbr     fmtwrt_c1        ; then copy 1 byte
+fmtwrt_i2:    ldi     0                ; high order 2 bytes are zero
+              sex     r7               ; point x to expr stack
+              stxd
+              stxd
+              lbr     fmtwrt_c2        ; then 2 bytes from variable
+fmtwrt_i:     sex     r7               ; point x to expr stack
+              lda     rf               ; copy variable bytes to expr stack
+              stxd
+              lda     rf
+              stxd
+fmtwrt_c2:    lda     rf
+              stxd
+fmtwrt_c1:    lda     rf
+              stxd
+              sex     r2               ; point x back to system stack
+              ldi     scratch1_.1      ; where to put conversion
+              phi     rd
+              ldi     scratch1_.0
+              plo     rd
+              ghi     r8               ; save consumed registers
+              stxd
+              glo     r8
+              stxd
+              ghi     r9
+              stxd
+              glo     r9
+              stxd
+              ghi     ra
+              stxd
+              glo     ra
+              stxd
+              ghi     rb
+              stxd
+              glo     rb
+              stxd
+              ghi     r7               ; point to data item
+              phi     rf
+              glo     r7
+              plo     rf
+              inc     rf
+              sep     scall            ; convert integer to ascii
+              dw      itoa32
+              irx                      ; recover consumed registers
+              ldxa
+              plo     rb
+              ldxa
+              phi     rb
+              ldxa
+              plo     ra
+              ldxa
+              phi     ra
+              ldxa
+              plo     r9
+              ldxa
+              phi     r9
+              ldxa
+              plo     r8
+              ldx
+              phi     r8
+              inc     r7               ; remove item from expr stack
+              inc     r7
+              inc     r7
+              inc     r7
+              lbr     fmtwrt_go        ; now process ascii number
+fmtwrt_r:     sex     r7               ; point x to expr stack
+              lda     rf               ; copy variable bytes to expr stack
+              stxd
+              lda     rf
+              stxd
+              lda     rf
+              stxd
+              lda     rf
+              stxd
+              sex     r2               ; point x back to system stack
+              ldi     scratch2_.1      ; where to put conversion
+              phi     rd
+              ldi     scratch2_.0
+              plo     rd
+              ghi     r8               ; save consumed registers
+              stxd
+              glo     r8
+              stxd
+              ghi     r9
+              stxd
+              glo     r9
+              stxd
+              ghi     ra
+              stxd
+              glo     ra
+              stxd
+              ghi     rb
+              stxd
+              glo     rb
+              stxd
+              ghi     r7               ; point to data item
+              phi     rf
+              glo     r7
+              plo     rf
+              inc     rf
+              sep     scall            ; convert real to ascii
+              dw      ftoa
+              irx                      ; recover consumed registers
+              ldxa
+              plo     rb
+              ldxa
+              phi     rb
+              ldxa
+              plo     ra
+              ldxa
+              phi     ra
+              ldxa
+              plo     r9
+              ldxa
+              phi     r9
+              ldxa
+              plo     r8
+              ldx
+              phi     r8
+              inc     r7               ; remove item from expr stack
+              inc     r7
+              inc     r7
+              inc     r7
+              ldi     scratch2_.1      ; where to put conversion
+              phi     rf
+              ldi     scratch2_.0
+              plo     rf
+              ldi     scratch1_.1      ; where to put conversion
+              phi     rd
+              ldi     scratch1_.0
+              plo     rd
+              sep     scall            ; convert from scientific, if needed
+              dw      fromsci
+fmtwrt_go:    ldi     0                ; clear count
+              plo     rc
+              ldi     scratch1_.1      ; point to conversion
+              phi     rf
+              ldi     scratch1_.0
+              plo     rf
+              ldn     r8               ; get current specifier
+              smi     'I'              ; is it I conversion
+              lbz     fmtwrt_ci        ; jump if so
+              ldn     r8               ; check for F conversion
+              smi     'F'
+              lbz     fmtwrt_cf        ; jump if so
+              ldn     r8               ; check for L conversion
+              smi     'L'
+              lbz     fmtwrt_cl        ; jump if so
+              lbr     fmtwrite_dn2     ; anything else aborts
+; ************************
+; ***** A Conversion *****
+; ************************
+fmtwrt_ca:    glo     re               ; is it an integer
+              smi     'I'
+              lbz     fmtwrt_ca4       ; jump if so
+              glo     re               ; is it a real
+              smi     'R'
+              lbz     fmtwrt_ca4       ; jump if so
+              glo     re               ; is it a short
+              smi     'S'
+              lbz     fmtwrt_ca2       ; jump if so
+              ldi     1                ; one character
+              lskp
+fmtwrt_ca2:   ldi     2                ; two characters
+              lskp
+fmtwrt_ca4:   ldi     4                ; four characters
+              phi     rc               ; store count
+              ldi     0                ; clear width
+              plo     rc
+              ldi     scratch1_.1      ; point to conversion buffer
+              phi     rd
+              ldi     scratch1_.0
+              plo     rd
+fmtwrt_calp:  lda     rf               ; get byte from variable
+              lbz     fmtwrt_caz       ; jump if zero
+              str     rd               ; store into output
+              inc     rd
+              inc     rc               ; increment size
+fmtwrt_caz:   ghi     rc               ; get count
+              smi     1                ; decrement it
+              phi     rc               ; put it back
+              lbnz    fmtwrt_calp      ; loop until all bytes copied
+              ldi     0                ; terminate string
+              str     rd
+              lbr     fmtwrt_cp        ; and then transfer to output
+              
 
-fmtloop:    lda     r8                 ; Get count for current format item
-            plo     ra
-            lbz     fmtwrt_dn          ; end if run out of format items
-; need to add support for hollerith data here
-            ldn     r8                 ; get format type
-            smi     'X'                ; check for X
-            lbz     fmtwrt_x           ; jump if so
-            ldn     r8                 ; get format type
-            smi     'H'                ; check for hollerith data
-            lbz     fmtwrt_h1          ; jump if so
-            lbr     fmtwrt_lp          ; on to process next variable
-fmtwrt_h1:  inc     r8                 ; move past H
-fmtwrt_h:   lda     r8                 ; get byte from format data
-            str     rb                 ; write to output
-            inc     rb
-            dec     ra                 ; decrement character count
-            glo     ra                 ; get count
-            lbnz    fmtwrt_h           ; loop back if not done
-            lbr     fmtloop            ; otherwise to next specifier
-fmtwrt_x:   ldi     ' '                ; write a blank to output
-            str     rb
-            inc     rb
-            dec     ra                 ; decrement count
-            glo     ra                 ; see if done
-            lbnz    fmtwrt_x           ; loop back if not done
-            inc     r8                 ; move to next specifier
-            inc     r8
-            inc     r8
-            lbr     fmtloop            ; otherwise check next specifier
+; ************************
+; ***** I Conversion *****
+; ************************
+fmtwrt_ci:    lda     rf               ; get byte from conversion
+              lbz     fmtwrt_cp        ; done with check
+              smi     '.'              ; was a decimal encountered
+              lbz     fmtwrt_ci_d      ; jump if so
+              inc     rc               ; otherwise increment size
+              lbr     fmtwrt_ci        ; loop back until end or decimal
+fmtwrt_ci_d:  ldi     0                ; terminate at decimal
+              dec     rf
+              str     rf
+              lbr     fmtwrt_cp        ; and then transfer to output
+; ************************
+; ***** F Conversion *****
+; ************************
+fmtwrt_cf:    inc     r8               ; get decimal size
+              inc     r8
+              ldn     r8
+              phi     rc
+              dec     r8
+              dec     r8
+fmtwrt_cf_1:  lda     rf               ; get byte from conversion
+              lbz     fmtwrt_cf_z      ; Jump if no decimal found
+              smi     '.'              ; was a decimal encountered
+              lbz     fmtwrt_cf_d      ; jump if so
+              inc     rc               ; otherwise increment size
+              lbr     fmtwrt_cf_1      ; loop back until end or decimal
+fmtwrt_cf_z:  dec     rf               ; move back to terminator
+              ldi     '.'              ; add a decimal point
+              str     rf
+              inc     rf
+fmtwrt_cf_z1: ghi     rc               ; get decimal count
+              lbz     fmtwrt_cf_z2     ; jump if done
+              smi     1                ; decrement count
+              phi     rc               ; and put back
+fmtwrt_cf_z3: ldi     '0'              ; otherwise add ascii zero
+              str     rf
+              inc     rf
+              inc     rc               ; increment size
+              lbr     fmtwrt_cf_z1     ; loop until enough decimal places
+fmtwrt_cf_z2: ldi     0                ; terminate output
+              str     rf
+              lbr     fmtwrt_cp        ; and copy result
+fmtwrt_cf_d:  ghi     rc               ; get decimal count
+              lbz     fmtwrt_cf_z2     ; done if enough decimal places
+              smi     1                ; decrement count
+              phi     rc
+              lda     rf               ; get byte from input
+              lbz     fmtwrt_cf_z4     ; jump if not enough decimals
+              inc     rc               ; increment width
+              lbr     fmtwrt_cf_d      ; and loop until done
+fmtwrt_cf_z4: dec     rf               ; move back to terminator
+              lbr     fmtwrt_cf_z3     ; and pad with zeroes
+; ************************        
+; ***** L Conversion *****
+; ************************        
+fmtwrt_cl:    lda     rf               ; get next byte
+              lbz     fmtwrt_clf       ; false if terminator found
+              smi     '0'              ; check for non-zero
+              lbnz    fmtwrt_clt       ; nonzero is true
+              lbr     fmtwrt_cl        ; loop until terminator or nonzero
+fmtwrt_clf:   ldi     'F'              ; need to output false
+              lskp
+fmtwrt_clt:   ldi     'T'              ; need to output true
+              plo     re               ; save output
+              ldi     scratch1_.1      ; back to beginning of buffer
+              phi     rf
+              ldi     scratch1_.0
+              plo     rf
+              glo     re               ; recover result
+              str     rf               ; write to buffer
+              inc     rf
+              ldi     0                ; terminate it
+              str     rf
+              ldi     1                ; width is 1
+              plo     rc
+; ******************************
+; ***** now copy to output *****
+; ******************************
+fmtwrt_cp:    ldi     scratch1_.1      ; point to converted data
+              phi     rf
+              ldi     scratch1_.0
+              plo     rf
+              inc     r8               ; get field width
+              ldn     r8
+              dec     r8
+              str     r2               ; compare to converted width
+              glo     rc
+              sd                       ; field.width-converted.width
+              lbnf    fmtwrt_cp_n      ; jump if converted width greater
+fmtwrt_cp_y:  glo     rc               ; check width
+              sm                       ; subtract field width
+              lbz     fmtwrt_cp_cp     ; copy remaining characters
+              ldi     ' '              ; write a blank to the output
+              str     rb
+              inc     rb
+              inc     rc               ; added a character
+              lbr     fmtwrt_cp_y      ; loop until padding done
+fmtwrt_cp_n:  ldi     '*'              ; flag data to wide
+              str     rb
+              inc     rb
+              dec     rc               ; remove 1 element
+              inc     rf
+              ldn     r2               ; recover field width
+              smi     1                ; now 1 smaller
+              str     r2
+fmtwrt_cp_n1: dec     rc               ; decrement width
+              glo     rc               ; see if remaining will fit
+              sm
+              lbz     fmtwrt_cp_cp     ; jump if so
+              inc     rf               ; increment pointer
+              lbr     fmtwrt_cp_n1     ; and loop until it fits
+fmtwrt_cp_cp: lda     rf               ; read next byte from data
+              lbz     fmtwrt_en        ; done with entry
+              str     rb               ; store into output
+              inc     rb
+              lbr     fmtwrt_cp_cp     ; loop until all copied
+fmtwrt_en:    dec     ra               ; decrement specifier count
+              glo     ra               ; see if done
+              lbnz    fmtwrite_lp      ; next variable if still good
+              inc     r8               ; move to next specifier
+              inc     r8
+              inc     r8
+              lbr     checkfmt         ; and check it
+fmtwrite_dn2: glo     rb               ; see if anything has been output
+              smi     iobuffer.0
+              lbnz    fmtwrite_dn3     ; jump if so
+              ghi     rb               ; check high byte as well
+              smi     iobuffer.1
+              lbz     fmtwrite_dn      ; jump if no output needed
+fmtwrite_dn3: ldi     0                ; terminate output
+              str     rb
+              ldi     iobuffer.1       ; point to output data
+              phi     rf
+              ldi     iobuffer.0
+              plo     rf
+              ghi     ra               ; get LUN
+              sep     scall            ; write the record
+              dw      writerec
+              lbr     fmtwrite_dn      ; and then done
+checkfmt:     lda     r8               ; get count for current item
+              plo     ra
+              lbnz    checkfmt_1       ; jump if not end of list
+              ldi     0                ; terminate io buffer
+              str     rb
+              ldi     iobuffer.1       ; point to output data
+              phi     rf
+              ldi     iobuffer.0
+              plo     rf
+              ghi     ra               ; get LUN
+              sep     scall            ; write the record
+              dw      writerec
+              ldn     r9               ; see if done with data list
+              lbz     fmtwrite_dn      ; jump if done
+              ldi     iobuffer.1       ; reset io buffer
+              phi     rb
+              ldi     iobuffer.0
+              plo     rb
+              irx                      ; recover beginning of format data
+              ldxa
+              plo     r8
+              ldx
+              phi     r8
+              dec     r2               ; restore stack pointer
+              dec     r2
+              lbr     checkfmt         ; back to checking format
+fmtwrite_dn:  irx                      ; remove format address from stack
+              irx
+              sep     sret             ; and return to caller
+checkfmt_1:   ldn     r8               ; get format type
+              smi     'X'              ; check for X
+              lbz     fmtwrt_x         ; jump if so
+              ldn     r8               ; check for new record
+              smi     '/'
+              lbz     fmtwrt_nr        ; jump if so
+              ldn     r8               ; check for hollerith data
+              smi     'H'
+              lbnz    fmtwrite_lp      ; On to variables if not
+fmtwrt_h1:    inc     r8               ; move past H
+fmtwrt_h:     lda     r8               ; get byte from format data
+              str     rb               ; write to output
+              inc     rb
+              dec     ra               ; decrement character count
+              glo     ra               ; get count
+              lbnz    fmtwrt_h         ; loop back if not done
+              lbr     checkfmt         ; otherwise to next specifier
+fmtwrt_x:     ldi     ' '              ; write a blank to output
+              str     rb
+              inc     rb
+              dec     ra               ; decrement count
+              glo     ra               ; see if done
+              lbnz    fmtwrt_x         ; loop back if not done
+fmtwrt_x1:    inc     r8               ; move to next specifier
+              inc     r8
+              inc     r8
+              lbr     checkfmt         ; check next format specifier
+fmtwrt_nr:    ldi     0                ; terminate current record
+              str     rb
+              ldi     iobuffer.1       ; point to output data
+              phi     rf
+              ldi     iobuffer.0
+              plo     rf
+              ghi     ra               ; get LUN
+              sep     scall            ; write the record
+              dw      writerec
+              ldi     iobuffer.1       ; reset io buffer
+              phi     rb
+              ldi     iobuffer.0
+              plo     rb
+              lbr     fmtwrt_x1        ; then to next specifier
+#endif
 
-fmtwrt_lp:  ldn     r8                 ; get current conversion
-            smi     'I'                ; is it integer
-            lbz     fmtwrt_i           ; jump if so
-            ldn     r8                 ; get current conversion
-            smi     'F'                ; check for F conversion
-            lbz     fmtwrt_f           ; jump if so
-            ldn     r8                 ; get current conversion
-            smi     'A'                ; check for A conversion
-            lbz     fmtwrt_a           ; jump if so
-            ldn     r8                 ; get current conversion
-            smi     'L'                ; check for L conversion
-            lbz     fmtwrt_l           ; jump if so
-            lbr     fmtwrt_dn          ; done if not valid conversion
+#ifdef WRTREC
+; ********************************
+; ***** Write record         *****
+; ***** D - LUN              *****
+; ***** RF - Pointer to data *****
+; ********************************
+writerec:     plo     re               ; keep copy of LUN
+              smi     5                ; check for terminal
+              lbz     wrtrec_t         ; jump if so
+              smi     1                ; check for terminal carriage control
+              lbz     wrtrec_tcc       ; jump if so
+              glo     re               ; recover LUN
+              sep     scall            ; call disk write
+              dw      fwrite
+              sep     sret             ; and return to caller
+wrtrec_t:     sep     scall            ; display buffer
+              dw      f_msg
+              sep     scall            ; followed by cr/lf
+              dw      f_inmsg
+              db      10,13,0
+              sep     sret             ; then return
+wrtrec_tcc:   lda     rf               ; get carriage control character
+              plo     re               ; keep a copy
+              smi     '+'              ; check for no advance
+              lbz     wrtrec_tccg      ; jump if so
+              glo     re               ; check for clear screen
+              smi     '0'              ; check for double space
+              lbz     wrtrec_tds
+              smi     1                ; check for clear screen
+              lbz     wrtrec_tcls      ; jump if so
+              glo     re               ; check for triple space
+              smi     '-'
+              lbz     wrtrec_tts       ; jump if so
 
-            /* ************************ */
-            /* ***** F Conversion ***** */
-            /* ************************ */
-fmtwrt_f:   lda     r9                 ; get next variable type
-            plo     re                 ; save for now
-            lbz     fmtwrt_dn          ; done if no more variables
-            lda     r9                 ; retrieve address of variable
-            phi     rf
-            lda     r9
-            plo     rf
-            glo     re                 ; recover type
-            shl                        ; check for pointer
-            lbnf    fmtwrt_fn
-            lda     rf                 ; retrieve pointed to address
-            str     r2
-            lda     rf
-            plo     rf
-            ldn     r2
-            phi     rf
-            glo     re                 ; clear pointer bit
-            ani     07fh
-            plo     re
-fmtwrt_fn:  glo     re                 ; now check variable type
-            smi     'B'                ; check for byte
-            lbz     fmtwrt_f1          ; jump if so
-            glo     re
-            smi     'L'                ; check for logical
-            lbz     fmtwrt_f1          ; jump if so
-            glo     re
-            smi     'S'                ; check for short
-            lbz     fmtwrt_f2          ; jump if so
-            glo     re
-            smi     'I'                ; check for integer
-            lbz     fmtwrt_f4          ; jump if so
-            glo     re
-            smi     'R'                ; check for real
-            lbz     fmtwrt_fr          ; jump if so
-            lbr     fmtwrt_dn          ; done if not valid conversion
-fmtwrt_f1:  ldi     0                  ; push byte variable to expr stack
-            sex     r7
-            stxd
-            stxd
-            stxd
-            lbr     fmtwrt_f1a         ; then retrieve variable
-fmtwrt_f2:  ldi     0                  ; push byte variable to expr stack
-            sex     r7
-            stxd
-            stxd
-            lbr     fmtwrt_f2a         ; then retrieve variable
-fmtwrt_f4:  sex     r7                 ; point x to expr stack
-            lda     rf                 ; copy variable contents to expr stack
-            stxd
-            lda     rf
-            stxd
-fmtwrt_f2a: lda     rf
-            stxd
-fmtwrt_f1a: lda     rf
-            stxd
-            sex     r2                 ; point x back to stack
-            ldi     scratch1_.1        ; where to put conversion
-            phi     rd
-            ldi     scratch1_.0
-            plo     rd
-            ghi     r8                 ; save consumed registers
-            stxd
-            glo     r8
-            stxd
-            ghi     r9
-            stxd
-            glo     r9
-            stxd
-            ghi     ra
-            stxd
-            glo     ra
-            stxd
-            ghi     rb
-            stxd
-            glo     rb
-            stxd
-            ghi     r7                 ; point to data item
-            phi     rf
-            glo     r7
-            plo     rf
-            inc     rf
-            sep     scall              ; convert integer to ascii
-            dw      itoa32
-            irx                        ; recover consumed registers
-            ldxa
-            plo     rb
-            ldxa
-            phi     rb
-            ldxa
-            plo     ra
-            ldxa
-            phi     ra
-            ldxa
-            plo     r9
-            ldxa
-            phi     r9
-            ldxa
-            plo     r8
-            ldx
-            phi     r8
-            inc     r7                 ; remove item from expr stack
-            inc     r7
-            inc     r7
-            inc     r7
-            ldi     '.'                ; need a decimal point
-            str     rd                 ; write to number buffer
-            inc     rd
-            inc     r8                 ; get number of decimal points
-            inc     r8
-            ldn     r8
-            plo     rc
-            dec     r8
-            dec     r8
-fmtwrt_fa:  glo     rc                 ; see if done
-            lbz     fmtwrt_fb          ; jump if so
-            ldi     '0'                ; write zero to output
-            str     rd
-            inc     rd
-            dec     rc                 ; decrement count
-            lbr     fmtwrt_fa          ; loop back for more
-fmtwrt_fb:  ldi     0                  ; terminate string
-            str     rd
-            lbr     fmtwrt_fi          ; then send to output
+              sep     scall            ; otherwise advance 1 line
+              dw      f_inmsg
+              db      10,13,0
+              lbr     wrtrec_tccg      ; then print line
+wrtrec_tds:   sep     scall            ; advance two lines
+              dw      f_inmsg
+              db      10,13,10,13,0
+              lbr     wrtrec_tccg      ; then print line
+wrtrec_tts:   sep     scall            ; advance three lines
+              dw      f_inmsg
+              db      10,13,10,13,10,13,0
+              lbr     wrtrec_tccg      ; then print line
+wrtrec_tcls:  sep     scall            ; clear the screen
+              dw      f_inmsg
+              db      27,'[H',27,'[2J',0
+wrtrec_tccg:  sep     scall            ; display buffer
+              dw      f_msg
+              sep     sret             ; and return to caller
 
-fmtwrt_fr:  sex     r7                 ; point x to expr stack
-            lda     rf                 ; copy variable contents to expr stack
-            stxd
-            lda     rf
-            stxd
-            lda     rf
-            stxd
-            lda     rf
-            stxd
-            sex     r2                 ; point x back to stack
-            ldi     scratch2_.1        ; where to put conversion
-            phi     rd
-            ldi     scratch2_.0
-            plo     rd
-            ghi     r8                 ; save consumed registers
-            stxd
-            glo     r8
-            stxd
-            ghi     r9
-            stxd
-            glo     r9
-            stxd
-            ghi     ra
-            stxd
-            glo     ra
-            stxd
-            ghi     rb
-            stxd
-            glo     rb
-            stxd
-            ghi     r7                 ; point to data item
-            phi     rf
-            glo     r7
-            plo     rf
-            inc     rf
-            sep     scall              ; convert integer to ascii
-            dw      ftoa
-            irx                        ; recover consumed registers
-            ldxa
-            plo     rb
-            ldxa
-            phi     rb
-            ldxa
-            plo     ra
-            ldxa
-            phi     ra
-            ldxa
-            plo     r9
-            ldxa
-            phi     r9
-            ldxa
-            plo     r8
-            ldx
-            phi     r8
-            inc     r7                 ; remove item from expr stack
-            inc     r7
-            inc     r7
-            inc     r7
-            inc     r8                 ; get number of decimal points
-            inc     r8
-            ldn     r8
-            plo     rc
-            dec     r8
-            dec     r8
-            ldi     scratch2_.1        ; where to put conversion
-            phi     rf
-            ldi     scratch2_.0
-            plo     rf
-            ldi     scratch1_.1        ; where to put conversion
-            phi     rd
-            ldi     scratch1_.0
-            plo     rd
-            sep     scall              ; convert from scientific, if needed
-            dw      fromsci
-            inc     r8                 ; get decimal count
-            inc     r8
-            ldn     r8
-            plo     rc
-            dec     r8
-            dec     r8
-            shl                        ; check for unspecified digits
-            lbdf    fmtwrt_fi          ; jump straitght to output if so
-            ldi     scratch1_.1        ; point to converted number
-            phi     rf
-            ldi     scratch1_.0
-            plo     rf
-fmtwrt_fr1: lda     rf                 ; get byte from number
-            lbz     fmtwrt_fr4         ; jump if end found
-            smi     '.'                ; looking for a decimal point
-            lbnz    fmtwrt_fr1         ; loop until decimal or end found
-fmtwrt_fr2: glo     rc                 ; see if enough digits have been output
-            lbz     fmtwrt_fr5
-            lda     rf                 ; get byte from 
-            lbz     fmtwrt_fr3         ; jump if end found
-            dec     rc                 ; decrement count
-            lbr     fmtwrt_fr2         ; jump if not
-fmtwrt_fr5: ldi     0                  ; terminate the number
-            str     rf
-            lbr     fmtwrt_fi          ; then send to output
-fmtwrt_fr4: dec     rf                 ; move back to zero byte
-            ldi     '.'                ; write a decimal point
-            str     rf
-            inc     rf
-            skp
-fmtwrt_fr3: dec     rf                 ; move back to terminator
-fmtwrt_fr6: ldi     '0'                ; write a zero to output
-            str     rf
-            inc     rf
-            dec     rc                 ; decrement count
-            glo     rc                 ; get count
-            lbnz    fmtwrt_fr6         ; loop until done
-            ldi     0                  ; terminate the number
-            str     rf
-            lbr     fmtwrt_fi          ; then send to output
-
-            /* ************************ */
-            /* ***** A Conversion ***** */
-            /* ************************ */
-fmtwrt_a:   lda     r9                 ; get next variable type
-            plo     re                 ; save for now
-            lbz     fmtwrt_dn          ; done if no more variables
-            lda     r9                 ; retrieve address of variable
-            phi     rf
-            lda     r9
-            plo     rf
-            glo     re                 ; check for pointer type
-            shl
-            lbnf    fmtwrt_ap          ; jump if not
-            lda     rf                 ; retrieve pointed to address
-            str     r2
-            lda     rf
-            plo     rf
-            ldn     r2
-            phi     rf
-            glo     re                 ; clear pointer bit
-            ani     07fh
-            plo     re
-fmtwrt_ap:  inc     r8                 ; get field width
-            ldn     r8
-            plo     rc
-            dec     r8
-            glo     re                 ; now check variable type
-            smi     'B'                ; check for byte
-            lbz     fmtwrt_a1          ; jump if so
-            glo     re                 ; now check variable type
-            smi     'L'                ; check for logical
-            lbz     fmtwrt_a1          ; jump if so
-            glo     re                 ; now check variable type
-            smi     'S'                ; check for short
-            lbz     fmtwrt_a2          ; jump if so
-            glo     re                 ; now check variable type
-            smi     'I'                ; check for integer
-            lbz     fmtwrt_a4          ; jump if so
-            glo     re                 ; now check variable type
-            smi     'R'                ; check for real
-            lbz     fmtwrt_a4          ; jump if so
-            lbr     fmtwrt_dn          ; invalid type ends write
-fmtwrt_a1:  ldi     1                  ; 1 character
-            lbr     fmtwrt_aa
-fmtwrt_a2:  ldi     2                  ; 2 characters
-            lbr     fmtwrt_aa
-fmtwrt_a4:  ldi     4                  ; 4 characters
-fmtwrt_aa:  phi     rc                 ; store count
-fmtwrt_ab:  lda     rf                 ; get byte from variable
-            lbz     fmtwrt_an          ; jump if not ascii data
-            str     rb                 ; write to output buffer
-            inc     rb
-            dec     rc                 ; decrement field width
-            glo     rc                 ; see if field width reached
-            lbz     fmtwrt_e1          ; end of entry if so
-fmtwrt_an:  ghi     rc                 ; get source count
-            smi     1                  ; subtract 1
-            phi     rc                 ; and put it back
-            lbnz    fmtwrt_ab          ; continue copying if not done
-fmtwrt_ac:  ldi     ' '                ; write a space to the output
-            str     rb
-            inc     rb
-            dec     rc                 ; decrement field width
-            glo     rc                 ; see if done
-            lbnz    fmtwrt_ac          ; loop back if not
-            lbr     fmtwrt_e1          ; otherwise done with item
-
-            /* ************************ */
-            /* ***** L Conversion ***** */
-            /* ************************ */
-fmtwrt_l:   lda     r9                 ; get next variable type
-            plo     re                 ; save for now
-            lbz     fmtwrt_dn          ; done if no more variables
-            lda     r9                 ; retrieve address of variable
-            phi     rf
-            lda     r9
-            plo     rf
-            glo     re                 ; see if pointer
-            shl
-            lbnf    fmtwrt_lx          ; jump if not
-            lda     rf                 ; retrieve pointed to address
-            str     r2
-            lda     rf
-            plo     rf
-            ldn     r2
-            phi     rf
-            glo     re                 ; clear pointer bit
-            ani     07fh
-            plo     re
-fmtwrt_lx:  inc     r8                 ; get field width
-            ldn     r8
-            plo     rc
-            dec     r8
-            glo     re                 ; now check variable type
-            smi     'B'                ; check for byte
-            lbz     fmtwrt_l1          ; jump if so
-            glo     re                 ; now check variable type
-            smi     'L'                ; check for logical
-            lbz     fmtwrt_l1          ; jump if so
-            glo     re                 ; now check variable type
-            smi     'S'                ; check for short
-            lbz     fmtwrt_l2          ; jump if so
-            glo     re                 ; now check variable type
-            smi     'I'                ; check for integer
-            lbz     fmtwrt_l4          ; jump if so
-            glo     re                 ; now check variable type
-            smi     'R'                ; check for real
-            lbz     fmtwrt_l4          ; jump if so
-            lbr     fmtwrt_dn          ; invalid type ends write
-fmtwrt_l1:  ldi     1                  ; 1 character
-            lbr     fmtwrt_la
-fmtwrt_l2:  ldi     2                  ; 2 characters
-            lbr     fmtwrt_la
-fmtwrt_l4:  ldi     4                  ; 4 characters
-fmtwrt_la:  phi     rc                 ; store count
-fmtwrt_lb:  ldi     ' '                ; write a space to the output
-            str     rb
-            inc     rb
-            dec     rc                 ; decrement field width
-            glo     rc                 ; see if done
-            lbnz    fmtwrt_lb          ; loop back if not
-            dec     rb                 ; need to write into final byte of field
-            ghi     rc                 ; move var size to low rc
-            plo     rc
-            ldi     0                  ; set initial value
-            str     r2
-fmtwrt_ld:  lda     rf                 ; get first byte of variable
-            or                         ; combine with prior value
-            str     r2                 ; put on stack
-fmtwrt_lc:  dec     rc                 ; decrement size count
-            glo     rc                 ; see if done
-            lbnz    fmtwrt_ld          ; jump if not
-            ldn     r2                 ; retrieve value
-            lbz     fmtwrt_lf          ; jump if false
-            ldi     'T'                ; write T to output
-fmtwrt_le:  str     rb
-            inc     rb
-            lbr     fmtwrt_e1          ; done with item
-fmtwrt_lf:  ldi     'F'                ; need to output F
-            lbr     fmtwrt_le          ; output it
-
-            /* ************************ */
-            /* ***** I Conversion ***** */
-            /* ************************ */
-fmtwrt_i:   lda     r9                 ; get next variable type
-            lbz     fmtwrt_dn          ; done if no more variables
-            plo     re                 ; save type for a moment
-            lda     r9                 ; retrieve address of data
-            phi     rf
-            lda     r9
-            plo     rf
-            glo     re                 ; check for pointer
-            shl
-            lbnf    fmtwrt_ix          ; jump if not
-            lda     rf                 ; retrieve pointed to address
-            str     r2
-            lda     rf
-            plo     rf
-            ldn     r2
-            phi     rf
-            glo     re                 ; clear pointer bit
-            ani     07fh
-            plo     re
-fmtwrt_ix:  glo     re                 ; get conversion
-            sex     r7                 ; point to expr stack
-            smi     'I'                ; is it an integer
-            lbz     fmtwrt_i4          ; jump if so
-            glo     re                 ; recover conversion
-            smi     'S'                ; is it a short
-            lbz     fmtwrt_i2          ; jump if so
-            glo     re                 ; recover conversion
-            smi     'B'                ; is it a byte
-            lbz     fmtwrt_i1          ; jump if so
-            glo     re                 ; recover conversion
-            smi     'L'                ; is it a logical
-            lbz     fmtwrt_i1          ; jump if so
-            glo     re                 ; recover conversion
-            smi     'R'                ; is it a Real
-            lbz     fmtwrt_ir          ; jump if so
-            sex     r2                 ; point x back to stack
-            lbr     fmtwrt_dn          ; unknown type ends
-fmtwrt_ir:  lda     rf                 ; place variable value on expr stack
-            stxd
-            lda     rf
-            stxd
-            lda     rf
-            stxd
-            lda     rf
-            stxd
-            sex     r2                 ; point x back to stack
-            ghi     r8                 ; save consumed registers
-            stxd
-            glo     r8
-            stxd
-            ghi     r9
-            stxd
-            glo     r9
-            stxd
-            ghi     ra
-            stxd
-            glo     ra
-            stxd
-            ghi     rb
-            stxd
-            glo     rb
-            stxd
-            sep     scall              ; convert floating point to integer
-            dw      ftoi
-            irx                        ; recover consumed registers
-            ldxa
-            plo     rb
-            ldxa
-            phi     rb
-            ldxa
-            plo     ra
-            ldxa
-            phi     ra
-            ldxa
-            plo     r9
-            ldxa
-            phi     r9
-            ldxa
-            plo     r8
-            ldx
-            phi     r8
-            lbr     fmtwrt_ia          ; then process as an integer
-fmtwrt_i1:  ldi     0                  ; first 3 bytes are zero
-            stxd                       ; push to expr stack
-            stxd
-            stxd
-            lda     rf                 ; get byte from variable
-            stxd                       ; push to expr stack
-            lbr     fmtwrt_ia          ; then continue
-fmtwrt_i2:  ldi     0                  ; first 2 bytes are zero
-            stxd                       ; push to expr stack
-            stxd
-            lda     rf                 ; get byte from variable
-            stxd                       ; push to expr stack
-            lda     rf                 ; get byte from variable
-            stxd                       ; push to expr stack
-            lbr     fmtwrt_ia          ; then continue
-fmtwrt_i4:  lda     rf                 ; place variable value on expr stack
-            stxd
-            lda     rf
-            stxd
-            lda     rf
-            stxd
-            lda     rf
-            stxd
-fmtwrt_ia:  sex     r2                 ; point x back to stack
-            ldi     scratch1_.1        ; where to put conversion
-            phi     rd
-            ldi     scratch1_.0
-            plo     rd
-            ghi     r8                 ; save consumed registers
-            stxd
-            glo     r8
-            stxd
-            ghi     r9
-            stxd
-            glo     r9
-            stxd
-            ghi     ra
-            stxd
-            glo     ra
-            stxd
-            ghi     rb
-            stxd
-            glo     rb
-            stxd
-            ghi     r7                 ; point to data item
-            phi     rf
-            glo     r7
-            plo     rf
-            inc     rf
-            sep     scall              ; convert integer to ascii
-            dw      itoa32
-            irx                        ; recover consumed registers
-            ldxa
-            plo     rb
-            ldxa
-            phi     rb
-            ldxa
-            plo     ra
-            ldxa
-            phi     ra
-            ldxa
-            plo     r9
-            ldxa
-            phi     r9
-            ldxa
-            plo     r8
-            ldx
-            phi     r8
-            inc     r7                 ; remove item from expr stack
-            inc     r7
-            inc     r7
-            inc     r7
-
-fmtwrt_fi:  ldi     scratch1_.1        ; point to ascii value
-            phi     rf
-            ldi     scratch1_.0
-            plo     rf
-            sep     scall              ; get length
-            dw      strlen
-            ldi     scratch1_.1        ; point to ascii value
-            phi     rf
-            ldi     scratch1_.0
-            plo     rf
-            glo     rc                 ; save for subtract
-            str     r2
-            inc     r8                 ; get field width
-            ldn     r8
-            dec     r8
-            sm                         ; subtract data size
-            lbdf    fmtwrt_fi2         ; jump if no overflow
-            plo     re
-            ldi     '*'                ; signal overflow in output
-            str     rb
-            inc     rb
-            inc     rf
-            glo     re
-fmtwrt_fi2: lbz     fmtwrt_c1          ; jump if data matches field size
-            plo     rc                 ; put back into counter
-            lbnf    fmtwrt_fi1         ; jump if data was wider
-            ldi     ' '                ; need to output a space
-            str     rb                 ; write into output
-            inc     rb
-            dec     rc                 ; decrement count
-            glo     rc                 ; recover count
-            lbr     fmtwrt_fi2         ; loop until done
-fmtwrt_fi1: inc     rf                 ; left trim data
-            inc     rc                 ; increment count
-            glo     rc                 ; retrieve count
-            lbr     fmtwrt_fi2         ; loop until data matches field width
-
-; Now copy to output
-fmtwrt_cpy: ldi     scratch1_.1        ; point to formatted number
-            phi     rf
-            ldi     scratch1_.0
-            plo     rf
-fmtwrt_c1:  lda     rf                 ; get byte from number
-            lbz     fmtwrt_e1          ; next variable if end found
-            str     rb                 ; write to output buffer
-            inc     rb
-            lbr     fmtwrt_c1          ; copy remaining characters
-fmtwrt_e1:  dec     ra                 ; decrement repeat count
-            glo     ra                 ; see if done with specifier
-            lbz     fmtwrt_e2          ; jump if so
-            lbr     fmtwrt_lp          ; loop back for next variable
-fmtwrt_e2:  inc     r8                 ; move to next specifier
-            inc     r8
-            inc     r8
-            lbr     fmtloop            ; then loop back
-
-fmtwrt_dn:  ldi     0                  ; terminate record
-            str     rb
-            ldi     iobuffer.1         ; point to record
-            phi     rf
-            ldi     iobuffer.0
-            plo     rf
-            ghi     ra                 ; get LUN
-            smi     6                  ; check for LUN 6
-            lbz     fmtwrt_d6          ; jump if so
-            ghi     ra                 ; need to get LUN
-            smi     5                  ; check for LUN 5
-            lbnz    fmtwrt_dsk         ; jump if a disk file
-            sep     scall              ; display it
-            dw      f_msg
-            sep     scall              ; display cr/lf
-            dw      f_inmsg
-            db      10,13,0
-            sep     sret               ; then return to caller
-fmtwrt_dsk: ghi     ra                 ; recover LUN number
-            sep     scall              ; call disk write
-            dw      fwrite
-            sep     sret               ; and then return
-fmtwrt_d6:  lda     rf                 ; get carriage control character
-            plo     re                 ; keep a copy
-            smi     '+'                ; check for no skip
-            lbz     fmtwrt_dg          ; jump if so
-            sep     scall              ; otherwise move to next line
-            dw      f_inmsg
-            db      10,13,0
-fmtwrt_dg:  sep     scall              ; display output
-            dw      f_msg
-            sep     sret               ; then return to caller
 #endif
 
 #ifdef FROMSCI

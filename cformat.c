@@ -84,11 +84,15 @@ void cformat(char* line) {
       sprintf(buffer,"           db      %d,%d,%d,%d",count,ftype,size1,size2);
       Asm(buffer);
       }
-    if (*line != ',' && *line != ')') {
+    if (*line != ',' && *line != ')' && *line != '/') {
       showError("Syntax error");
       return;
       }
-    if (*line == ',') line++;
+    if (*line == '/') {
+      Asm("           db      1,'/',0,0");
+      line++;
+      }
+    else if (*line == ',') line++;
     }
   Asm("           db      0");
   sprintf(buffer,"lbl_%d:",nextLabel++);
