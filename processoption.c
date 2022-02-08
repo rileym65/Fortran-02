@@ -53,6 +53,9 @@ void processOption(char* option) {
       useElfos = -1;
       programStart = 0x2000;
       }
+    if (strcmp(option,"-noelfos") == 0) {
+      useElfos = 0;
+      }
     if (strcmp(option,"-stg") == 0) {
       useStg = -1;
       exitAddress = 0x8003;

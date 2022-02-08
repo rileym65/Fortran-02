@@ -35,6 +35,7 @@ int prepass(char* filename) {
       if (strcasecmp(currentLine,".fp") == 0) { useFp = -1; use32Bits = -1; }
       if (strcasecmp(currentLine,".32") == 0) { use32Bits = -1; }
       if (strcasecmp(currentLine,".elfos") == 0) { useElfos = -1; programStart = 0x2000; }
+      if (strcasecmp(currentLine,".noelfos") == 0) { useElfos = 0; }
       if (strcasecmp(currentLine,".list") == 0) { showList = -1; }
       if (strcasecmp(currentLine,".nolist") == 0) { showList = 0; }
       if (strcasecmp(currentLine,".1805") == 0) { use1805 = -1; }
