@@ -29,6 +29,7 @@
 #define OP_SIN   0x93
 #define OP_SGN   0x92
 #define OP_ABS   0x91
+#define OP_POW   0x80
 #define OP_MUL   0x70
 #define OP_DIV   0x71
 #define OP_MOD   0x72
@@ -492,7 +493,10 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
       switch (*pos) {
         case 0  : op = OP_END; break;
         case ',': op = OP_END; break;
-        case '*': op = OP_MUL; break;
+        case '*':
+             if (*(pos+1) == '*') { op = OP_POW; pos++; }
+               else op = OP_MUL;
+             break;
         case '/': op = OP_DIV; break;
         case '%': op = OP_MOD; break;
         case '+': op = OP_ADD; break;
@@ -693,6 +697,31 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
                  Asm("           dw      gtefp");
                  addDefine("GTEFP",1,1);
                  }
+               break;
+          case OP_POW :
+               if (numbers[nstack] == 'I') {
+                 Asm("           sep     scall               ; Convert to floating point");
+                 Asm("           dw      itof");
+                 addDefine("USEFP",1,1);
+                 numbers[nstack] = 'R';
+                 }
+               if (numbers[nstack-1] == 'I') {
+                 Asm("           inc     r7                  ; Convert first number to integer");
+                 Asm("           inc     r7");
+                 Asm("           inc     r7");
+                 Asm("           inc     r7");
+                 Asm("           sep     scall");
+                 Asm("           dw      itof");
+                 Asm("           dec     r7");
+                 Asm("           dec     r7");
+                 Asm("           dec     r7");
+                 Asm("           dec     r7");
+                 numbers[nstack-1] = 'R';
+                 addDefine("USEFP",1,1);
+                 }
+               Asm("           sep     scall               ; Perform power");
+               Asm("           dw      fppow");
+               addDefine("POWFP",1,1);
                break;
           case OP_ABS :
                Asm("           sep     scall               ; Perform greater or equal");
