@@ -696,10 +696,14 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
                break;
           case OP_ABS :
                Asm("           sep     scall               ; Perform greater or equal");
-               if (numbers[nstack] == 'I')
+               if (numbers[nstack] == 'I') {
                  Asm("           dw      abs32");
-               else
+                 addDefine("ABS32",1,1);
+                 }
+               else {
                  Asm("           dw      absfp");
+                 addDefine("ABSFP",1,1);
+                 }
                break;
           case OP_COS :
                if (numbers[nstack] == 'I') {
