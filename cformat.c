@@ -40,6 +40,8 @@ void cformat(char* line) {
       Asm(buffer);
       if (*line == '\'') line++;
       }
+    else if (*line == '/') {
+      }
     else {
       if (*line >= '0' && *line <= '9') {
         count = 0;
@@ -89,8 +91,11 @@ void cformat(char* line) {
       return;
       }
     if (*line == '/') {
-      Asm("           db      1,'/',0,0");
-      line++;
+      while (*line == '/') {
+        Asm("           db      1,'/',0,0");
+        line++;
+        }
+      if (*line == ',') line++;
       }
     else if (*line == ',') line++;
     }
