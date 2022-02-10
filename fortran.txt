@@ -27,11 +27,14 @@ if the -d command line switch is specified
       fnmame(arg,arg,...) = expr
       var = expr
       ASSIGN line TO var
-      CALL APPEND(lun,filename,reclen)
-      CALL OPEN(lun,filename,reclen)
+      CALL APPEND(lun,'filename',reclen)
+      CALL OPEN(lun,'filename',reclen)
       CALL OUT(port,value)
       CALL POKE(address,value)
-      CALL TRUNCATE(lun,filename,reclen)
+      CALL TRUNCATE(lun,'filename',reclen)
+      CALL MKDIR('dirname')
+      CALL CHDIR('dirname')
+      CALL RMDIR('dirname')
       CALL subr[(arg,arg,...)]
       DO line var=start,end[,step]
       FORMAT(spec,spec,...)

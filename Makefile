@@ -24,16 +24,19 @@ OBJS = \
 	cexpr.o \
 	cexternal.o \
 	cformat.o \
+	cchdir.o \
 	checkmain.o \
 	cif.o \
 	clet.o \
 	cgoto.o \
+	cmkdir.o \
 	copen.o \
 	cpause.o \
 	cprogram.o \
 	cread.o \
 	creturn.o \
 	crewind.o \
+	crmdir.o \
 	csfunction.o \
 	cstop.o \
 	csubroutine.o \
@@ -94,11 +97,13 @@ cexpr.o:         header.h cexpr.c
 cexternal.o:     header.h cexternal.c
 cformat.o:       header.h cformat.c
 cgoto.o:         header.h cgoto.c
+cchdir.o:        header.h cchdir.c
 checkmain.o:     header.h checkmain.c
 cif.o:           header.h cif.c
 ctype.o:         header.h ctype.c
 clet.o:          header.h clet.c
 ccommon.o:       header.h ccommon.c
+cmkdir.o:        header.h cmkdir.c
 compileline.o:   header.h compileline.c
 copen.o:         header.h copen.c
 cpause.o:        header.h cpause.c
@@ -106,6 +111,7 @@ cprogram.o:      header.h cprogram.c
 cread.o:         header.h cread.c
 creturn.o:       header.h creturn.c
 crewind.o:       header.h crewind.c
+crmdir.o:        header.h crmdir.c
 csfunction.o:    header.h csfunction.c
 cstop.o:         header.h cstop.c
 csubroutine.o:   header.h csubroutine.c

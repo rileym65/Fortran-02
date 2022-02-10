@@ -10,7 +10,7 @@
 
 #include "header.h"
 
-void cchdir(char* line) {
+void crmdir(char* line) {
   int  reclen;
   int  labelFName;
   int  labelJump;
@@ -48,8 +48,8 @@ void cchdir(char* line) {
   sprintf(buffer,"              ldi   lbl_%d.0",labelFName);
   Asm(buffer);
   Asm("              plo   rf");
-  Asm("              sep   scall              ; Change directory");
-  Asm("              dw    0324h");
+  Asm("              sep   scall              ; Remove directory");
+  Asm("              dw    0327h");
   addDefine("FOPEN",1,1);
   }
 

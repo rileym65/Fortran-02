@@ -34,6 +34,21 @@ void ccall(char* line) {
     return;
     }
 
+  if (strncasecmp(line, "chdir(", 6) == 0) {
+    cchdir(line+6);
+    return;
+    }
+
+  if (strncasecmp(line, "mkdir(", 6) == 0) {
+    cmkdir(line+6);
+    return;
+    }
+
+  if (strncasecmp(line, "rmdir(", 6) == 0) {
+    crmdir(line+6);
+    return;
+    }
+
   if (strncasecmp(line, "poke(", 5) == 0) {
     line += 5;
     line = cexpr(line, 0, module);
