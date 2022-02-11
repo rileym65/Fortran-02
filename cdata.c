@@ -133,6 +133,7 @@ void cdata(char* line) {
           }
         else if (isFloat) ir.real = atof(token);
         else ir.integer = atoi(token);
+        isFloat = 0;
         for (i=0; i<count; i++) {
           if (var >= numVars) {
             showError("Too many values specified");
