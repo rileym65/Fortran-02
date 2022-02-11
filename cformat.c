@@ -11,10 +11,13 @@
 #include "header.h"
 
 void cformat(char* line) {
+  int i;
   int count;
   int size1;
   int size2;
+  int repeats;
   char string[256];
+  char *restart;
   int pos;
   char ftype;
   if (inBlockData) {
@@ -29,6 +32,7 @@ void cformat(char* line) {
   line++;
   sprintf(buffer,"           lbr     lbl_%d",nextLabel);
   Asm(buffer);
+  repeats = 0;
   while (*line != ')' && *line != 0) {
     if (*line == '\'') {
       pos = 0;
@@ -39,6 +43,7 @@ void cformat(char* line) {
       sprintf(buffer,"           db      %d,'H%s'",count,string);
       Asm(buffer);
       if (*line == '\'') line++;
+      if (*line == ',') line++;
       }
     else if (*line == '/') {
       }
@@ -52,52 +57,76 @@ void cformat(char* line) {
         }
       else count = 1;
       ftype = *line++;
-      if (ftype >= 'a' && ftype <= 'z') ftype -= 32;
-      if (ftype != 'I' && ftype != 'X' && ftype != 'A' && ftype != 'L' &&
-          ftype != 'F') {
-        showError("Invalid format specifier");
-        return;
-        }
-      size2 = -1;
-      if (*line >= '0' && *line <= '9') {
-        size1 = 0;
-        while (*line >= '0' && *line <= '9') {
-          size1 = (size1 * 10) + (*line - '0');
-          line++;
-          }
+      if (ftype == '(') {
+        restart = line;
+        repeats = count;
         }
       else {
-        size1 = 1;
-        }
-      if (*line == '.') {
-        if (ftype != 'F') {
-          showError("Invalid specifier");
+        if (ftype >= 'a' && ftype <= 'z') ftype -= 32;
+        if (ftype != 'I' && ftype != 'X' && ftype != 'A' && ftype != 'L' &&
+            ftype != 'F' && ftype != 'H') {
+          showError("Invalid format specifier");
           return;
           }
-        size2 = 0;
-        line++;
-        while (*line >= '0' && *line <= '9') {
-          size2 = (size2 * 10) + (*line - '0');
+        if (ftype == 'H') {
+          pos = 0;
+          for (i=0; i<count; i++) string[pos++] = *line++;
+          string[pos] = 0;
+          sprintf(buffer,"           db      %d,'H%s'",count,string);
+          Asm(buffer);
+          }
+        else {
+          size2 = -1;
+          if (*line >= '0' && *line <= '9') {
+            size1 = 0;
+            while (*line >= '0' && *line <= '9') {
+              size1 = (size1 * 10) + (*line - '0');
+              line++;
+              }
+            }
+          else {
+            size1 = 1;
+            }
+          if (*line == '.') {
+            if (ftype != 'F') {
+              showError("Invalid specifier");
+              return;
+              }
+            size2 = 0;
+            line++;
+            while (*line >= '0' && *line <= '9') {
+              size2 = (size2 * 10) + (*line - '0');
+              line++;
+              }
+            }
+          else size2 = 0xff;
+          if (ftype == 'F' && size2 == 0xff) size2 = 0;
+          sprintf(buffer,"           db      %d,%d,%d,%d",count,ftype,size1,size2);
+          Asm(buffer);
+          }
+
+
+      if (*line != ',' && *line != ')' && *line != '/') {
+        showError("Syntax error");
+        return;
+        }
+      if (*line == ')' && repeats > 0) {
+        repeats--;
+        if (repeats > 0) line = restart;
+        }
+      if (*line == '/') {
+        while (*line == '/') {
+          Asm("           db      1,'/',0,0");
           line++;
           }
+        if (*line == ',') line++;
         }
-      else size2 = 0xff;
-      if (ftype == 'F' && size2 == 0xff) size2 = 0;
-      sprintf(buffer,"           db      %d,%d,%d,%d",count,ftype,size1,size2);
-      Asm(buffer);
-      }
-    if (*line != ',' && *line != ')' && *line != '/') {
-      showError("Syntax error");
-      return;
-      }
-    if (*line == '/') {
-      while (*line == '/') {
-        Asm("           db      1,'/',0,0");
-        line++;
+      else if (*line == ',') line++;
+
         }
-      if (*line == ',') line++;
+
       }
-    else if (*line == ',') line++;
+
     }
   Asm("           db      0");
   sprintf(buffer,"lbl_%d:",nextLabel++);
