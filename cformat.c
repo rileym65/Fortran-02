@@ -20,6 +20,7 @@ void cformat(char* line) {
   char *restart;
   int pos;
   char ftype;
+printf("-->%s\n",line);
   if (inBlockData) {
     showError("Not allowed in BLOCK DATA");
     return;
@@ -46,6 +47,11 @@ void cformat(char* line) {
       if (*line == ',') line++;
       }
     else if (*line == '/') {
+        while (*line == '/') {
+          Asm("           db      1,'/',0,0");
+          line++;
+          }
+        if (*line == ',') line++;
       }
     else {
       if (*line >= '0' && *line <= '9') {
@@ -106,31 +112,23 @@ void cformat(char* line) {
           }
 
 
-      if (*line != ',' && *line != ')' && *line != '/') {
-        showError("Syntax error");
-        return;
-        }
-      if (*line == ')' && repeats > 0) {
-        repeats--;
-        if (repeats > 0) line = restart;
-        else {
-          line++;
-          if (*line == ',') line++;
+        if (*line != ',' && *line != ')' && *line != '/') {
+          showError("Syntax error");
+          return;
           }
-        }
-      if (*line == '/') {
-        while (*line == '/') {
-          Asm("           db      1,'/',0,0");
-          line++;
+        if (*line == ')' && repeats > 0) {
+          repeats--;
+          if (repeats > 0) line = restart;
+          else {
+            line++;
+            if (*line == ',') line++;
+            }
           }
         if (*line == ',') line++;
-        }
-      else if (*line == ',') line++;
-
+  
         }
 
       }
-
     }
   Asm("           db      0");
   sprintf(buffer,"lbl_%d:",nextLabel++);
