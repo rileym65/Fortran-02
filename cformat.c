@@ -113,6 +113,10 @@ void cformat(char* line) {
       if (*line == ')' && repeats > 0) {
         repeats--;
         if (repeats > 0) line = restart;
+        else {
+          line++;
+          if (*line == ',') line++;
+          }
         }
       if (*line == '/') {
         while (*line == '/') {
