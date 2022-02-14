@@ -11,7 +11,6 @@
 #include "header.h"
 
 void cchdir(char* line) {
-  int  reclen;
   int  labelFName;
   int  labelJump;
   int  pos;

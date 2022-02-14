@@ -11,7 +11,6 @@
 #include "header.h"
 
 void cmkdir(char* line) {
-  int  reclen;
   int  labelFName;
   int  labelJump;
   int  pos;

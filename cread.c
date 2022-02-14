@@ -12,7 +12,6 @@
 
 void cread(char* line) {
   char token[32];
-  int  pos;
   int  v;
   int  size;
   int  varLabel;

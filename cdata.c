@@ -23,7 +23,6 @@ void cdata(char* line) {
   int  count;
   int  isFloat;
   int  flag;
-  int  shift;
   INTREAL ir;
   checkMain();
 //  Asm("          sep   scall                    ; Call data initializer");
@@ -115,7 +114,6 @@ void cdata(char* line) {
         token[pos] = 0;
         if (token[0] == '\'') {
           ir.integer = 0;
-          shift = 24;
           for (j=1; j<strlen(token); j++) {
             ir.integer = (ir.integer << 8) | token[j];
             }
