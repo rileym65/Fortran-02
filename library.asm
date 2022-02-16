@@ -2644,6 +2644,42 @@ ioflag_er:    ldi      0xff            ; indicate bad file number
               sep      sret            ; and return
 #endif
 
+#ifdef FPOS
+fpos:         inc      r7              ; retrieve LUN
+              lda      r7
+              inc      r7              ; remove remaining bytes
+              inc      r7
+              sep      scall           ; get file record for file
+              dw       fildes
+              lbnf     fpos_1          ; jump if valid LUN
+fpos_2:       sex      r7              ; on invalid file, push 0
+              ldi      0
+              stxd
+              stxd
+              stxd
+              stxd
+              sex      r2              ; point x back to system stack
+              sep      sret            ; and return
+fpos_1:       lda      rd              ; check if file is open
+              lbz      fpos_2          ; push 0 if file is not open
+              inc      rd              ; move to Elf/OS FILDES
+              inc      rd
+              inc      rd
+              inc      rd
+              inc      rd
+              sex      r7              ; push file position
+              lda      rd
+              stxd
+              lda      rd
+              stxd
+              lda      rd
+              stxd
+              lda      rd
+              stxd
+              sex      r2              ; point x back to system stack
+              sep      sret            ; and return
+#endif
+
 #ifdef FSEEK
 #redefine IOSTATUS
 fseek:        sep      scall           ; get file record for file
@@ -2656,7 +2692,7 @@ fseek:        sep      scall           ; get file record for file
               phi      rb
               lda      r7
               plo      r8
-              lda      r7
+              ldn      r7
               phi      r8
               lda      rd              ; get file open flag
               lbz      ferr_no         ; jump if file not open

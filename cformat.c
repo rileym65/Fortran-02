@@ -20,7 +20,6 @@ void cformat(char* line) {
   char *restart;
   int pos;
   char ftype;
-printf("-->%s\n",line);
   if (inBlockData) {
     showError("Not allowed in BLOCK DATA");
     return;

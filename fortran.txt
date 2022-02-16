@@ -99,6 +99,7 @@ Expression operators:
       INT(n)
       LN(n)
       PEEK(n)
+      POS(lun)
       RND(n)
       SGN(n)
       SIN(n)

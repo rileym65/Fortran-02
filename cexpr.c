@@ -10,6 +10,7 @@
 
 #include "header.h"
 
+#define OP_POS      0xa4
 #define OP_IOSTATUS 0xa3
 #define OP_IOFLAG   0xa2
 #define OP_INP   0xa1
@@ -248,6 +249,12 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
         }
       else if (strncasecmp(pos, "inp(", 4) == 0) {
         ops[ostack++] = OP_INP;
+        ops[ostack++] = OP_OP;
+        pos += 3;
+        flag = -1;
+        }
+      else if (strncasecmp(pos, "pos(", 4) == 0) {
+        ops[ostack++] = OP_POS;
         ops[ostack++] = OP_OP;
         pos += 3;
         flag = -1;
@@ -832,6 +839,17 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
                Asm("           sep     scall               ; Perform random");
                Asm("           dw      rnd32");
                addDefine("RND32",1,1);
+               break;
+          case OP_POS :
+               if (numbers[nstack] == 'R') {
+                 Asm("           sep     scall               ; Convert to floating point");
+                 Asm("           dw      ftoi");
+                 addDefine("USEFP",1,1);
+                 numbers[nstack] = 'I';
+                 }
+               Asm("           sep     scall               ; get file position");
+               Asm("           dw      fpos");
+               addDefine("FPOS",1,1);
                break;
           case OP_PEEK :
                if (numbers[nstack] == 'R') {
