@@ -17,6 +17,7 @@ OBJS = \
 	ccommon.o \
 	ccontinue.o \
 	cdata.o \
+	cdelete.o \
 	cdimension.o \
 	cdo.o \
 	cend.o \
@@ -89,6 +90,7 @@ cblockdata.o:    header.h cblockdata.c
 ccall.o:         header.h ccall.c
 ccontinue.o:     header.h ccontinue.c
 cdata.o:         header.h cdata.c
+cdelete.o:       header.h cdelete.c
 cdimension.o:    header.h cdimension.c
 cdo.o:           header.h cdo.c
 cend.o:          header.h cend.c

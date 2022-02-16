@@ -28,6 +28,7 @@ if the -d command line switch is specified
       var = expr
       ASSIGN line TO var
       CALL APPEND(lun,'filename',reclen)
+      CALL DELETE('filename')
       CALL OPEN(lun,'filename',reclen)
       CALL OUT(port,value)
       CALL POKE(address,value)

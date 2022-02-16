@@ -49,6 +49,11 @@ void ccall(char* line) {
     return;
     }
 
+  if (strncasecmp(line, "delete(", 7) == 0) {
+    cdelete(line+7);
+    return;
+    }
+
   if (strncasecmp(line, "poke(", 5) == 0) {
     line += 5;
     line = cexpr(line, 0, module);

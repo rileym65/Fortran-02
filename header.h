@@ -324,6 +324,7 @@ extern void ccall(char* line);
 extern void ccommon(char* line);
 extern void ccontinue(char* line);
 extern void cdata(char* line);
+extern void cdelete(char* line);
 extern void cdimension(char* line);
 extern void cdo(char* line);
 extern void cDoEnd();
