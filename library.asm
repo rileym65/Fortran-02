@@ -2709,6 +2709,8 @@ fseek:        sep      scall           ; get file record for file
               inc      rd
               inc      rd
               inc      rd
+              ldi      0               ; clear high byte of RC
+              phi      rc
               sep      scall           ; call Elf/OS to seek the file
               dw       030fh
               dec      rd              ; move back to IOSTATUS field
