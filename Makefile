@@ -33,6 +33,7 @@ OBJS = \
 	cmkdir.o \
 	copen.o \
 	cpause.o \
+	cposition.o \
 	cprogram.o \
 	cread.o \
 	creturn.o \
@@ -109,6 +110,7 @@ cmkdir.o:        header.h cmkdir.c
 compileline.o:   header.h compileline.c
 copen.o:         header.h copen.c
 cpause.o:        header.h cpause.c
+cposition.o:     header.h cposition.c
 cprogram.o:      header.h cprogram.c
 cread.o:         header.h cread.c
 creturn.o:       header.h creturn.c

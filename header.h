@@ -340,6 +340,7 @@ extern void clet(char* line);
 extern void cmkdir(char* line);
 extern void copen(char* line, byte flags);
 extern void cpause(char* line);
+extern void cposition(char* line);
 extern void cprogram(char* line);
 extern void cread(char* line);
 extern void creturn(char* line);

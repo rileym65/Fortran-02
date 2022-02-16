@@ -28,14 +28,15 @@ if the -d command line switch is specified
       var = expr
       ASSIGN line TO var
       CALL APPEND(lun,'filename',reclen)
+      CALL CHDIR('dirname')
       CALL DELETE('filename')
+      CALL MKDIR('dirname')
       CALL OPEN(lun,'filename',reclen)
       CALL OUT(port,value)
       CALL POKE(address,value)
-      CALL TRUNCATE(lun,'filename',reclen)
-      CALL MKDIR('dirname')
-      CALL CHDIR('dirname')
+      CALL POSITION(lun,offset,[whence])
       CALL RMDIR('dirname')
+      CALL TRUNCATE(lun,'filename',reclen)
       CALL subr[(arg,arg,...)]
       DO line var=start,end[,step]
       FORMAT(spec,spec,...)
@@ -67,6 +68,7 @@ Expression operators:
       -
       *
       /
+      **
       &
       |
       ^
@@ -137,7 +139,6 @@ Terminal carrieage control codes (LUN 6 only)
 
 Still to implement:
       EQUIVALENCE (var,var,...),(var,var,...),...
-
 
       READ(lun[,REC=index],fline,ERR=line,END=line)var,var,...
       WRITE(lun[,REC=index],fline,ERR=line,END=line)var,var,...
