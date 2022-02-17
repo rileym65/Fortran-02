@@ -88,10 +88,10 @@ void ccommon(char* line) {
         variables[i].sizes[0] = dims[0];
         variables[i].sizes[1] = dims[1];
         variables[i].sizes[2] = dims[2];
-        if (dimCount == 0) vsize = vsize * dims[0];
-        if (dimCount == 1) vsize = vsize * dims[0] * dims[1];
-        if (dimCount == 2) vsize = vsize * dims[0] * dims[1] * dims[2];
         }
+      if (variables[i].dimensions == 1) vsize *= variables[i].sizes[0];
+      if (variables[i].dimensions == 2) vsize *= (variables[i].sizes[0] * variables[i].sizes[1]);
+      if (variables[i].dimensions == 3) vsize *= (variables[i].sizes[0] * variables[i].sizes[1] * variables[i].sizes[2]);
       variables[i].offset = common[c].size;
       common[c].size += vsize;
       if (common[c].size > common[c].maxSize) {
