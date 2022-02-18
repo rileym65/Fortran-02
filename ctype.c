@@ -20,7 +20,6 @@ void ctype(char* line,int vtype) {
   flag = -1;
   pos = 0;
   checkMain();
-  if (passNumber != 1) return;
   while (flag) {
     if (*line >= 'a' && *line <= 'z') token[pos++] = *line++;
     else if (*line >= 'A' && *line <= 'Z') token[pos++] = *line++;
@@ -33,50 +32,63 @@ void ctype(char* line,int vtype) {
         return;
         }
       pos = 0;
-      i = addVariable(token, module);
+      i = findFunction(token);
       if (i >= 0) {
-        variables[i].type = vtype;
+        externals[i].type = vtype;
+        if (*line == ',') line++;
+        else if (*line == 0) flag = 0;
         }
-      else return;
-      if (*line == '(') {
-        line++;
-        dimCount = 0;
-        dims[0] = 0; dims[1] = 0; dims[2] = 0;
-        while (*line != ')' && *line != 0) {
-          if (*line >= '0' && *line <= '9') {
-            dims[dimCount] = (dims[dimCount] * 10) + (*line - '0');
-            line++;
+      else {
+        if (passNumber == 1) {
+          i = addVariable(token, module);
+          if (i >= 0) {
+            variables[i].type = vtype;
             }
-          else if (*line == ',') {
-            if (dims[dimCount] == 0) {
-              showError("Array dimension of 0 is not allowed");
+          else return;
+          }
+        if (*line == '(') {
+          line++;
+          dimCount = 0;
+          dims[0] = 0; dims[1] = 0; dims[2] = 0;
+          while (*line != ')' && *line != 0) {
+            if (*line >= '0' && *line <= '9') {
+              dims[dimCount] = (dims[dimCount] * 10) + (*line - '0');
+              line++;
+              }
+            else if (*line == ',') {
+              if (dims[dimCount] == 0) {
+                showError("Array dimension of 0 is not allowed");
+                return;
+                }
+              if (dimCount == 2) {
+                showError("Dimensions beyond 3 are not supported");
+                return;
+                }
+              dimCount++;
+              line++;
+              }
+            else {
+              showError("Invalid character in array specification");
               return;
               }
-            if (dimCount == 2) {
-              showError("Dimensions beyond 3 are not supported");
-              return;
-              }
-            dimCount++;
-            line++;
             }
-          else {
-            showError("Invalid character in array specification");
-            return;
+          if (passNumber == 1) {
+            variables[i].dimensions = dimCount+1;
+            variables[i].sizes[0] = dims[0];
+            variables[i].sizes[1] = dims[1];
+            variables[i].sizes[2] = dims[2];
             }
           }
-        variables[i].dimensions = dimCount+1;
-        variables[i].sizes[0] = dims[0];
-        variables[i].sizes[1] = dims[1];
-        variables[i].sizes[2] = dims[2];
+        if (*line == ')') line++;
+        if (*line == ',') line++;
+        else if (*line == 0) flag = 0;
         }
-      if (*line == ')') line++;
-      if (*line == ',') line++;
-      else if (*line == 0) flag = 0;
       }
     else {
       showError("Invalid character found in variable name");
       return;
       }
+
     }
   }
 
