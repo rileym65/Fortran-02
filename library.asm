@@ -1630,7 +1630,18 @@ fmtwrite_lp:  lda     r9               ; get next variable type
               phi     rf
               lda     r9
               plo     rf
-              ldn     r8               ; get conversion type
+              glo     re               ; recover type
+              shl                      ; see if high bit is set
+              lbnf    fmtwrite_1       ; jump if not
+              shr                      ; strip high bit
+              plo     re               ; put back in re
+              lda     rf               ; retrieve pointed to address
+              str     r2               ; set aside
+              ldn     rf               ; read low byte
+              plo     rf
+              ldx                      ; recover high byte
+              phi     rf
+fmtwrite_1:   ldn     r8               ; get conversion type
               smi     'A'              ; check for A conversion
               lbz     fmtwrt_ca        ; jump if so
               glo     re               ; recover variable type
