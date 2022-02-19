@@ -32,7 +32,7 @@ void crmdir(char* line) {
   pos = strlen(buffer);
   while (*line != 0 && *line != '\'') buffer[pos++] = *line++;
   buffer[pos] = 0;
-  strcat(buffer,"',0");
+  strcat(buffer,"',0,0");
   Asm(buffer);
   if (*line != '\'') {
     showError("Syntax error");
