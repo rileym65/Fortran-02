@@ -32,7 +32,7 @@ void crmdir(char* line) {
   pos = strlen(buffer);
   while (*line != 0 && *line != '\'') buffer[pos++] = *line++;
   buffer[pos] = 0;
-  strcat(buffer,"',0");
+  strcat(buffer,"',0,0");
   Asm(buffer);
   if (*line != '\'') {
     showError("Syntax error");
@@ -44,9 +44,11 @@ void crmdir(char* line) {
   sprintf(buffer,"              ldi   lbl_%d.1           ; Point to filename",labelFName);
   Asm(buffer);
   Asm("              phi   rf");
+  Asm("              phi   ra");
   sprintf(buffer,"              ldi   lbl_%d.0",labelFName);
   Asm(buffer);
   Asm("              plo   rf");
+  Asm("              plo   ra");
   Asm("              sep   scall              ; Remove directory");
   Asm("              dw    0327h");
   addDefine("FOPEN",1,1);
