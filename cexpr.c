@@ -1015,7 +1015,11 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
         }
       }
     }
-  if (nstack == 0) { printf("nstack empty\n"); return pos; }
+  if (nstack == 0) { 
+    sprintf(abuffer,"nstack empty\n");
+    showError(abuffer);
+    return pos;
+    }
   if (nstack != 1) {
      sprintf(abuffer,"Did not reduce to 1 term: %d\n",nstack);
      showError(abuffer);
