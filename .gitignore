@@ -2,6 +2,7 @@ fortran
 library.h
 x.x
 *.o
+*.build
 *.dat
 *.bak
 *.rc
