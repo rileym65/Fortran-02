@@ -48,6 +48,7 @@ typedef struct {
   word  sizes[3];
   dword value;
   byte  isArg;
+  dword *values;
   } VARREC;
 
 typedef struct {

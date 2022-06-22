@@ -13,6 +13,8 @@
 void cdata(char* line) {
   char token[32];
   int  vars[256];
+  int  counts[256];
+  int  totalSlots;
   int  numVars;
   int  i,j;
   int  pos;
@@ -23,12 +25,15 @@ void cdata(char* line) {
   int  count;
   int  isFloat;
   int  flag;
+  int  ct;
+  int  ap;
   INTREAL ir;
   checkMain();
 //  Asm("          sep   scall                    ; Call data initializer");
 //  Asm("          dw    fdata");
   while (*line != 0) {
     numVars = 0;
+    totalSlots = 0;
     pos = 0;
     flag = -1;
     while (flag) {
@@ -51,6 +56,25 @@ void cdata(char* line) {
         v = getVariable(token, module);
         if (v < 0) return;
         vars[numVars++] = v;
+        if (variables[v].dimensions == 0) {
+          counts[numVars-1] = 1;
+          totalSlots += 1;
+          }
+        if (variables[v].dimensions == 1) {
+          ct = variables[v].sizes[0];
+          counts[numVars-1] = ct;
+          totalSlots += ct;
+          }
+        if (variables[v].dimensions == 2) {
+          ct = variables[v].sizes[0] * variables[v].sizes[1];
+          counts[numVars-1] = ct;
+          totalSlots += ct;
+          }
+        if (variables[v].dimensions == 3) {
+          ct = variables[v].sizes[0] * variables[v].sizes[1] * variables[v].sizes[2];
+          counts[numVars-1] = ct;
+          totalSlots += ct;
+          }
         pos = 0;
         }
       if (*line == 0 || *line == '/') flag = 0;
@@ -63,6 +87,7 @@ void cdata(char* line) {
     line++;
     var = 0;
     pos = 0;
+    ap = 0;
     count = 1;
     isFloat = 0;
     flag = -1;
@@ -133,11 +158,29 @@ void cdata(char* line) {
         else ir.integer = atoi(token);
         isFloat = 0;
         for (i=0; i<count; i++) {
-          if (var >= numVars) {
+          if (var >= totalSlots) {
             showError("Too many values specified");
             return;
             }
           variables[vars[var]].value = ir.integer;
+          if (variables[vars[var]].dimensions != 0) {
+            if (variables[vars[var]].values == NULL) {
+              if (variables[vars[var]].dimensions == 1)
+                variables[vars[var]].values =
+                 (dword*)malloc(variables[vars[var]].sizes[0] * sizeof(dword));
+              if (variables[vars[var]].dimensions == 2)
+                variables[vars[var]].values =
+                 (dword*)malloc(variables[vars[var]].sizes[0] *
+                                variables[vars[var]].sizes[1] * sizeof(dword));
+              if (variables[vars[var]].dimensions == 3)
+                variables[vars[var]].values =
+                 (dword*)malloc(variables[vars[var]].sizes[0] *
+                                variables[vars[var]].sizes[1] *
+                                variables[vars[var]].sizes[2] * sizeof(dword));
+              ap = 0;
+              }
+            variables[vars[var]].values[ap++] = ir.integer;
+            }
           if (strlen(variables[vars[var]].common) > 0) {
             ofs = variables[vars[var]].offset;
             c = getCommon(variables[vars[var]].common,module);
@@ -163,36 +206,11 @@ void cdata(char* line) {
                    break;
               }
             }
-//          switch (varType(vars[var])) {
-//            case 'B': Asm("          dw    1"); break;
-//            case 'L': Asm("          dw    1"); break;
-//            case 'S': Asm("          dw    2"); break;
-//            case 'I': Asm("          dw    4"); break;
-//            case 'R': Asm("          dw    4"); break;
-//            }
-//          if (strlen(variables[vars[var]].common) > 0) {
-//            sprintf(buffer,"          dw    c_%s+%d",variables[vars[var]].common, variables[vars[var]].offset);
-//            Asm(buffer);
-//            }
-//          else {
-//            sprintf(buffer,"          dw    %s_%s",variables[vars[var]].module, variables[vars[var]].name);
-//            Asm(buffer);
-//            }
-//          switch (varType(vars[var])) {
-//            case 'B':
-//            case 'L':
-//                 sprintf(buffer,"          db    %d",ir.integer & 0xff);
-//                 break;
-//            case 'S':
-//                 sprintf(buffer,"          dw    %d",ir.integer & 0xffff);
-//                 break;
-//            case 'I':
-//            case 'R':
-//                 sprintf(buffer,"          dw    %d,%d",(ir.integer >> 16) & 0xffff, ir.integer & 0xffff);
-//                 break;
-//            }
-//          Asm(buffer);
-          var++;
+          counts[var]--;
+          if (counts[var] == 0) {
+            var++;
+            ap = 0;
+            }
           }
         pos = 0;
         count = 1;

@@ -32,6 +32,7 @@ int addVariable(char* name,char* module) {
   variables[numVariables-1].dimensions = 0;
   variables[numVariables-1].value = 0;
   variables[numVariables-1].isArg = 0;
+  variables[numVariables-1].values = NULL;
   return numVariables-1;
   }
 

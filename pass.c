@@ -15,7 +15,9 @@ int pass(char* filename) {
   int   j;
   int   size;
   int   cnt;
+  int   count;
   char  tmp[16];
+  char  vt[3];
   source = fopen(filename,"r");
   if (source == NULL) {
     printf("Could not open %s\n",filename);
@@ -105,26 +107,51 @@ int pass(char* filename) {
 
   Asm("DATA__:  equ  $");
   for (i=0; i<numVariables; i++) {
+    size = 1;
+    switch (varType(i)) {
+      case 'I': size *= 4; strcpy(vt, "dw"); break;
+      case 'R': size *= 4; strcpy(vt, "dw"); break;
+      case 'S': size *= 2; strcpy(vt, "dw"); break;
+      case 'L': size *= 1; strcpy(vt, "db"); break;
+      case 'B': size *= 1; strcpy(vt, "db"); break;
+      default : size *= 4; strcpy(vt, "dw"); break;
+      }
     if (strlen(variables[i].common) == 0) {
       if (variables[i].dimensions > 0) {
-        size = variables[i].sizes[0];
-        if (variables[i].dimensions > 1)
+        size *= variables[i].sizes[0];
+        count = variables[i].sizes[0];
+        if (variables[i].dimensions > 1) {
           size *= variables[i].sizes[1];
-        if (variables[i].dimensions > 2)
-          size *= variables[i].sizes[2];
-        switch (varType(i)) {
-          case 'I': size *= 4; break;
-          case 'R': size *= 4; break;
-          case 'S': size *= 2; break;
-          case 'L': size *= 1; break;
-          case 'B': size *= 1; break;
-          default : size *= 4; break;
+          count *= variables[i].sizes[1];
           }
-        sprintf(buffer, "%s_%s:    ds    %d", 
-                variables[i].module,
-                variables[i].name,
-                size);
-        Asm(buffer);
+        if (variables[i].dimensions > 2) {
+          size *= variables[i].sizes[2];
+          count *= variables[i].sizes[2];
+          }
+        if (variables[i].values == NULL) {
+          sprintf(buffer, "%s_%s:    ds    %d", 
+                  variables[i].module,
+                  variables[i].name,
+                  size);
+          Asm(buffer);
+         }
+        else {
+          for (j=0; j<count; j++) {
+            if (j == 0) {
+              sprintf(buffer, "%s_%s:    dw    %d,%d", 
+                      variables[i].module,
+                      variables[i].name,
+                      variables[i].values[j] / 256,
+                      variables[i].values[j] % 256);
+              }
+            else {
+              sprintf(buffer, "          dw    %d,%d", 
+                      variables[i].values[j] / 256,
+                      variables[i].values[j] % 256);
+              }
+            Asm(buffer);
+            }
+          }
         }
       else if (variables[i].isArg) {
         sprintf(buffer, "%s_%s:    dw    0", 
