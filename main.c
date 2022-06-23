@@ -22,12 +22,12 @@ void writeAsm(char* line,char* rem) {
     while (strlen(line) < 40) strcat(line," ");
     sprintf(buffer,"%s; %s\n",line,rem);
     if (showAsm) printf("%s",buffer);
-    if (useAsm) write(asmFile, buffer, strlen(buffer));
+    write(asmFile, buffer, strlen(buffer));
     }
   else {
     sprintf(buffer,"%s\n",line);
     if (showAsm) printf("%s",buffer);
-    if (useAsm) write(asmFile, buffer, strlen(buffer));
+    write(asmFile, buffer, strlen(buffer));
     }
   }
 
@@ -281,7 +281,7 @@ int main(int argc, char** argv, char** envp) {
     printf("Could not open output file: %s\n",outName);
     exit(1);
     }
-  if (useAsm) asmFile = open(asmName,O_CREAT|O_TRUNC|O_WRONLY,0666);
+  asmFile = open(asmName,O_CREAT|O_TRUNC|O_WRONLY,0666);
   if (createLst) lstFile = fopen(lstName,"w");
   pass(sourceFile);
   if (outCount > 0) writeOutput();
@@ -289,7 +289,6 @@ int main(int argc, char** argv, char** envp) {
     write(outFile, image+lowestAddress, highestAddress-lowestAddress+1);
     }
   close(outFile);
-  if (useAsm) {
 //    for (i=0; i<numberOfVariables; i++) {
 //      if (useAsm) {
 //        sprintf(buffer,"%s: ",variableNames[i]);
@@ -298,8 +297,7 @@ int main(int argc, char** argv, char** envp) {
 //        writeAsm(buffer,"");
 //        }
 //      }
-    close(asmFile);
-    }
+  close(asmFile);
   if (numNests > 0) printf("#define without #endif\n");
   printf("\n\n");
   printf("Lines compiled: %d\n",lineCount);
