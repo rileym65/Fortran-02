@@ -10,6 +10,41 @@
 
 #include "header.h"
 
+void addDefine(char* define, int value, int redefine) {
+  int i;
+  if (passNumber == 2) return;
+  for (i=0; i<numDefines; i++)
+    if (strcasecmp(define, defines[i]) == 0) {
+      if (redefine) {
+        defineValues[i] = value;
+        return;
+        }
+      printf("<ASM>Duplicate define: %s\n",define);
+      exit(1);
+      }
+  numDefines++;
+  if (numDefines == 1) {
+    defines = (char**)malloc(sizeof(char*));
+    defineValues = (int*)malloc(sizeof(int));
+    }
+  else {
+    defines = (char**)realloc(defines, sizeof(char*) * numDefines);
+    defineValues = (int*)realloc(defineValues, sizeof(int) * numDefines);
+    }
+  defines[numDefines-1] = (char*)malloc(strlen(define) + 1);
+  strcpy(defines[numDefines-1], define);
+  defineValues[numDefines-1] = value;
+  }
+
+int getDefine(char* define) {
+  int i;
+  for (i=0; i<numDefines; i++)
+    if (strcasecmp(define, defines[i]) == 0) {
+      return defineValues[i];
+      }
+  return 0;
+  }
+
 void Asm(char* line) {
   if (passNumber == 2) {
     if (showAsm) printf("%s\n",line);
