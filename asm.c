@@ -10,6 +10,28 @@
 
 #include "header.h"
 
+void addLabel(char* label, word value) {
+  int i;
+  if (passNumber == 2) return;
+  for (i=0; i<numLabels; i++)
+    if (strcasecmp(label, labels[i]) == 0) {
+      printf("<ASM>Duplicate label: %s\n",label);
+      exit(1);
+      }
+  numLabels++;
+  if (numLabels == 1) {
+    labels = (char**)malloc(sizeof(char*));
+    labelValues = (word*)malloc(sizeof(word));
+    }
+  else {
+    labels = (char**)realloc(labels, sizeof(char*) * numLabels);
+    labelValues = (word*)realloc(labelValues, sizeof(word) * numLabels);
+    }
+  labels[numLabels-1] = (char*)malloc(strlen(label) + 1);
+  strcpy(labels[numLabels-1], label);
+  labelValues[numLabels-1] = value;
+  }
+
 void addDefine(char* define, int value, int redefine) {
   int i;
   if (passNumber == 2) return;
