@@ -316,7 +316,10 @@ LINK int    numLabels;
 LINK word   asmAddress;
 LINK char   nests[10];
 LINK int    numNests;
+LINK char** extrns;
+LINK int    numExtrns;
 
+extern void  addExtrn(char* e);
 extern char* arrayRef(char* line, int v);
 extern char* buildCall(char* subName, char* line);
 extern void cassign(char* line);
@@ -356,6 +359,7 @@ extern char* getArg(char*line, char dest, char* rem);
 extern word getCommon(char* name, char* module);
 extern int  getVariable(char* name, char* module);
 extern char* getVarName(char *line, char* token);
+extern void moduleStart();
 extern int  nextStatement();
 extern void startup();
 extern int  validVar(char *line);

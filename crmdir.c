@@ -51,6 +51,6 @@ void crmdir(char* line) {
   Asm("              plo   ra");
   Asm("              sep   scall              ; Remove directory");
   Asm("              dw    0327h");
-  addDefine("FOPEN",1,1);
+  addExtrn("fopen");
   }
 

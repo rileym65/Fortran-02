@@ -94,7 +94,7 @@ void cendfile(char* line) {
     }
   Asm("              sep   scall              ; Close the file");
   Asm("              dw    fclose");
-  addDefine("FCLOSE",1,1);
+  addExtrn("fclose");
 
   }
 

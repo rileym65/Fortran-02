@@ -48,7 +48,7 @@ int csfunction(char* line) {
   sprintf(buffer,"%s:",subname); Asm(buffer);
   Asm("              sep   scall              ; Bind parameters");
   Asm("              dw    fenter");
-  addDefine("FENTER",1,1);
+  addExtrn("fenter");
   while (*line != 0 && *line != ')') {
     if ((*line >= 'a' && *line <= 'z') ||
         (*line >= 'A' && *line <= 'Z')) {
@@ -133,6 +133,6 @@ int csfunction(char* line) {
       }
     }
   Asm("              dw    0");
-  addDefine("FENTER",1,1);
+  addExtrn("fenter");
   }
 */

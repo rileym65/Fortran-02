@@ -51,6 +51,6 @@ void cchdir(char* line) {
   Asm("              plo   ra");
   Asm("              sep   scall              ; Change directory");
   Asm("              dw    0324h");
-  addDefine("FOPEN",1,1);
+  addExtrn("fopen");
   }
 

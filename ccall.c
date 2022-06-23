@@ -148,6 +148,7 @@ void ccall(char* line) {
            (*line >= '0' && *line <= '9') ||
             *line == '_') subName[pos++] = *line++;
     subName[pos] = 0;
+    addExtrn(subName);
     if (pos == 0) {
       showError("NULL name not allowed");
       return;

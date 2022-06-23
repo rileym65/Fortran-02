@@ -139,6 +139,7 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
     Asm("           sep     scall                     ; push constant to expr stack");
     Asm("           dw      epush");
     Asm("           db      0,0,0,0");
+    addExtrn("epush");
     ops[ostack++] = OP_SUB;
     pos++;
     }
@@ -296,6 +297,7 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
           pos--;
             Asm("           sep     scall                     ; push constant to expr stack");
             Asm("           dw      epush");
+            addExtrn("epush");
             sprintf(abuffer,"           db      %d,%d,%d,%d",
               (number >> 24) & 0xff,
               (number >> 16) & 0xff,
@@ -377,13 +379,14 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
                 Asm("           sep     scall                     ; push variable to expr stack");
                 if ((varType(v) == 'I' || varType(v) == 'R') && isArray == 0) {
                   Asm("           dw      vpush32p");
+                  addExtrn("vpush32p");
                   }
                 if (varType(v) == 'S') {
                   Asm("           dw      vpush16p");
-                  addDefine("VPUSH16P",1,1);
+                  addExtrn("vpush16p");
                   }
                 if ((varType(v) == 'B' || varType(v) == 'L') && isArray == 0) {
-                  addDefine("VPUSH8P",1,1);
+                  addExtrn("vpush8p");
                   Asm("           dw      vpush8p");
                   }
                 sprintf(abuffer,"           dw      %s_%s",module,token);
@@ -545,12 +548,12 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
             Asm("           dec     r7");
             Asm("           dec     r7");
             numbers[nstack-1] = 'R';
-            addDefine("USEFP",1,1);
+            addExtrn("itof");
             }
           if (numbers[nstack] == 'I') {
             Asm("           sep     scall");
             Asm("           dw      itof");
-            addDefine("USEFP",1,1);
+            addExtrn("itof");
             numbers[nstack] = 'R';
             }
           }
@@ -567,12 +570,12 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
             Asm("           dec     r7");
             Asm("           dec     r7");
             numbers[nstack-1] = 'I';
-            addDefine("USEFP",1,1);
+            addExtrn("ftoi");
             }
           if (numbers[nstack] == 'R') {
             Asm("           sep     scall");
             Asm("           dw      ftoi");
-            addDefine("USEFP",1,1);
+            addExtrn("ftoi");
             numbers[nstack] = 'I';
             }
           }
@@ -581,139 +584,139 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
                Asm("           sep     scall               ; Perform multiplication");
                if (numbers[nstack-1] == 'I' && numbers[nstack] == 'I') {
                  Asm("           dw      mul32");
-                 addDefine("MUL32",1,1);
+                 addExtrn("mul32");
                  }
                else {
                  Asm("           dw      mulfp");
-                 addDefine("MULFP",1,1);
+                 addExtrn("mulfp");
                  }
                break;
           case OP_DIV :
                Asm("           sep     scall               ; Perform division");
                if (numbers[nstack-1] == 'I' && numbers[nstack] == 'I') {
                  Asm("           dw      div32");
-                 addDefine("DIV32",1,1);
+                 addExtrn("div32");
                  }
                else {
                  Asm("           dw      divfp");
-                 addDefine("DIVFP",1,1);
+                 addExtrn("divfp");
                  }
                break;
           case OP_MOD :
                Asm("           sep     scall               ; Perform modulo");
                if (numbers[nstack-1] == 'I' && numbers[nstack] == 'I') {
                  Asm("           dw      mod32");
-                 addDefine("MOD32",1,1);
+                 addExtrn("mod32");
                  }
                break;
           case OP_ADD :
                Asm("           sep     scall               ; Perform addition");
                if (numbers[nstack-1] == 'I' && numbers[nstack] == 'I') {
                  Asm("           dw      add32");
-                 addDefine("ADD32",1,1);
+                 addExtrn("add32");
                  }
                else {
                  Asm("           dw      addfp");
-                 addDefine("ADDFP",1,1);
+                 addExtrn("addfp");
                  }
                break;
           case OP_SUB :
                Asm("           sep     scall               ; Perform subtraction");
                if (numbers[nstack-1] == 'I' && numbers[nstack] == 'I') {
                  Asm("           dw      sub32");
-                 addDefine("SUB32",1,1);
+                 addExtrn("sub32");
                  }
                else {
                  Asm("           dw      subfp");
-                 addDefine("SUBFP",1,1);
+                 addExtrn("subfp");
                  }
                break;
           case OP_AND :
                Asm("           sep     scall               ; Perform bitwise and");
                Asm("           dw      and32");
-               addDefine("AND32",1,1);
+               addExtrn("and32");
                break;
           case OP_OR  :
                Asm("           sep     scall               ; Perform bitwise or");
                Asm("           dw      or32");
-               addDefine("OR32",1,1);
+               addExtrn("or32");
                break;
           case OP_XOR :
                Asm("           sep     scall               ; Perform bitwise xor");
                Asm("           dw      xor32");
-               addDefine("XOR32",1,1);
+               addExtrn("xor32");
                break;
           case OP_EQ  :
                Asm("           sep     scall               ; Perform equals");
                if (numbers[nstack-1] == 'I' && numbers[nstack] == 'I') {
                  Asm("           dw      eq32");
-                 addDefine("EQ32",1,1);
+                 addExtrn("eq32");
                  }
                else {
                  Asm("           dw      eqfp");
-                 addDefine("EQFP",1,1);
+                 addExtrn("eqfp");
                  }
                break;
           case OP_NE  :
                Asm("           sep     scall               ; Perform not equals");
                if (numbers[nstack-1] == 'I' && numbers[nstack] == 'I') {
                  Asm("           dw      ne32");
-                 addDefine("NE32",1,1);
+                 addExtrn("ne32");
                  }
                else {
                  Asm("           dw      nefp");
-                 addDefine("NEFP",1,1);
+                 addExtrn("nefp");
                  }
                break;
           case OP_LT  :
                Asm("           sep     scall               ; Perform less than");
                if (numbers[nstack-1] == 'I' && numbers[nstack] == 'I') {
                  Asm("           dw      lt32");
-                 addDefine("LT32",1,1);
+                 addExtrn("lt32");
                  }
                else {
                  Asm("           dw      ltfp");
-                 addDefine("LTFP",1,1);
+                 addExtrn("ltfp");
                  }
                break;
           case OP_GT  :
                Asm("           sep     scall               ; Perform greater than");
                if (numbers[nstack-1] == 'I' && numbers[nstack] == 'I') {
                  Asm("           dw      gt32");
-                 addDefine("GT32",1,1);
+                 addExtrn("gt32");
                  }
                else {
                  Asm("           dw      gtfp");
-                 addDefine("GTFP",1,1);
+                 addExtrn("gtfp");
                  }
                break;
           case OP_LTE :
                Asm("           sep     scall               ; Perform less or equal");
                if (numbers[nstack-1] == 'I' && numbers[nstack] == 'I') {
                  Asm("           dw      lte32");
-                 addDefine("LTE32",1,1);
+                 addExtrn("lte32");
                  }
                else {
                  Asm("           dw      ltefp");
-                 addDefine("LTEFP",1,1);
+                 addExtrn("ltefp");
                  }
                break;
           case OP_GTE :
                Asm("           sep     scall               ; Perform greater or equal");
                if (numbers[nstack-1] == 'I' && numbers[nstack] == 'I') {
                  Asm("           dw      gte32");
-                 addDefine("GTE32",1,1);
+                 addExtrn("gte32");
                  }
                else {
                  Asm("           dw      gtefp");
-                 addDefine("GTEFP",1,1);
+                 addExtrn("gtefp");
                  }
                break;
           case OP_POW :
                if (numbers[nstack] == 'I') {
                  Asm("           sep     scall               ; Convert to floating point");
                  Asm("           dw      itof");
-                 addDefine("USEFP",1,1);
+                 addExtrn("itof");
                  numbers[nstack] = 'R';
                  }
                if (numbers[nstack-1] == 'I') {
@@ -728,138 +731,138 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
                  Asm("           dec     r7");
                  Asm("           dec     r7");
                  numbers[nstack-1] = 'R';
-                 addDefine("USEFP",1,1);
+                 addExtrn("itof");
                  }
                Asm("           sep     scall               ; Perform power");
                Asm("           dw      fppow");
-               addDefine("POWFP",1,1);
+               addExtrn("fppow");
                break;
           case OP_ABS :
                Asm("           sep     scall               ; Perform greater or equal");
                if (numbers[nstack] == 'I') {
                  Asm("           dw      abs32");
-                 addDefine("ABS32",1,1);
+                 addExtrn("abs32");
                  }
                else {
                  Asm("           dw      absfp");
-                 addDefine("ABSFP",1,1);
+                 addExtrn("absfp");
                  }
                break;
           case OP_COS :
                if (numbers[nstack] == 'I') {
                  Asm("           sep     scall               ; Convert to floating point");
                  Asm("           dw      itof");
-                 addDefine("USEFP",1,1);
+                 addExtrn("itof");
                  numbers[nstack] = 'R';
                  }
                Asm("           sep     scall               ; Perform cos");
                Asm("           dw      fpcos");
-               addDefine("COSFP",1,1);
+               addExtrn("fpcos");
                break;
           case OP_SIN :
                if (numbers[nstack] == 'I') {
                  Asm("           sep     scall               ; Convert to floating point");
                  Asm("           dw      itof");
-                 addDefine("USEFP",1,1);
+                 addExtrn("itof");
                  numbers[nstack] = 'R';
                  }
                Asm("           sep     scall               ; Perform sin");
                Asm("           dw      fpsin");
-               addDefine("SINFP",1,1);
+               addExtrn("fpsin");
                break;
           case OP_TAN :
                if (numbers[nstack] == 'I') {
                  Asm("           sep     scall               ; Convert to floating point");
                  Asm("           dw      itof");
-                 addDefine("USEFP",1,1);
+                 addExtrn("itof");
                  numbers[nstack] = 'R';
                  }
                Asm("           sep     scall               ; Perform tan");
                Asm("           dw      fptan");
-               addDefine("TANFP",1,1);
+               addExtrn("fptan");
                break;
           case OP_ACOS :
                if (numbers[nstack] == 'I') {
                  Asm("           sep     scall               ; Convert to floating point");
                  Asm("           dw      itof");
-                 addDefine("USEFP",1,1);
+                 addExtrn("itof");
                  numbers[nstack] = 'R';
                  }
                Asm("           sep     scall               ; Perform acos");
                Asm("           dw      fpacos");
-               addDefine("ACOSFP",1,1);
+               addExtrn("fpacos");
                break;
           case OP_ASIN :
                if (numbers[nstack] == 'I') {
                  Asm("           sep     scall               ; Convert to floating point");
                  Asm("           dw      itof");
-                 addDefine("USEFP",1,1);
+                 addExtrn("itof");
                  numbers[nstack] = 'R';
                  }
                Asm("           sep     scall               ; Perform asin");
                Asm("           dw      fpasin");
-               addDefine("ASINFP",1,1);
+               addExtrn("fpasin");
                break;
           case OP_ATAN :
                if (numbers[nstack] == 'I') {
                  Asm("           sep     scall               ; Convert to floating point");
                  Asm("           dw      itof");
-                 addDefine("USEFP",1,1);
+                 addExtrn("itof");
                  numbers[nstack] = 'R';
                  }
                Asm("           sep     scall               ; Perform atan");
                Asm("           dw      fpatan");
-               addDefine("ATANFP",1,1);
+               addExtrn("fpatan");
                break;
           case OP_SQRT :
                if (numbers[nstack] == 'I') {
                  Asm("           sep     scall               ; Convert to floating point");
                  Asm("           dw      itof");
-                 addDefine("USEFP",1,1);
+                 addExtrn("itof");
                  numbers[nstack] = 'R';
                  }
                Asm("           sep     scall               ; Perform square root");
                Asm("           dw      fpsqrt");
-               addDefine("SQRTFP",1,1);
+               addExtrn("fpsqrt");
                break;
           case OP_SGN :
                Asm("           sep     scall               ; Perform sgn");
                if (numbers[nstack] == 'I') {
                  Asm("           dw      sgn32");
-                 addDefine("SGN32",1,1);
+                 addExtrn("sgn32");
                  }
                else {
                  Asm("           dw      sgnfp");
-                 addDefine("SGNFP",1,1);
+                 addExtrn("sgn32");
                  }
                break;
           case OP_RND :
                if (numbers[nstack] == 'R') {
                  Asm("           sep     scall               ; Convert to floating point");
                  Asm("           dw      ftoi");
-                 addDefine("USEFP",1,1);
+                 addExtrn("ftoi");
                  numbers[nstack] = 'I';
                  }
                Asm("           sep     scall               ; Perform random");
                Asm("           dw      rnd32");
-               addDefine("RND32",1,1);
+               addExtrn("rnd32");
                break;
           case OP_POS :
                if (numbers[nstack] == 'R') {
                  Asm("           sep     scall               ; Convert to floating point");
                  Asm("           dw      ftoi");
-                 addDefine("USEFP",1,1);
+                 addExtrn("ftoi");
                  numbers[nstack] = 'I';
                  }
                Asm("           sep     scall               ; get file position");
                Asm("           dw      fpos");
-               addDefine("FPOS",1,1);
+               addExtrn("fpos");
                break;
           case OP_PEEK :
                if (numbers[nstack] == 'R') {
                  Asm("           sep     scall               ; Convert to floating point");
                  Asm("           dw      ftoi");
-                 addDefine("USEFP",1,1);
+                 addExtrn("ftoi");
                  numbers[nstack] = 'I';
                  }
                Asm("           inc     r7                  ; Retrieve address for peek");
@@ -897,13 +900,13 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
                Asm("           dw      sampleef");
                Asm("           str     r7");
                Asm("           dec     r7");
-               addDefine("USEEF",1,1);
+               addExtrn("sampleef");
                break;
           case OP_INT :
                if (numbers[nstack] == 'R') {
                  Asm("           sep     scall               ; Convert to integer");
                  Asm("           dw      ftoi");
-                 addDefine("USEFP",1,1);
+                 addExtrn("ftoi");
                  numbers[nstack] = 'I';
                  }
                break;
@@ -911,7 +914,7 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
                if (numbers[nstack] == 'I') {
                  Asm("           sep     scall               ; Convert to floating point");
                  Asm("           dw      itof");
-                 addDefine("USEFP",1,1);
+                 addExtrn("itof");
                  numbers[nstack] = 'F';
                  }
                break;
@@ -919,29 +922,29 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
                if (numbers[nstack] == 'I') {
                  Asm("           sep     scall               ; Convert to floating point");
                  Asm("           dw      itof");
-                 addDefine("USEFP",1,1);
+                 addExtrn("itof");
                  numbers[nstack] = 'R';
                  }
                Asm("           sep     scall               ; Perform ln");
                Asm("           dw      fpln");
-               addDefine("LNFP",1,1);
+               addExtrn("fpln");
                break;
           case OP_EXP :
                if (numbers[nstack] == 'I') {
                  Asm("           sep     scall               ; Convert to floating point");
                  Asm("           dw      itof");
-                 addDefine("USEFP",1,1);
+                 addExtrn("itof");
                  numbers[nstack] = 'R';
                  }
                Asm("           sep     scall               ; Perform exp");
                Asm("           dw      fpexp");
-               addDefine("EXPFP",1,1);
+               addExtrn("fpexp");
                break;
           case OP_INP :
                if (numbers[nstack] == 'R') {
                  Asm("           sep     scall               ; Convert to floating point");
                  Asm("           dw      ftoi");
-                 addDefine("USEFP",1,1);
+                 addExtrn("ftoi");
                  numbers[nstack] = 'I';
                  }
                Asm("           ldi     0d3h                ; Push SEP R3 onto stack");
@@ -974,23 +977,23 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
                if (numbers[nstack] == 'R') {
                  Asm("           sep     scall               ; Convert to floating point");
                  Asm("           dw      ftoi");
-                 addDefine("USEFP",1,1);
+                 addExtrn("ftoi");
                  numbers[nstack] = 'I';
                  }
                Asm("           sep     scall               ; Perform ioflag()");
                Asm("           dw      ioflag");
-               addDefine("IOFLAG",1,1);
+               addExtrn("ioflag");
                break;
           case OP_IOSTATUS :
                if (numbers[nstack] == 'R') {
                  Asm("           sep     scall               ; Convert to floating point");
                  Asm("           dw      ftoi");
-                 addDefine("USEFP",1,1);
+                 addExtrn("ftoi");
                  numbers[nstack] = 'I';
                  }
                Asm("           sep     scall               ; Perform iostatus()");
                Asm("           dw      iostatus");
-               addDefine("IOSTATUS",1,1);
+               addExtrn("iostatus");
                break;
           }
         if (ops[ostack] >= 0x90) nstack++;
@@ -1043,11 +1046,12 @@ char* cexpr(char* line, int etype, char* prefix) {
   if (etype == 0 && rtype == 'R') {
     Asm("           sep     scall");
     Asm("           dw      ftoi");
+    addExtrn("ftoi");
     }
   if (etype == 1 && rtype == 'I') {
     Asm("           sep     scall");
     Asm("           dw      itof");
-    addDefine("USEFP",1,1);
+    addExtrn("itof");
     }
   return line;
   }

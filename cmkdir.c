@@ -49,6 +49,6 @@ void cmkdir(char* line) {
   Asm("              plo   rf");
   Asm("              sep   scall              ; Make directory");
   Asm("              dw    0321h");
-  addDefine("FOPEN",1,1);
+  addExtrn("fopen");
   }
 

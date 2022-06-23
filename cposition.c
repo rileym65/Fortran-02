@@ -53,6 +53,6 @@ void cposition(char* line) {
   Asm("           ldx");
   Asm("           sep     scall               ; Perform seek");
   Asm("           dw      fseek");
-  addDefine("FSEEK",1,1);
+  addExtrn("fseek");
   }
 

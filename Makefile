@@ -1,4 +1,4 @@
-PROJECT = fortran
+PROJECT = fortran02
 CC = gcc
 DEFS = -Wall
 INCS =
@@ -57,6 +57,7 @@ OBJS = \
 	library.o \
 	main.o \
 	match.o \
+	modulestart.o \
 	nextstatement.o \
 	optionfile.o \
 	pass.o \
@@ -80,6 +81,10 @@ library.h: library.asm
 clean:
 	-rm *.o
 	-rm $(PROJECT)
+
+install:
+	cp fortran02 /usr/local/bin
+	chmod a+x /usr/local/bin/fortran02
 
 addvariable.o:   header.h addvariable.c
 arrayref.o:      header.h arrayref.c
@@ -132,6 +137,7 @@ getvarname.o:    header.h getvarname.c
 library.o:       header.h library.h library.c
 main.o:          header.h main.c
 match.o:         header.h match.c
+modulestart.o:   header.h modulestart.c
 nextstatement.o: header.h nextstatement.c
 optionfile.o:    header.h optionfile.c
 pass.o:          header.h pass.c

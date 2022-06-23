@@ -221,15 +221,15 @@ void cread(char* line) {
   Asm("           sep     scall               ; Process write list");
   if (fline > 0) {
     Asm("           dw      fmtread");
-    addDefine("FMTREAD",1,1);
+    addExtrn("fmtread");
     }
   else if (fline == -999) {
     Asm("           dw      ffread");
-    addDefine("FFREAD",1,1);
+    addExtrn("ffread");
     }
   else {
     Asm("           dw      uread");
-    addDefine("UREAD",1,1);
+    addExtrn("uread");
     }
   if (err > 0) {
     sprintf(buffer,"           lbdf    %s_%d                 ; Jump on error",module, err);

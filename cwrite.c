@@ -181,15 +181,15 @@ void cwrite(char* line) {
   Asm("           sep     scall               ; Process write list");
   if (fline > 0) {
     Asm("           dw      fmtwrite");
-    addDefine("FMTWRITE",1,1);
+    addExtrn("fmtwrite");
     }
   else if (fline == -999) {
     Asm("           dw      ffwrite");
-    addDefine("FFWRITE",1,1);
+    addExtrn("ffwrite");
     }
   else {
     Asm("           dw      uwrite");
-    addDefine("UWRITE",1,1);
+    addExtrn("uwrite");
     }
   sprintf(buffer,"           lbr     lbl_%d",eolLabel);
   Asm(buffer);

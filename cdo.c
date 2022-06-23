@@ -305,18 +305,18 @@ void cdo(char* line) {
       }
     Asm("              sep   scall              ; subtract");
     Asm("              dw    sub32");
-    addDefine("SUB32",1,1);
+    addExtrn("sub32");
     argret = getArg(step, 'e', "Push step to expr stack");
     if (argret == NULL) return;
     Asm("              sep   scall              ; subtract");
     Asm("              dw    div32");
-    addDefine("DIV32",1,1);
+    addExtrn("div32");
     Asm("              sep   scall              ; Add 1");
     Asm("              dw    epush");
     Asm("              db    0,0,0,1");
     Asm("              sep   scall              ; and add");
     Asm("              dw    add32");
-    addDefine("ADD32",1,1);
+    addExtrn("add32");
     Asm("              inc   r7                 ; retrieve loops");
     Asm("              lda   r7");
     Asm("              plo   rb");

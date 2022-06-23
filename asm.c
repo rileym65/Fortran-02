@@ -32,6 +32,17 @@ void addLabel(char* label, word value) {
   labelValues[numLabels-1] = value;
   }
 
+word getLabel(char* label) {
+  int i;
+  if (passNumber == 1) return 0;
+  for (i=0; i<numLabels; i++)
+    if (strcasecmp(label, labels[i]) == 0) {
+      return labelValues[i];
+      }
+  printf("<ASM>Label not found: %s\n",label);
+  exit(1);
+  }
+
 void addDefine(char* define, int value, int redefine) {
   int i;
   if (passNumber == 2) return;
@@ -65,6 +76,23 @@ int getDefine(char* define) {
       return defineValues[i];
       }
   return 0;
+  }
+
+void addExtrn(char* e) {
+  int i;
+  char name[256];
+  strcpy(name, module);
+  strcat(name,"|");
+  strcat(name,e);
+  for (i=0; i<numExtrns; i++)
+    if (strcasecmp(extrns[i], name) == 0) return;
+  numExtrns++;
+  if (numExtrns == 1)
+    extrns = (char**)malloc(sizeof(char*));
+  else
+    extrns = (char**)realloc(extrns, sizeof(char*) * numExtrns);
+  extrns[numExtrns-1] = (char*)malloc(strlen(name) + 1);
+  strcpy(extrns[numExtrns-1], name);
   }
 
 void Asm(char* line) {

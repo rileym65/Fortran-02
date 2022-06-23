@@ -49,8 +49,8 @@ char* arrayRef(char* line, int v) {
       Asm("           dw      mul32");
       Asm("           sep     scall                     ; then add first dimension");
       Asm("           dw      add32");
-      addDefine("MUL32",1,1);
-      addDefine("ADD32",1,1);
+      addExtrn("mul32");
+      addExtrn("add32");
       }
     if (*line == ',') {
       dims++;
@@ -93,6 +93,6 @@ char* arrayRef(char* line, int v) {
     Asm("           shlc");
     Asm("           phi     rf");
     }
-  addDefine("DEC32",1,1);
+  addExtrn("dec32");
   return line;
   }

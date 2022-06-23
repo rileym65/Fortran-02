@@ -10,11 +10,19 @@
 
 #include "header.h"
 
-void checkMain() {
-  if (inUnit) return;
-  inUnit = -1;
-  Asm("START___:");
-  numExternals = 0;
-  moduleStart();
+void moduleStart() {
+  char m[256];
+  char buffer[256];
+  int i;
+  char *pchar;
+  strcpy(m, module);
+  strcat(m, "|");
+  for (i=0; i<numExtrns; i++) {
+    if (strncmp(m, extrns[i], strlen(m)) == 0) {
+      pchar = strchr(extrns[i], '|') + 1;
+      sprintf(buffer,"           extrn   %s",pchar);
+      Asm(buffer);
+      }
+    }
   }
 

@@ -49,6 +49,6 @@ void cdelete(char* line) {
   Asm("              plo   rf");
   Asm("              sep   scall              ; Delete file");
   Asm("              dw    0318h");
-  addDefine("FOPEN",1,1);
+  addExtrn("fopen");
   }
 

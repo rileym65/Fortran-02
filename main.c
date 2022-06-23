@@ -284,7 +284,7 @@ int main(int argc, char** argv, char** envp) {
   asmFile = open(asmName,O_CREAT|O_TRUNC|O_WRONLY,0666);
   if (createLst) lstFile = fopen(lstName,"w");
   pass(sourceFile);
-  if (outCount > 0) writeOutput();
+//  if (outCount > 0) writeOutput();
   if (outMode == 'B') {
     write(outFile, image+lowestAddress, highestAddress-lowestAddress+1);
     }

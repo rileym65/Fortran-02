@@ -20,18 +20,18 @@ void library() {
   ctmp = showCompiler;
   showCompiler = 0;
 
-  file = fopen("library.asm","r");
-  if (file == NULL) {
-    i = 0;
-    while (strstr(librarysrc[i],"__END__") == NULL) {
-      Asm(librarysrc[i]);
-      i++;
-      }
-    }
-  else {
-    fclose(file);
-    Asm("#include library.asm");
-    }
+//  file = fopen("library.asm","r");
+//  if (file == NULL) {
+//    i = 0;
+//    while (strstr(librarysrc[i],"__END__") == NULL) {
+//      Asm(librarysrc[i]);
+//      i++;
+//      }
+//    }
+//  else {
+//    fclose(file);
+//    Asm("#include library.asm");
+//    }
 
   showCompiler = ctmp;
   }

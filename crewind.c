@@ -94,7 +94,6 @@ void crewind(char* line) {
     }
   Asm("              sep   scall              ; Rewind the file");
   Asm("              dw    frewind");
-  addDefine("FREWIND",1,1);
-
+  addExtrn("frewind");
   }
 

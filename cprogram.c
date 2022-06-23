@@ -33,6 +33,7 @@ void cprogram(char* line) {
     }
   token[pos] = 0;
   strcpy(module, token);
+  moduleStart();
   Asm("START___:");
   numExternals = 0;
   }

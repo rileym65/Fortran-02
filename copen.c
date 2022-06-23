@@ -74,6 +74,6 @@ void copen(char* line, byte flags) {
   Asm("              ldx");
   Asm("              sep   scall              ; Open the file");
   Asm("              dw    fopen");
-  addDefine("FOPEN",1,1);
+  addExtrn("fopen");
   }
 

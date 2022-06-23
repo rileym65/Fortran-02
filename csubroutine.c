@@ -38,6 +38,11 @@ void csubroutine(char* line, char t, byte rt) {
   token[pos] = 0;
   strcpy(module, token);
 
+  sprintf(buffer,"           proc    %s",module);
+  Asm(buffer);
+
+  moduleStart();
+
   if (t == 'F') {
     if (passNumber == 1) {
       functionVar = addVariable(token,module);
@@ -50,12 +55,11 @@ void csubroutine(char* line, char t, byte rt) {
       }
     }
 
-  sprintf(buffer,"%s:", token); Asm(buffer);
-  Asm("              sep   scall              ; Bind parameters");
-  Asm("              dw    fenter");
-  addDefine("FENTER",1,1);
+  Asm("           sep     scall              ; Bind parameters");
+  Asm("           dw      fenter");
+  addExtrn("fenter");
   if (*line == 0) {
-    Asm("              dw    0");
+    Asm("           dw    0");
     return;
     }
   line++;
@@ -89,6 +93,6 @@ void csubroutine(char* line, char t, byte rt) {
       }
     }
   Asm("              dw    0");
-  addDefine("FENTER",1,1);
+  addExtrn("fenter");
   }
 
