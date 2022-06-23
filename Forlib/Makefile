@@ -26,6 +26,7 @@ OBJS=\
 	div32i.prg \
 	divfp.prg \
 	divfpi.prg \
+	epush.prg \
         eq16.prg \
         eq32.prg \
         eqfp.prg \
@@ -141,6 +142,9 @@ OBJS=\
 	true32.prg \
 	uwrite.prg \
 	uread.prg \
+	vpush8p.prg \
+	vpush16p.prg \
+	vpush32p.prg \
 	writerec.prg \
 	xor16.prg \
 	xor32.prg \
@@ -295,6 +299,10 @@ $(PROJECT): $(OBJS)
 	cat isnumeral.prg >> $(PROJECT)
 	cat ioresults16.prg >> $(PROJECT)
 	cat ioresults32.prg >> $(PROJECT)
+	cat vpush8p.prg >> $(PROJECT)
+	cat vpush16p.prg >> $(PROJECT)
+	cat vpush32p.prg >> $(PROJECT)
+	cat epush.prg >> $(PROJECT)
 
 .asm.prg:
 	asm02 -l -L $<
