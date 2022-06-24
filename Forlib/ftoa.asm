@@ -14,7 +14,7 @@
 ; *************************************************
             proc     ftoa
 
-.link .require fpdata
+.link .requires fpdata
 
             extrn    divfpi
             extrn    fp_10

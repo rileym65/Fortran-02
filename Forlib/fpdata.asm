@@ -13,5 +13,18 @@ fp_3:       db      00,00,040h,040h
 fpdot5:     db      000h, 000h, 000h, 03fh
 fp_halfpi:  db      0dbh, 00fh, 0c9h, 03fh
 
+            public  fpdot1
+            public  fp_0
+            public  fp_1
+            public  fp_2
+            public  fp_3
+            public  fp_10
+            public  fp_100
+            public  fp_1000
+            public  fp_e
+            public  fp_pi
+            public  fpdot5
+            public  fp_halfpi
+
             endp
 

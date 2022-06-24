@@ -12,7 +12,7 @@
 ; ********************************************
             proc    subfpi
 
-.link .require addfpi
+.link .requires addfpi
 
             extrn   fpargs
             extrn   fpsub_1

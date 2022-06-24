@@ -64,6 +64,7 @@ OBJS=\
 	fpsqrt.prg \
 	fptan.prg \
 	fread.prg \
+	free.prg \
 	frewind.prg \
 	fromsci.prg \
 	fseek.prg \
@@ -77,6 +78,7 @@ OBJS=\
         gte32.prg \
         gtefp.prg \
         gtfp.prg \
+	heap.prg \
 	hfree.prg \
 	icomp32.prg \
 	ioflag.prg \
@@ -88,6 +90,7 @@ OBJS=\
 	itoa32.prg \
 	itof.prg \
 	left.prg \
+	lfsr.prg \
 	lfsrshift.prg \
 	lt16.prg \
 	lt32.prg \
@@ -119,6 +122,7 @@ OBJS=\
 	rnd16.prg \
 	rnd32.prg \
 	round45.prg \
+	scratch.prg \
 	sgn16.prg \
 	sgn32.prg \
 	sgnfp.prg \
@@ -303,6 +307,10 @@ $(PROJECT): $(OBJS)
 	cat vpush16p.prg >> $(PROJECT)
 	cat vpush32p.prg >> $(PROJECT)
 	cat epush.prg >> $(PROJECT)
+	cat scratch.prg >> $(PROJECT)
+	cat lfsr.prg >> $(PROJECT)
+	cat heap.prg >> $(PROJECT)
+	cat free.prg >> $(PROJECT)
 
 .asm.prg:
 	asm02 -l -L $<

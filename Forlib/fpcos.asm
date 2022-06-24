@@ -17,8 +17,8 @@
 ; ******************************************************
             proc     fpcos
 
-.link .require fpsin
-.link .require fpdata
+.link .requires fpsin
+.link .requires fpdata
 
             extrn    addtows
             extrn    fact
