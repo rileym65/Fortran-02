@@ -389,7 +389,7 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
                   addExtrn("vpush8p");
                   Asm("           dw      vpush8p");
                   }
-                sprintf(abuffer,"           dw      %s_%s",module,token);
+                sprintf(abuffer,"           dw      %s",token);
                 Asm(abuffer);
                 numbers[nstack++] = (varType(v) == 'R') ? 'R' : 'I';
                 }
@@ -401,7 +401,7 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
                   sprintf(abuffer,"           dw      c_%s+%d",variables[v].common,variables[v].offset);
                   }
                 else {
-                  sprintf(abuffer,"           dw      %s_%s",module,token);
+                  sprintf(abuffer,"           dw      %s",token);
                   }
                 Asm(abuffer);
                 if (varType(v) == 'I') numbers[nstack++] = 'I';
@@ -418,10 +418,10 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
                   Asm(abuffer);
                   }
                 else {
-                  sprintf(abuffer,"           ldi     %s_%s.1             ; Point to variable",module,token);
+                  sprintf(abuffer,"           ldi     %s.1             ; Point to variable",token);
                   Asm(abuffer);
                   Asm("           phi     rf");
-                  sprintf(abuffer,"           ldi     %s_%s.0             ; Point to variable",module,token);
+                  sprintf(abuffer,"           ldi     %s.0             ; Point to variable",token);
                   Asm(abuffer);
                   }
                 Asm("           plo     rf");

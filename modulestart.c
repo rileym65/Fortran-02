@@ -15,6 +15,7 @@ void moduleStart() {
   char buffer[256];
   int i;
   char *pchar;
+  if (inSub == 0) startup();
   strcpy(m, module);
   strcat(m, "|");
   for (i=0; i<numExtrns; i++) {

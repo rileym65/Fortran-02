@@ -33,7 +33,6 @@ int pass(char* filename) {
   highestAddress = 0;
   lowestAddress = 0xffff;
   Asm("BEGIN__:  equ  $");
-  startup();
   Asm("PROGRAM__:  equ  $");
   inUnit = 0;
   inSub = 0;
@@ -106,121 +105,6 @@ int pass(char* filename) {
     }
 
   Asm("DATA__:  equ  $");
-  for (i=0; i<numVariables; i++) {
-    size = 1;
-    switch (varType(i)) {
-      case 'I': size *= 4; strcpy(vt, "dw"); break;
-      case 'R': size *= 4; strcpy(vt, "dw"); break;
-      case 'S': size *= 2; strcpy(vt, "dw"); break;
-      case 'L': size *= 1; strcpy(vt, "db"); break;
-      case 'B': size *= 1; strcpy(vt, "db"); break;
-      default : size *= 4; strcpy(vt, "dw"); break;
-      }
-    if (strlen(variables[i].common) == 0) {
-      if (variables[i].dimensions > 0) {
-        size *= variables[i].sizes[0];
-        count = variables[i].sizes[0];
-        if (variables[i].dimensions > 1) {
-          size *= variables[i].sizes[1];
-          count *= variables[i].sizes[1];
-          }
-        if (variables[i].dimensions > 2) {
-          size *= variables[i].sizes[2];
-          count *= variables[i].sizes[2];
-          }
-        if (variables[i].values == NULL) {
-          sprintf(buffer, "%s_%s:    ds    %d", 
-                  variables[i].module,
-                  variables[i].name,
-                  size);
-          Asm(buffer);
-         }
-        else {
-          for (j=0; j<count; j++) {
-            if (j == 0) {
-              sprintf(buffer, "%s_%s:    dw    %d,%d", 
-                      variables[i].module,
-                      variables[i].name,
-                      variables[i].values[j] / 256,
-                      variables[i].values[j] % 256);
-              }
-            else {
-              sprintf(buffer, "          dw    %d,%d", 
-                      variables[i].values[j] / 256,
-                      variables[i].values[j] % 256);
-              }
-            Asm(buffer);
-            }
-          }
-        }
-      else if (variables[i].isArg) {
-        sprintf(buffer, "%s_%s:    dw    0", 
-                       variables[i].module,
-                       variables[i].name);
-        Asm(buffer);
-        }
-      else {
-        switch (variables[i].type) {
-          case V_BYTE:
-               sprintf(buffer, "%s_%s:    db    %d", 
-                       variables[i].module,
-                       variables[i].name,
-                       variables[i].value);
-               Asm(buffer);
-               break;
-          case V_LOGICAL:
-               sprintf(buffer, "%s_%s:    db    %d", 
-                       variables[i].module,
-                       variables[i].name,
-                       variables[i].value);
-               Asm(buffer);
-               break;
-          case V_SHORT:
-               sprintf(buffer, "%s_%s:    dw    %d", 
-                       variables[i].module,
-                       variables[i].name,
-                       variables[i].value);
-               Asm(buffer);
-               break;
-          case V_INTEGER:
-               sprintf(buffer, "%s_%s:    dw    %d,%d", 
-                       variables[i].module,
-                       variables[i].name,
-                       variables[i].value / 65536,
-                       variables[i].value % 65536);
-               Asm(buffer);
-               break;
-          case V_REAL:
-               sprintf(buffer, "%s_%s:    dw    %d,%d", 
-                       variables[i].module,
-                       variables[i].name,
-                       variables[i].value / 65536,
-                       variables[i].value % 65536);
-               Asm(buffer);
-               break;
-          case V_DEFAULT:
-               if ((variables[i].name[0] >= 'i' && variables[i].name[0] <= 'n') ||
-                   (variables[i].name[0] >= 'I' && variables[i].name[0] <= 'N')) {
-                 sprintf(buffer, "%s_%s:    dw    %d,%d", 
-                         variables[i].module,
-                         variables[i].name,
-                         variables[i].value / 65536,
-                         variables[i].value % 65536);
-                 Asm(buffer);
-                 }
-               else {
-                 sprintf(buffer, "%s_%s:    dw    %d,%d", 
-                         variables[i].module,
-                         variables[i].name,
-                         variables[i].value / 65536,
-                         variables[i].value % 65536);
-                 Asm(buffer);
-                 }
-          }
-
-        }
-      }
-    }
   for (i=0; i<numCommon; i++) {
     sprintf(buffer, "c_%s:    db    ", common[i].name);
     cnt = 0;
@@ -240,61 +124,6 @@ int pass(char* filename) {
       }
     }
 
-/* ************************************* */
-/* ***** File record               ***** */
-/* ***** byte 0 - 0-closed         ***** */
-/* ***** byte 1 - record length    ***** */
-/* ***** byte 2 - ioflag           ***** */
-/* ***** byte 3 - ioresult         ***** */
-/* ***** byte 4-5 - current record ***** */
-/* ***** Elf/OS Fildes follows     ***** */
-/* ************************************* */
-  if (useElfos) {
-    Asm("file1_:    db    0,0");
-    Asm("           db    0,0");
-    Asm("           dw    0");
-    Asm("fildes1_:  db    0,0,0,0");
-    Asm("           dw    FREE_+2");
-    Asm("           db    0,0,0,0,0,0,0,0,0,0,0");
-    Asm("file2_:    db    0,0");
-    Asm("           db    0,0");
-    Asm("           dw    0");
-    Asm("fildes2_:  db    0,0,0,0");
-    Asm("           dw    FREE_+514");
-    Asm("           db    0,0,0,0,0,0,0,0,0,0,0");
-    Asm("file3_:    db    0,0");
-    Asm("           db    0,0");
-    Asm("           dw    0");
-    Asm("fildes3_:  db    0,0,0,0");
-    Asm("           dw    FREE_+1026");
-    Asm("           db    0,0,0,0,0,0,0,0,0,0,0");
-    Asm("file4_:    db    0,0");
-    Asm("           db    0,0");
-    Asm("           dw    0");
-    Asm("fildes4_:  db    0,0,0,0");
-    Asm("           dw    FREE_+1538");
-    Asm("           db    0,0,0,0,0,0,0,0,0,0,0");
-    }
-  else {
-    Asm("file1_:    equ   $");
-    Asm("file2_:    equ   $");
-    Asm("file3_:    equ   $");
-    Asm("file4_:    equ   $");
-    }
-
-  sprintf(buffer,"iobuffer:  ds    %d",iBufferSize); Asm(buffer);
-  if (getDefine("FMTWRITE")) {
-    Asm("SCRATCH1_: ds    64");
-    Asm("SCRATCH2_: ds    32");
-    }
-  else if (getDefine("FFWRITE")) {
-    Asm("SCRATCH1_: ds    64");
-    Asm("SCRATCH2_: ds    32");
-    }
-  if (getDefine("LFSR")) {
-    Asm("LFSR_:     dw    0");
-    Asm("LFSR__:    dw    0");
-    }
   if (useData) {
     Asm("DATA_:     dw    0");
     }

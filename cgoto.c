@@ -93,12 +93,12 @@ void cgoto(char* line) {
       Asm("            plo  ra");
       Asm("            sep  ra");
       if (variables[v].isArg) {
-        sprintf(buffer,"lbl_%d:   ldi   %s_%s.1                ; Point to variable",
-                nextLabel++, variables[v].module, variables[v].name);
+        sprintf(buffer,"lbl_%d:   ldi   %s.1                ; Point to variable",
+                nextLabel++, variables[v].name);
         Asm(buffer);
         Asm("            phi  rf");
-        sprintf(buffer,"          ldi   %s_%s.0",
-                variables[v].module, variables[v].name);
+        sprintf(buffer,"          ldi   %s.0",
+                variables[v].name);
         Asm(buffer);
         Asm("            plo  rf");
         Asm("           lda     rf                        ; Retrieve pointed to address");
@@ -119,12 +119,12 @@ void cgoto(char* line) {
         Asm("            plo  rf");
         }
       else {
-        sprintf(buffer,"lbl_%d:   ldi   %s_%s.1                ; Point to variable",
-                nextLabel++, variables[v].module, variables[v].name);
+        sprintf(buffer,"lbl_%d:   ldi   %s.1                ; Point to variable",
+                nextLabel++, variables[v].name);
         Asm(buffer);
         Asm("            phi  rf");
-        sprintf(buffer,"          ldi   %s_%s.0",
-                variables[v].module, variables[v].name);
+        sprintf(buffer,"          ldi   %s.0",
+                variables[v].name);
         Asm(buffer);
         Asm("            plo  rf");
         }
@@ -152,12 +152,12 @@ void cgoto(char* line) {
         }
       line++;
       if (variables[v].isArg) {
-        sprintf(buffer,"lbl_%d:   ldi   %s_%s.1                ; Point to variable",
-                nextLabel++, variables[v].module, variables[v].name);
+        sprintf(buffer,"lbl_%d:   ldi   %s.1                ; Point to variable",
+                nextLabel++, variables[v].name);
         Asm(buffer);
         Asm("            phi  rf");
-        sprintf(buffer,"          ldi   %s_%s.0",
-                variables[v].module, variables[v].name);
+        sprintf(buffer,"          ldi   %s.0",
+                variables[v].name);
         Asm(buffer);
         Asm("            plo  rf");
         Asm("           lda     rf                        ; Retrieve pointed to address");
@@ -178,12 +178,12 @@ void cgoto(char* line) {
         Asm("            plo  ra");
         }
       else {
-        sprintf(buffer,"          ldi   %s_%s.1                ; Point to variable",
-                variables[v].module, variables[v].name);
+        sprintf(buffer,"          ldi   %s.1                ; Point to variable",
+                variables[v].name);
         Asm(buffer);
         Asm("            phi  ra");
-        sprintf(buffer,"          ldi   %s_%s.0",
-                variables[v].module, variables[v].name);
+        sprintf(buffer,"          ldi   %s.0",
+                variables[v].name);
         Asm(buffer);
         Asm("            plo  ra");
         }
@@ -308,12 +308,12 @@ void cgoto(char* line) {
         }
       }
     if (variables[v].isArg) {
-      sprintf(buffer,"          ldi   %s_%s.1                ; Point to variable",
-              variables[v].module, variables[v].name);
+      sprintf(buffer,"          ldi   %s.1                ; Point to variable",
+              variables[v].name);
       Asm(buffer);
       Asm("            phi  rf");
-      sprintf(buffer,"          ldi   %s_%s.0",
-              variables[v].module, variables[v].name);
+      sprintf(buffer,"          ldi   %s.0",
+              variables[v].name);
       Asm(buffer);
       Asm("            plo  rf");
       Asm("           lda     rf                        ; Retrieve pointed to address");
@@ -334,12 +334,12 @@ void cgoto(char* line) {
       Asm("            plo  rf");
       }
     else {
-      sprintf(buffer,"          ldi   %s_%s.1                ; Point to variable",
-              variables[v].module, variables[v].name);
+      sprintf(buffer,"          ldi   %s.1                ; Point to variable",
+              variables[v].name);
       Asm(buffer);
       Asm("            phi  rf");
-      sprintf(buffer,"          ldi   %s_%s.0",
-              variables[v].module, variables[v].name);
+      sprintf(buffer,"          ldi   %s.0",
+              variables[v].name);
       Asm(buffer);
       Asm("            plo  rf");
       }

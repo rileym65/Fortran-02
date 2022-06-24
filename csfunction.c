@@ -64,8 +64,8 @@ int csfunction(char* line) {
         i = getVariable(token, subname);
       if (i < 0) return -1;
       variables[i].isArg = 0xff;
-      sprintf(buffer,"              dw    %s_%s",
-        variables[i].module, variables[i].name);
+      sprintf(buffer,"              dw    %s",
+        variables[i].name);
       Asm(buffer);
       if (*line != ',' && *line != 0 && *line != ')') {
         showError("Syntax error");
@@ -118,8 +118,8 @@ int csfunction(char* line) {
         i = getVariable(token, module);
       if (i < 0) return;
       variables[i].isArg = 0xff;
-      sprintf(buffer,"              dw    %s_%s",
-        variables[i].module, variables[i].name);
+      sprintf(buffer,"              dw    %s",
+        variables[i].name);
       Asm(buffer);
       if (*line != ',' && *line != 0 && *line != ')') {
         showError("Syntax error");

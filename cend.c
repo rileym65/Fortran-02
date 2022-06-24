@@ -52,6 +52,7 @@ void cend(char* line) {
     common[i].numVariables = 0;
     common[i].size = 0;
     }
+  moduleEnd();
   if (inSub) {
     Asm("           endp");
     }

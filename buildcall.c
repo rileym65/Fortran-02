@@ -81,12 +81,12 @@ char* buildCall(char* subName, char* line) {
       i = numCallArgs-1;
       while (i >= 0) {
         if (callArgTypes[i] == 'V') {
-          sprintf(buffer,"          ldi   (%s_%s).0               ; Push variable address",
-                  variables[callArgs[i]].module, variables[callArgs[i]].name);
+          sprintf(buffer,"          ldi   (%s).0               ; Push variable address",
+                  variables[callArgs[i]].name);
           Asm(buffer);
           Asm("          stxd");
-          sprintf(buffer,"          ldi   (%s_%s).1",
-                  variables[callArgs[i]].module, variables[callArgs[i]].name);
+          sprintf(buffer,"          ldi   (%s).1",
+                  variables[callArgs[i]].name);
           Asm(buffer);
           Asm("          stxd");
           }

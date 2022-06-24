@@ -24,6 +24,7 @@ void startup() {
 
   ctmp = showCompiler;
   showCompiler = 0;
+  Asm(".link .library forlib.lib");
   Asm("scall:      equ  r4");
   Asm("sret:       equ  r5");
   if (useElfos == 0) {

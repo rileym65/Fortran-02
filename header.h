@@ -359,6 +359,7 @@ extern char* getArg(char*line, char dest, char* rem);
 extern word getCommon(char* name, char* module);
 extern int  getVariable(char* name, char* module);
 extern char* getVarName(char *line, char* token);
+extern void moduleEnd();
 extern void moduleStart();
 extern int  nextStatement();
 extern void startup();

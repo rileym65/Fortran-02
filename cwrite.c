@@ -244,8 +244,8 @@ void cwrite(char* line) {
           variables[v].common, variables[v].offset);
         }
       else {
-        sprintf(buffer,"           dw      %s_%s",
-          variables[v].module, variables[v].name);
+        sprintf(buffer,"           dw      %s",
+          variables[v].name);
         }
       Asm(buffer);
       }

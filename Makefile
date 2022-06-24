@@ -57,6 +57,7 @@ OBJS = \
 	library.o \
 	main.o \
 	match.o \
+	moduleend.o \
 	modulestart.o \
 	nextstatement.o \
 	optionfile.o \
@@ -74,9 +75,6 @@ $(PROJECT): $(OBJS)
 
 .c.o:
 	$(CC) $(DEFS) $(INCDIR) $(INCS) -c $<
-
-library.h: library.asm
-	cat library.asm | ./mklibrary.pl > library.h
 
 clean:
 	-rm *.o
@@ -137,6 +135,7 @@ getvarname.o:    header.h getvarname.c
 library.o:       header.h library.h library.c
 main.o:          header.h main.c
 match.o:         header.h match.c
+moduleend.o:     header.h moduleend.c
 modulestart.o:   header.h modulestart.c
 nextstatement.o: header.h nextstatement.c
 optionfile.o:    header.h optionfile.c
