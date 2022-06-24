@@ -147,22 +147,22 @@ void startup() {
     }
 //   t1 = variableRAM + (2 * numberOfVariables);
   t1 = variableNextAddress;
-  Asm("          ldi  free_.1");
-  Asm("          phi  rf");
-  Asm("          ldi  free_.0");
-  Asm("          plo  rf");
-  if (use32Bits) {
-    Asm("          ldi  0");
-    Asm("          str  rf");
-    Asm("          inc  rf");
-    Asm("          str  rf");
-    Asm("          inc  rf");
-    }
-  Asm("          ldi  END__.1");
-  Asm("          str  rf");
-  Asm("          inc  rf");
-  Asm("          ldi  END__.0");
-  Asm("          str  rf");
+//  Asm("          ldi  free_.1");
+//  Asm("          phi  rf");
+//  Asm("          ldi  free_.0");
+//  Asm("          plo  rf");
+//  if (use32Bits) {
+//    Asm("          ldi  0");
+//    Asm("          str  rf");
+//    Asm("          inc  rf");
+//    Asm("          str  rf");
+//    Asm("          inc  rf");
+//    }
+//  Asm("          ldi  END__.1");
+//  Asm("          str  rf");
+//  Asm("          inc  rf");
+//  Asm("          ldi  END__.0");
+//  Asm("          str  rf");
   if (useData) {
     Asm("          ldi  DATA_.1");
     Asm("          phi  rf");

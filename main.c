@@ -302,6 +302,8 @@ int main(int argc, char** argv, char** envp) {
   printf("\n\n");
   printf("Lines compiled: %d\n",lineCount);
   printf("Error count   : %d\n",errorCount);
+  exit(0);
+
   printf("Runtime size  : %d\n",getLabel("PROGRAM__")-getLabel("BEGIN__") +
                                 getLabel("ENDRUNTIME__")-getLabel("RUNTIME__"));
   printf("program size  : %d\n",getLabel("RUNTIME__")-getLabel("PROGRAM__"));

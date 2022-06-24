@@ -67,16 +67,16 @@ int pass(char* filename) {
     Asm("            phi  r6");
     Asm("            sep  sret");
     }
-  else if (exitAddress != 0xffff) {
-    sprintf(buffer,"          lbr   0%xh                    ; Jump to exit address",exitAddress); Asm(buffer);
-    }
-  else if (useElfos) {
-    Asm("          lbr   0303h                   ; Jump to exit address");
-    }
-  else {
-    Asm("          idl                           ; Idle the CPU");
-    Asm("          lbr   $-1");
-    }
+//  else if (exitAddress != 0xffff) {
+//    sprintf(buffer,"          lbr   0%xh                    ; Jump to exit address",exitAddress); Asm(buffer);
+//    }
+//  else if (useElfos) {
+//    Asm("          lbr   0303h                   ; Jump to exit address");
+//    }
+//  else {
+//    Asm("          idl                           ; Idle the CPU");
+//    Asm("          lbr   $-1");
+//    }
   if (passNumber == 2 && showCompiler) printf("\n");
   library();
   Asm("ENDRUNTIME__:  equ  $");
@@ -133,7 +133,7 @@ int pass(char* filename) {
   if (useStg) {
     Asm("STG_:      dw    0");
     }
-  Asm("FREE_:    dw    0");
+//  Asm("FREE_:    dw    0");
   if (useElfos) {
     Asm("end__:    equ   $+2048");
     }

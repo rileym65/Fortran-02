@@ -1,4 +1,5 @@
 fortran
+fortran02
 library.h
 x.x
 *.o
@@ -10,11 +11,10 @@ x.x
 *.lst
 *.prg
 *.bin
-*.asm
 *.txt
 *.pl
 *.swp
 *.f
 +library.asm
 +fortran.txt
-
++Forlib/*.asm
