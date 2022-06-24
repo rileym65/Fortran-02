@@ -148,6 +148,7 @@ OBJS=\
 	uread.prg \
 	vpush8p.prg \
 	vpush16p.prg \
+	vpush32.prg \
 	vpush32p.prg \
 	writerec.prg \
 	xor16.prg \
@@ -305,6 +306,7 @@ $(PROJECT): $(OBJS)
 	cat ioresults32.prg >> $(PROJECT)
 	cat vpush8p.prg >> $(PROJECT)
 	cat vpush16p.prg >> $(PROJECT)
+	cat vpush32.prg >> $(PROJECT)
 	cat vpush32p.prg >> $(PROJECT)
 	cat epush.prg >> $(PROJECT)
 	cat scratch.prg >> $(PROJECT)
