@@ -82,11 +82,11 @@ void cassign(char* line) {
     Asm("            plo  rf");
     }
   else {
-    sprintf(buffer,"            ldi  %s.1          ; Point to variable",
+    sprintf(buffer,"            ldi  v_%s.1          ; Point to variable",
             variables[v].name);
     Asm(buffer);
     Asm("            phi  rf");
-    sprintf(buffer,"            ldi  %s.0",
+    sprintf(buffer,"            ldi  v_%s.0",
             variables[v].name);
     Asm(buffer);
     Asm("            plo  rf");

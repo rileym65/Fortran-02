@@ -179,7 +179,7 @@ void cread(char* line) {
       }
     sprintf(buffer,"           db      %d",varType(v));
     Asm(buffer);
-    sprintf(buffer,"           dw      %s",variables[v].name);
+    sprintf(buffer,"           dw      v_%s",variables[v].name);
     Asm(buffer);
     if (*line != ',' && *line != 0) {
       showError("Syntax error");

@@ -24,11 +24,11 @@ void creturn(char* line) {
     return;
     }
   if (functionVar >= 0) {
-    sprintf(buffer,"              ldi   %s.1            ; Point to result variable",
+    sprintf(buffer,"              ldi   v_%s.1            ; Point to result variable",
             variables[functionVar].name);
     Asm(buffer);
     Asm("              phi   rf");
-    sprintf(buffer,"              ldi   %s.0",
+    sprintf(buffer,"              ldi   v_%s.0",
             variables[functionVar].name);
     Asm(buffer);
     Asm("              plo   rf");

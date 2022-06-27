@@ -40,7 +40,7 @@ void moduleEnd() {
             count *= variables[i].sizes[2];
             }
           if (variables[i].values == NULL) {
-            sprintf(buffer, "%s:    ds    %d", 
+            sprintf(buffer, "v_%s:    ds    %d", 
                     variables[i].name,
                     size);
             Asm(buffer);
@@ -48,7 +48,7 @@ void moduleEnd() {
           else {
             for (j=0; j<count; j++) {
               if (j == 0) {
-                sprintf(buffer, "%s:    dw    %d,%d", 
+                sprintf(buffer, "v_%s:    dw    %d,%d", 
                         variables[i].name,
                         variables[i].values[j] / 256,
                         variables[i].values[j] % 256);
@@ -63,39 +63,39 @@ void moduleEnd() {
             }
           }
         else if (variables[i].isArg) {
-          sprintf(buffer, "%s:    dw    0", 
+          sprintf(buffer, "v_%s:    dw    0", 
                          variables[i].name);
           Asm(buffer);
           }
         else {
           switch (variables[i].type) {
             case V_BYTE:
-                 sprintf(buffer, "%s:    db    %d", 
+                 sprintf(buffer, "v_%s:    db    %d", 
                          variables[i].name,
                          variables[i].value);
                  Asm(buffer);
                  break;
             case V_LOGICAL:
-                 sprintf(buffer, "%s:    db    %d", 
+                 sprintf(buffer, "v_%s:    db    %d", 
                          variables[i].name,
                          variables[i].value);
                  Asm(buffer);
                  break;
             case V_SHORT:
-                 sprintf(buffer, "%s:    dw    %d", 
+                 sprintf(buffer, "v_%s:    dw    %d", 
                          variables[i].name,
                          variables[i].value);
                  Asm(buffer);
                  break;
             case V_INTEGER:
-                 sprintf(buffer, "%s:    dw    %d,%d", 
+                 sprintf(buffer, "v_%s:    dw    %d,%d", 
                          variables[i].name,
                          variables[i].value / 65536,
                          variables[i].value % 65536);
                  Asm(buffer);
                  break;
             case V_REAL:
-                 sprintf(buffer, "%s:    dw    %d,%d", 
+                 sprintf(buffer, "v_%s:    dw    %d,%d", 
                          variables[i].name,
                          variables[i].value / 65536,
                          variables[i].value % 65536);
@@ -104,14 +104,14 @@ void moduleEnd() {
             case V_DEFAULT:
                  if ((variables[i].name[0] >= 'i' && variables[i].name[0] <= 'n') ||
                      (variables[i].name[0] >= 'I' && variables[i].name[0] <= 'N')) {
-                   sprintf(buffer, "%s:    dw    %d,%d", 
+                   sprintf(buffer, "v_%s:    dw    %d,%d", 
                            variables[i].name,
                            variables[i].value / 65536,
                            variables[i].value % 65536);
                    Asm(buffer);
                    }
                  else {
-                   sprintf(buffer, "%s:    dw    %d,%d", 
+                   sprintf(buffer, "v_%s:    dw    %d,%d", 
                            variables[i].name,
                            variables[i].value / 65536,
                            variables[i].value % 65536);

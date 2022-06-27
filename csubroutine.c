@@ -78,7 +78,7 @@ void csubroutine(char* line, char t, byte rt) {
         i = getVariable(token, module);
       if (i < 0) return;
       variables[i].isArg = 0xff;
-      sprintf(buffer,"              dw    %s",
+      sprintf(buffer,"              dw    v_%s",
         variables[i].name);
       Asm(buffer);
       if (*line != ',' && *line != 0 && *line != ')') {

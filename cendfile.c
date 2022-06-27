@@ -57,31 +57,31 @@ void cendfile(char* line) {
       return;
       }
     if (varType(v) == 'I') {
-      sprintf(buffer,"              ldi   (%s+3).1        ; Point variable",
+      sprintf(buffer,"              ldi   (v_%s+3).1        ; Point variable",
         variables[v].name);
       Asm(buffer);
       Asm("              phi   rf");
-      sprintf(buffer,"              ldi   (%s+3).0",
+      sprintf(buffer,"              ldi   (v_%s+3).0",
         variables[v].name);
       Asm(buffer);
       Asm("              plo   rf");
       }
     else if (varType(v) == 'S') {
-      sprintf(buffer,"              ldi   (%s+1).1        ; Point variable",
+      sprintf(buffer,"              ldi   (v_%s+1).1        ; Point variable",
         variables[v].name);
       Asm(buffer);
       Asm("              phi   rf");
-      sprintf(buffer,"              ldi   (%s+1).0",
+      sprintf(buffer,"              ldi   (v_%s+1).0",
         variables[v].name);
       Asm(buffer);
       Asm("              plo   rf");
       }
     else {
-      sprintf(buffer,"              ldi   (%s).1          ; Point variable",
+      sprintf(buffer,"              ldi   (v_%s).1          ; Point variable",
         variables[v].name);
       Asm(buffer);
       Asm("              phi   rf");
-      sprintf(buffer,"              ldi   (%s).0",
+      sprintf(buffer,"              ldi   (v_%s).0",
         variables[v].name);
       Asm(buffer);
       Asm("              plo   rf");

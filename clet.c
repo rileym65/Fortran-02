@@ -108,10 +108,10 @@ void clet(char* line) {
       }
 
     if (variables[v].isArg) {
-      sprintf(buffer,"          ldi   (%s).1              ; Get destination variable address",
+      sprintf(buffer,"          ldi   (v_%s).1              ; Get destination variable address",
               varname); Asm(buffer);
       Asm("          phi   rf");
-      sprintf(buffer,"          ldi   (%s).0", varname); Asm(buffer);
+      sprintf(buffer,"          ldi   (v_%s).0", varname); Asm(buffer);
       Asm("          plo   rf");
       Asm("          lda   rf                        ; retrieve pointed to address");
       Asm("          plo   re");
@@ -150,21 +150,21 @@ void clet(char* line) {
       }
     else {
       if (varType(v) == 'I' || varType(v) == 'R') {
-        sprintf(buffer,"          ldi   (%s+3).1              ; Get destination variable address", varname); Asm(buffer);
+        sprintf(buffer,"          ldi   (v_%s+3).1              ; Get destination variable address", varname); Asm(buffer);
         Asm("          phi   rf");
-        sprintf(buffer,"          ldi   (%s+3).0", varname); Asm(buffer);
+        sprintf(buffer,"          ldi   (v_%s+3).0", varname); Asm(buffer);
         Asm("          plo   rf");
         }
       if (varType(v) == 'S') {
-        sprintf(buffer,"          ldi   (%s+1).1              ; Get destination variable address", varname); Asm(buffer);
+        sprintf(buffer,"          ldi   (v_%s+1).1              ; Get destination variable address", varname); Asm(buffer);
         Asm("          phi   rf");
-        sprintf(buffer,"          ldi   (%s+1).0", varname); Asm(buffer);
+        sprintf(buffer,"          ldi   (v_%s+1).0", varname); Asm(buffer);
         Asm("          plo   rf");
         }
       if (varType(v) == 'B' || varType(v) == 'L') {
-        sprintf(buffer,"          ldi   (%s).1              ; Get destination variable address", varname); Asm(buffer);
+        sprintf(buffer,"          ldi   (v_%s).1              ; Get destination variable address", varname); Asm(buffer);
         Asm("          phi   rf");
-        sprintf(buffer,"          ldi   (%s).0", varname); Asm(buffer);
+        sprintf(buffer,"          ldi   (v_%s).0", varname); Asm(buffer);
         Asm("          plo   rf");
         }
       }

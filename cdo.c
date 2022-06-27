@@ -147,11 +147,11 @@ void cdo(char* line) {
     doLoops[numDoLoops].step = atoi(step);
     value = atoi(start);
     if (variables[v].isArg) {
-      sprintf(buffer,"          ldi   %s.1                 ; point to variable",
+      sprintf(buffer,"          ldi   v_%s.1                 ; point to variable",
               variables[v].name);
       Asm(buffer);
       Asm("          phi   rf");
-      sprintf(buffer,"          ldi   %s.0",variables[v].name);
+      sprintf(buffer,"          ldi   v_%s.0",variables[v].name);
       Asm(buffer);
       Asm("          plo   rf");
       Asm("           lda     rf                        ; Retrieve pointed to address");
@@ -170,10 +170,10 @@ void cdo(char* line) {
       Asm("          plo   rf");
       }
     else {
-      sprintf(buffer,"          ldi   (%s).1                 ; point to variable", variables[v].name);
+      sprintf(buffer,"          ldi   (v_%s).1                 ; point to variable", variables[v].name);
       Asm(buffer);
       Asm("          phi   rf");
-      sprintf(buffer,"          ldi   (%s).0", variables[v].name);
+      sprintf(buffer,"          ldi   (v_%s).0", variables[v].name);
       Asm(buffer);
       Asm("          plo   rf");
       }
@@ -232,11 +232,11 @@ void cdo(char* line) {
     argret = getArg(start, 'e', "Push start to expr stack");
     if (argret == NULL) return;
     if (variables[v].isArg) {
-      sprintf(buffer,"          ldi   %s.1                 ; point to variable",
+      sprintf(buffer,"          ldi   v_%s.1                 ; point to variable",
               variables[v].name);
       Asm(buffer);
       Asm("          phi   rf");
-      sprintf(buffer,"          ldi   %s.0", variables[v].name);
+      sprintf(buffer,"          ldi   v_%s.0", variables[v].name);
       Asm(buffer);
       Asm("          plo   rf");
       Asm("           lda     rf                        ; Retrieve pointed to address");
@@ -255,10 +255,10 @@ void cdo(char* line) {
       Asm("          plo   rf");
       }
     else {
-      sprintf(buffer,"          ldi   (%s).1                 ; point to variable", variables[v].name);
+      sprintf(buffer,"          ldi   (v_%s).1                 ; point to variable", variables[v].name);
       Asm(buffer);
       Asm("          phi   rf");
-      sprintf(buffer,"          ldi   (%s).0", variables[v].name);
+      sprintf(buffer,"          ldi   (v_%s).0", variables[v].name);
       Asm(buffer);
       Asm("          plo   rf");
       }
@@ -366,11 +366,11 @@ void cDoEnd() {
     default : i = 3; s1 = 4; break;
     }
   if (variables[v].isArg) {
-    sprintf(buffer,"          ldi   %s.1                 ; point to variable",
+    sprintf(buffer,"          ldi   v_%s.1                 ; point to variable",
             variables[v].name);
     Asm(buffer);
     Asm("          phi   rf");
-    sprintf(buffer,"          ldi   %s.0                 ; point to variable",
+    sprintf(buffer,"          ldi   v_%s.0                 ; point to variable",
             variables[v].name);
     Asm(buffer);
     Asm("          plo   rf");
@@ -400,11 +400,11 @@ void cDoEnd() {
     Asm("          plo   rf");
     }
   else {
-    sprintf(buffer,"          ldi   (%s+%d).1                 ; point to variable",
+    sprintf(buffer,"          ldi   (v_%s+%d).1                 ; point to variable",
             variables[v].name, i);
     Asm(buffer);
     Asm("          phi   rf");
-    sprintf(buffer,"          ldi   (%s+%d).0                 ; point to variable",
+    sprintf(buffer,"          ldi   (v_%s+%d).0                 ; point to variable",
             variables[v].name, i);
     Asm(buffer);
     Asm("          plo   rf");
@@ -445,11 +445,11 @@ void cDoEnd() {
       default : i = 3; s2 = 4; break;
       }
     if (variables[v2].isArg) {
-      sprintf(buffer,"          ldi   %s.1                 ; point to variable",
+      sprintf(buffer,"          ldi   v_%s.1                 ; point to variable",
               variables[v2].name);
       Asm(buffer);
       Asm("          phi   rd");
-      sprintf(buffer,"          ldi   %s.0                 ; point to variable",
+      sprintf(buffer,"          ldi   v_%s.0                 ; point to variable",
               variables[v2].name);
       Asm(buffer);
       Asm("          plo   rd");
@@ -479,11 +479,11 @@ void cDoEnd() {
       Asm("          plo   rd");
       }
     else {
-      sprintf(buffer,"          ldi   (%s+%d).1                 ; point to variable",
+      sprintf(buffer,"          ldi   (v_%s+%d).1                 ; point to variable",
               variables[v2].name, i);
       Asm(buffer);
       Asm("          phi   rd");
-      sprintf(buffer,"          ldi   (%s+%d).0                 ; point to variable",
+      sprintf(buffer,"          ldi   (v_%s+%d).0                 ; point to variable",
               variables[v2].name, i);
       Asm(buffer);
       Asm("          plo   rd");

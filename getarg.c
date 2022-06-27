@@ -67,11 +67,11 @@ char* getArg(char*line, char dest, char* rem) {
       }
     if (dest == 'e') ofs = 0;
     if (variables[v].isArg) {
-      sprintf(buffer,"              ldi   %s.1        ; Point to variable",
+      sprintf(buffer,"              ldi   v_%s.1        ; Point to variable",
         variables[v].name);
       Asm(buffer);
       Asm("              phi   rf");
-      sprintf(buffer,"              ldi   %s.0",
+      sprintf(buffer,"              ldi   v_%s.0",
         variables[v].name);
       Asm(buffer);
       Asm("              plo   rf");
@@ -101,11 +101,11 @@ char* getArg(char*line, char dest, char* rem) {
       Asm("              plo   rf");
       }
     else {
-      sprintf(buffer,"              ldi   (%s+%d).1        ; Point to variable",
+      sprintf(buffer,"              ldi   (v_%s+%d).1        ; Point to variable",
         variables[v].name, ofs);
       Asm(buffer);
       Asm("              phi   rf");
-      sprintf(buffer,"              ldi   (%s+%d).0",
+      sprintf(buffer,"              ldi   (v_%s+%d).0",
         variables[v].name, ofs);
       Asm(buffer);
       Asm("              plo   rf");

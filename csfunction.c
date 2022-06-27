@@ -64,7 +64,7 @@ int csfunction(char* line) {
         i = getVariable(token, subname);
       if (i < 0) return -1;
       variables[i].isArg = 0xff;
-      sprintf(buffer,"              dw    %s",
+      sprintf(buffer,"              dw    v_%s",
         variables[i].name);
       Asm(buffer);
       if (*line != ',' && *line != 0 && *line != ')') {
@@ -118,7 +118,7 @@ int csfunction(char* line) {
         i = getVariable(token, module);
       if (i < 0) return;
       variables[i].isArg = 0xff;
-      sprintf(buffer,"              dw    %s",
+      sprintf(buffer,"              dw    v_%s",
         variables[i].name);
       Asm(buffer);
       if (*line != ',' && *line != 0 && *line != ')') {
