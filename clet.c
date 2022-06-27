@@ -62,6 +62,7 @@ void clet(char* line) {
       }
     }
   varname[pos] = 0;
+  if (strcmp(varname, module) == 0) strcat(varname,"_");
   line = trim(line);
 /* *********************************** */
 /* ***** Process array reference ***** */

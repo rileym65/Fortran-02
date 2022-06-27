@@ -13,8 +13,8 @@
 void checkMain() {
   if (inUnit) return;
   inUnit = -1;
-  Asm("START___:");
-  numExternals = 0;
   moduleStart();
+  numExternals = 0;
+  Asm("START___:");
   }
 

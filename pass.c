@@ -106,8 +106,10 @@ int pass(char* filename) {
 
   Asm("DATA__:  equ  $");
   for (i=0; i<numCommon; i++) {
-    sprintf(buffer, "c_%s:    db    ", common[i].name);
+    sprintf(buffer, "         proc  c_%s", common[i].name);
+    Asm(buffer);
     cnt = 0;
+    strcpy(buffer,  "         db    ");
     for (j=0; j<common[i].maxSize; j++) {
       sprintf(tmp,"%d",common[i].data[j]);
       if (cnt != 0) strcat(buffer,",");
@@ -122,6 +124,7 @@ int pass(char* filename) {
     if (cnt != 0) {
       Asm(buffer);
       }
+    Asm("         endp");
     }
 
   if (useData) {

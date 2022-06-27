@@ -35,6 +35,8 @@ void ccommon(char* line) {
       area[pos] = 0;
       if (pos == 0) strcpy(area, "_");
       if (*line == '/') line++;
+      sprintf(buffer,"c_%s",area);
+      addExtrn(buffer);
       pos = 0;
       }
     else if (*line >= 'a' && *line <= 'z') token[pos++] = *line++;

@@ -44,6 +44,7 @@ void csubroutine(char* line, char t, byte rt) {
   moduleStart();
 
   if (t == 'F') {
+    strcat(token, "_");
     if (passNumber == 1) {
       functionVar = addVariable(token,module);
       if (functionVar < 0) return;
@@ -54,7 +55,6 @@ void csubroutine(char* line, char t, byte rt) {
       if (functionVar < 0) return;
       }
     }
-
   Asm("           sep     scall              ; Bind parameters");
   Asm("           dw      fenter");
   addExtrn("fenter");

@@ -37,6 +37,8 @@ void cexternal(char* line) {
       strcpy(externals[numExternals].name, token);
       externals[numExternals].type = V_DEFAULT;
       numExternals++;
+      sprintf(buffer,"           extrn   %s",token);
+      Asm(buffer);
       if (*line != 0 && *line != ',') {
         showError("Syntax error");
         return;
