@@ -12,7 +12,6 @@
 
 int compileLine(char* line) {
   listCount = 0;
-  if (showCompiler && passNumber == 2) printf("%04x:",address);
   if (passNumber == 2 && createLst)
     fprintf(lstFile,"                  ; %s\n",initialLine);
   if (passNumber == 2 && useAsm) {
@@ -63,7 +62,6 @@ int compileLine(char* line) {
     cDoEnd();
     numDoLoops--;
     }
-  if (passNumber == 2 && showCompiler) printf("\n");
   return 0;
   }
 
