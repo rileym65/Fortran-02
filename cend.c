@@ -13,7 +13,6 @@
 void cend(char* line) {
   int i;
   inUnit = 0;
-  inBlockData = 0;
   functionVar = -1;
   if (*line != 0) {
     showError("Invalid character encountered in END statement");
@@ -52,7 +51,8 @@ void cend(char* line) {
     common[i].numVariables = 0;
     common[i].size = 0;
     }
-  moduleEnd();
+  if (inBlockData == 0) moduleEnd();
+  inBlockData = 0;
   if (inSub) {
     Asm("           endp");
     }

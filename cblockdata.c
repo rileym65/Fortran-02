@@ -29,6 +29,8 @@ void cblockdata(char* line) {
     return;
     }
   token[pos] = 0;
+  if (strlen(token) == 0) strcpy(token,"BLOCKDATA");
   strcpy(module, token);
+printf("module: %s\n",module);
   }
 
