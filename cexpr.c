@@ -114,7 +114,7 @@ char* convertNumber(char* buffer, dword* value, byte* success, int* error, char*
   return buffer;
   }
 
-char* evaluate(char *pos, int *err, char* rtype, char *module) {
+char* evaluate(char *pos, int *err, char* rtype, char *prefix) {
   char numbers[256];
   byte ops[256];
   int  nstack;
@@ -125,6 +125,7 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
   int  v;
   int  error;
   int  isArray;
+  int  inlineSub;
   char ntype;
   char term;
   byte success;
@@ -133,7 +134,9 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
   char abuffer[256];
   nstack = 0;
   ostack = 0;
+  inlineSub = 0;
   op = 0;
+  if (strcmp(prefix, module) != 0) inlineSub = -1;
   *err = 0;
   if (*pos == '-' && (*(pos+1) < '0' || *(pos+1) > '9')) {
     Asm("           sep     scall                     ; push constant to expr stack");
@@ -352,7 +355,17 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
                 }
               }
             if (term == 0) {
-              v = getVariable(token, module);
+              if (inlineSub) {
+                strcpy(abuffer, prefix);
+                strcat(abuffer, "_");
+                strcat(abuffer, token);
+                v = findVariable(abuffer, module);
+                if (v < 0) {
+                  v = getVariable(token, module);
+                  }
+                }
+              else
+                v = getVariable(token, module);
               if (v < 0) {
                 *err = -1;
                 return pos;
@@ -389,7 +402,10 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
                   addExtrn("vpush8p");
                   Asm("           dw      vpush8p");
                   }
-                sprintf(abuffer,"           dw      v_%s",token);
+                if (inlineSub) 
+                  sprintf(abuffer,"           dw      v_%s_%s",prefix,token);
+                else
+                  sprintf(abuffer,"           dw      v_%s", token);
                 Asm(abuffer);
                 numbers[nstack++] = (varType(v) == 'R') ? 'R' : 'I';
                 }
@@ -402,7 +418,10 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
                   sprintf(abuffer,"           dw      c_%s+%d",variables[v].common,variables[v].offset);
                   }
                 else {
-                  sprintf(abuffer,"           dw      v_%s",token);
+                  if (inlineSub) 
+                    sprintf(abuffer,"           dw      v_%s_%s",prefix, token);
+                  else 
+                    sprintf(abuffer,"           dw      v_%s",token);
                   }
                 Asm(abuffer);
                 if (varType(v) == 'I') numbers[nstack++] = 'I';
@@ -419,11 +438,20 @@ char* evaluate(char *pos, int *err, char* rtype, char *module) {
                   Asm(abuffer);
                   }
                 else {
-                  sprintf(abuffer,"           ldi     v_%s.1             ; Point to variable",token);
-                  Asm(abuffer);
-                  Asm("           phi     rf");
-                  sprintf(abuffer,"           ldi     v_%s.0             ; Point to variable",token);
-                  Asm(abuffer);
+                  if (inlineSub) {
+                    sprintf(abuffer,"           ldi     v_%s_%s.1             ; Point to variable",prefix,token);
+                    Asm(abuffer);
+                    Asm("           phi     rf");
+                    sprintf(abuffer,"           ldi     v_%s_%s.0             ; Point to variable",prefix,token);
+                    Asm(abuffer);
+                    }
+                  else {
+                    sprintf(abuffer,"           ldi     v_%s.1             ; Point to variable",token);
+                    Asm(abuffer);
+                    Asm("           phi     rf");
+                    sprintf(abuffer,"           ldi     v_%s.0             ; Point to variable",token);
+                    Asm(abuffer);
+                    }
                   }
                 Asm("           plo     rf");
                 if (variables[v].isArg) {

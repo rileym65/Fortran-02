@@ -12,7 +12,7 @@
 
 int csfunction(char* line) {
   int  i;
-  char token[32];
+  char token[96];
   char subname[64];
   int  fp;
   int  pos;
@@ -33,9 +33,11 @@ int csfunction(char* line) {
   i = findVariable(token, module);
   if (i >= 0) return 0;
   checkMain();
-  strcpy(subname, module);
-  strcat(subname, "_");
-  strcat(subname, token);
+//  strcpy(subname, module);
+//  strcat(subname, "_");
+//  strcat(subname, token);
+  strcpy(subname, token);
+
   if ((subname[0] >= 'i' && subname[0] <= 'n') ||
       (subname[0] >= 'I' && subname[0] <= 'N')) fp = 0;
     else fp = -1;
@@ -52,16 +54,19 @@ int csfunction(char* line) {
   while (*line != 0 && *line != ')') {
     if ((*line >= 'a' && *line <= 'z') ||
         (*line >= 'A' && *line <= 'Z')) {
-      pos = 0;
+//      pos = 0;
+      strcpy(token, subname);
+      strcat(token,"_");
+      pos = strlen(token);
       while ((*line >= 'a' && *line <= 'z') ||
              (*line >= 'A' && *line <= 'Z') ||
              (*line >= '0' && *line <= '9') ||
               *line == '_') token[pos++] = *line++;
       token[pos] = 0;
       if (passNumber == 1)
-        i = addVariable(token, subname);
+        i = addVariable(token, module);
       else
-        i = getVariable(token, subname);
+        i = getVariable(token, module);
       if (i < 0) return -1;
       variables[i].isArg = 0xff;
       sprintf(buffer,"              dw    v_%s",
