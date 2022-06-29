@@ -31,13 +31,14 @@ void startup() {
     sprintf(buffer,"stack:      equ  0%04xh",stack); Asm(buffer);
     sprintf(buffer,"estack:     equ  0%04xh",estack); Asm(buffer);
     }
-  if (useElfos) {
-    t1 = programStart;
-    t2 = (getLabel("FREE_") - programStart + 1);
-    t3 = programStart;
-    sprintf(buffer,"          dw   %d,%d,%d",t1,t2,t3); Asm(buffer);
-    }
+//  if (useElfos) {
+//    t1 = programStart;
+//    t2 = (getLabel("FREE_") - programStart + 1);
+//    t3 = programStart;
+//    sprintf(buffer,"          dw   %d,%d,%d",t1,t2,t3); Asm(buffer);
+//    }
   if (useElfos ) {
+    Asm("            org  02000h");
     Asm("init:       br   estart");
     sprintf(buffer,"            db   %d,%d",tv.tm_mon+0x81,tv.tm_mday);
     Asm(buffer);

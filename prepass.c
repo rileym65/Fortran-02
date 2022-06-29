@@ -54,11 +54,6 @@ int prepass(char* filename) {
       if (strncasecmp(currentLine,".iosize=",8) == 0) { iBufferSize=getHex(currentLine+8); }
       if (strncasecmp(currentLine,".exit=",6) == 0) { exitAddress=getHex(currentLine+6); }
       if (strncasecmp(currentLine,".start=",7) == 0) { programStart=getHex(currentLine+7); }
-      if (strcasecmp(currentLine,".binary") == 0) {
-        outMode = 'B';
-        strcpy(outName,baseName);
-        strcat(outName, ".bin");
-        }
       if (strcasecmp(currentLine,".stg") == 0) {
         useStg = -1;
         exitAddress = 0x8003;

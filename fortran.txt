@@ -155,7 +155,6 @@ Compiler Directives:
 .arch=pev2      - Set architecture to Pico/Elf V2
 .arch=elf2k     - Set architecture to Elf 2k
 .arch=mchip     - Set architecture to MemberCHIP
-.binary         - Output file as binary
 .fp             - Enable floating-point mode (on by default)
 .elfos          - Produce Elf/OS executable
 .estack=addr    - Set address for expr stack
@@ -186,7 +185,6 @@ Switches:
 -fp             - enable floating point (on by default)
 -a              - produce assembly file
 -A              - display assembly
--b              - output as binary
 -c              - show compiler output
 -d              - Compile lines beginning with D
 -i              - output as Intel hex

@@ -66,9 +66,6 @@ void writeOutput() {
     strcat(outLine,temp);
     write(outFile, outLine, strlen(outLine));
     }
-  if (outMode == 'B') {
-    write(outFile, outBuffer, outCount);
-    }
   }
 
 void output(byte value) {
@@ -82,11 +79,6 @@ void output(byte value) {
     }
   if (passNumber == 1) {
     if (address > highest) highest = address;
-    }
-  if (outMode == 'B') {
-    image[address] = value;
-    if (address < lowestAddress) lowestAddress = address;
-    if (address > highestAddress) highestAddress = address;
     }
   if (passNumber == 2) {
     if (showCompiler) {
@@ -197,7 +189,6 @@ int main(int argc, char** argv, char** envp) {
   switch (outMode) {
     case 'R': strcat(outName, ".prg"); break;
     case 'I': strcat(outName, ".hex"); break;
-    case 'B': strcat(outName, ".bin"); break;
     }
   strcpy(asmName,baseName);
   strcat(asmName,".asm");
@@ -244,7 +235,6 @@ int main(int argc, char** argv, char** envp) {
     if (use1805) printf("  1804/5/6 instructions\n");
     if (useAsm) printf("  Create .asm file\n");
     if (showAsm) printf("  Show assembly listing\n");
-    if (outMode == 'B') printf("  Produce binary output\n");
     if (outMode == 'I') printf("  Produce Intel hex output\n");
     if (outMode == 'R') printf("  Produce RCS hex output\n");
     if (showRuntime) printf("  Show runtime modules\n");
@@ -285,9 +275,6 @@ int main(int argc, char** argv, char** envp) {
   if (createLst) lstFile = fopen(lstName,"w");
   pass(sourceFile);
 //  if (outCount > 0) writeOutput();
-  if (outMode == 'B') {
-    write(outFile, image+lowestAddress, highestAddress-lowestAddress+1);
-    }
   close(outFile);
 //    for (i=0; i<numberOfVariables; i++) {
 //      if (useAsm) {

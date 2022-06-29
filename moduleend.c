@@ -130,26 +130,30 @@ void moduleEnd() {
       Asm("           db    0,0");
       Asm("           dw    0");
       Asm("fildes1_:  db    0,0,0,0");
-      Asm("           dw    FREE_+2");
+      Asm("           dw    dta1_");
       Asm("           db    0,0,0,0,0,0,0,0,0,0,0");
       Asm("file2_:    db    0,0");
       Asm("           db    0,0");
       Asm("           dw    0");
       Asm("fildes2_:  db    0,0,0,0");
-      Asm("           dw    FREE_+514");
+      Asm("           dw    dta2_");
       Asm("           db    0,0,0,0,0,0,0,0,0,0,0");
       Asm("file3_:    db    0,0");
       Asm("           db    0,0");
       Asm("           dw    0");
       Asm("fildes3_:  db    0,0,0,0");
-      Asm("           dw    FREE_+1026");
+      Asm("           dw    dta3_");
       Asm("           db    0,0,0,0,0,0,0,0,0,0,0");
       Asm("file4_:    db    0,0");
       Asm("           db    0,0");
       Asm("           dw    0");
       Asm("fildes4_:  db    0,0,0,0");
-      Asm("           dw    FREE_+1538");
+      Asm("           dw    dta4_");
       Asm("           db    0,0,0,0,0,0,0,0,0,0,0");
+      Asm("dta1_:     dw    512");
+      Asm("dta2_:     dw    512");
+      Asm("dta3_:     dw    512");
+      Asm("dta4_:     dw    512");
       }
     else {
       Asm("file1_:    equ   $");
