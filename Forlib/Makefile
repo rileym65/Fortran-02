@@ -321,3 +321,6 @@ clean:
 	-rm *.prg
 	-rm $(PROJECT)
 
+install:
+	cp forlib.lib /usr/local/lib
+
